@@ -174,16 +174,13 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
-	public void run() {
-		outer: while(true) {
-			auto it = this.getToken();
-			if(it.getTyp() == -99) {
-				continue;
-			}
-			//log("%s %d", it.toString(), it.getTyp());
-			if(it.getTyp() == termdollar) {
-				break outer;
-			}
-		}
+	private Token addExprAst() {
+		Token mulExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token addExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termAddExpression);
+		this.ast.append(addExpr.getTreeIdx());
+		this.ast.append(mulExpr.getTreeIdx());
+		return Token(mulExpr.getLoc(), termAddExpression, pos);
 	}
 }
