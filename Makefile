@@ -12,13 +12,14 @@ build: $(GEN) $(OBJS) Makefile
 	sh IncreBuildId.sh
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
-parsetable.d: d.dlr Makefile
+src/parsetable.d: d.dlr Makefile
 	../dalr/Dalr -i d.dlr -r src/parsetable.d -rm parsetable
 
-lextable.d: d.dlr d.dex Makefile
+src/lextable.d: d.dlr d.dex Makefile
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable
 
-parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d src/token.d Makefile
+parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d\
+src/token.d Makefile
 	dmd -c $(DFLAGS) src/parser.d
 
 lextable.o: src/lextable.d Makefile
