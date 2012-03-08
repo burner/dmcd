@@ -175,6 +175,133 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
+	private Token typOfAst() {
+		Token exp = this.tokenStack[-2];
+		size_t pos = this.ast.insert(termTypeof);
+		this.ast.append(exp.getTreeIdx());
+		return Token(this.tokenStack[-4].getLoc(), termTypeof, pos);
+	}
+
+	private Token typNTAst() {
+		Token baTy = this.tokenStack[-2];
+		Token de2 = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termTypeNT);
+		this.ast.append(baTy.getTreeIdx());
+		this.ast.append(de2.getTreeIdx());
+		return Token(baTy.getLoc(), termTypeNT, pos);
+	}
+
+	private Token basTypAst() {
+		Token idLst = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termBasicType);
+		this.ast.append(idLst.getTreeIdx());
+		return Token(this.tokenStack[-2].getLoc(), termBasicType, pos);
+	}
+	
+	private Token dec2aAst() {
+		Token baTy2 = this.tokenStack[-2];
+		Token de2 = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termDeclarator2);
+		this.ast.append(baTy2.getTreeIdx());
+		this.ast.append(de2.getTreeIdx());
+		return Token(baTy2.getLoc(), termDeclarator2, pos);
+	}
+
+	private Token dec2bAst() {
+		Token deSufOp = this.tokenStack[-1];
+		Token de2 = this.tokenStack[-3];
+		size_t pos = this.ast.insert(termDeclarator2);
+		this.ast.append(de2.getTreeIdx());
+		this.ast.append(deSufOp.getTreeIdx());
+		return Token(de2.getLoc(), termDeclarator2, pos);
+	}
+
+	private Token dec2cAst() {
+		Token de2 = this.tokenStack[-2];
+		//Token deSuOp = this.tokenStack[-1]; TODO check this
+		size_t pos = this.ast.insert(termDeclarator2);
+		this.ast.append(de2.getTreeIdx());
+		//this.ast.append(deSuOp.getTreeIdx());
+		return Token(de2.getLoc(), termDeclarator2, pos);
+	}
+
+	private Token basTyp2a() {
+		Token typNT = this.tokenStack[-2];
+		size_t pos = this.ast.insert(termBasicType2);
+		this.ast.append(typNT.getTreeIdx());
+		return Token(typNT.getLoc(), termBasicType2, pos);
+	}
+	
+	private Token basTyp2b() {
+		Token assiExp2 = this.tokenStack[-2];
+		Token assiExp1 = this.tokenStack[-4];
+		size_t pos = this.ast.insert(termBasicType2);
+		this.ast.append(assiExp1.getTreeIdx());
+		this.ast.append(assiExp2.getTreeIdx());
+		return Token(assiExp1.getLoc(), termBasicType2, pos);
+	}
+	
+	private Token idLstAst() {
+		Token idLst = this.tokenStack[-3];
+		Token id = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termIdentifierList);
+		this.ast.append(idLst.getTreeIdx());
+		this.ast.append(id.getTreeIdx());
+		return Token(idLst.getLoc(), termIdentifierList, pos);
+	}
+
+	private Token decSufOpaAst() {
+		Token decSufOp = this.tokenStack[-2];
+		Token decSuf = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termDeclaratorSuffixesOpt);
+		this.ast.append(decSufOp.getTreeIdx());
+		this.ast.append(decSuf.getTreeIdx());
+		return Token(decSufOp.getLoc(), termDeclaratorSuffixesOpt, pos);
+	}
+
+	private Token decSufOpbAst() {
+		Token decSuf = this.tokenStack[-1];
+		size_t pos = this.ast.insert(termDeclaratorSuffixesOpt);
+		this.ast.append(decSuf.getTreeIdx());
+		return Token(decSuf.getLoc(), termDeclaratorSuffixesOpt, pos);
+	}
+
+	private Token basTypNoIdLsta() {
+		Token idLst = this.tokenStack[-1];
+		Token typOf = this.tokenStack[-2];
+		size_t pos = this.ast.insert(termBasicTypeNoIdList);
+		this.ast.append(idLst.getTreeIdx());
+		this.ast.append(typOf.getTreeIdx());
+		return Token(idLst.getLoc(), termBasicTypeNoIdList, pos);
+	}
+
+	private Token basTypNoIdLstb() {
+		Token typeNT = this.tokenStack[-2];
+		Token typeCon = this.tokenStack[-4];
+		size_t pos = this.ast.insert(termBasicTypeNoIdList);
+		this.ast.append(typeCon.getTreeIdx());
+		this.ast.append(typeNT.getTreeIdx());
+		return Token(typeCon.getLoc(), termBasicTypeNoIdList, pos);
+	}
+
+	private Token tmpInsAst() {
+		Token tmpArgLstOpt = this.tokenStack[-2];
+		Token identi = this.tokenStack[-5];
+		size_t pos = this.ast.insert(termTemplateInstance);
+		this.ast.append(identi.getTreeIdx());
+		this.ast.append(tmpArgLstOpt.getTreeIdx());
+		return Token(identi.getLoc(), termTemplateInstance, pos);
+	}
+
+	private Token tmpArgLstAst() {
+		Token tmpArg = this.tokenStack[-1];
+		Token tmpArgLst = this.tokenStack[-3];
+		size_t pos = this.ast.insert(termTemplateArgumentList);
+		this.ast.append(tmpArgLst.getTreeIdx());
+		this.ast.append(tmpArg.getTreeIdx());
+		return Token(tmpArgLst.getLoc(), termTemplateArgumentList, pos);
+	}
+
 	private Token impExprAst() {
 		Token assiExpr = this.tokenStack[-2];
 		Token importToken = this.tokenStack[-4];

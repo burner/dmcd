@@ -73,10 +73,34 @@
 ">>>=" {: return Token(this.getLoc(), termunsignedrightshiftassign); :}
 "^=" {: return Token(this.getLoc(), termxorassign); :}
 "^^=" {: return Token(this.getLoc(), termxorxorassign); :}
+"bool" {: return Token(this.getLoc(), termbool); :}
+"byte" {: return Token(this.getLoc(), termbyte); :}
+"short" {: return Token(this.getLoc(), termshort); :}
+"int" {: return Token(this.getLoc(), termint); :}
+"long" {: return Token(this.getLoc(), termlong); :}
+"ubyte" {: return Token(this.getLoc(), termubyte); :}
+"ushort" {: return Token(this.getLoc(), termushort); :}
+"uint" {: return Token(this.getLoc(), termuint); :}
+"ulong" {: return Token(this.getLoc(), termulong); :}
+"char" {: return Token(this.getLoc(), termchar); :}
+"wchar" {: return Token(this.getLoc(), termwchar); :}
+"dchar" {: return Token(this.getLoc(), termdchar); :}
+"float" {: return Token(this.getLoc(), termfloatSym); :}
+"double" {: return Token(this.getLoc(), termdouble); :}
+"real" {: return Token(this.getLoc(), termreal); :}
+"ifloat" {: return Token(this.getLoc(), termifloat); :}
+"idouble" {: return Token(this.getLoc(), termidouble); :}
+"ireal" {: return Token(this.getLoc(), termireal); :}
+"cfloat" {: return Token(this.getLoc(), termcfloat); :}
+"cdouble" {: return Token(this.getLoc(), termcdouble); :}
+"creal" {: return Token(this.getLoc(), termcreal); :}
+"void" {: return Token(this.getLoc(), termvoid); :}
+"typeof" {: return Token(this.getLoc(), termtypeof); :}
 "[:digit:]+" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
 "[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloat, this.lexText.getString()); :}
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
-"[:alpha:_]+" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+"identifier" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+
 %%
 "[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
 %%

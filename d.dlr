@@ -1,4 +1,6 @@
-S := Expression;
+%left identifierIdenTemp
+
+S := Declarator2;
 
 Expression :=
 	AssignExpression;
@@ -10,35 +12,36 @@ ExpressionOpt :=
 
 AssignExpression :=
 	ConditionalExpression;
-	| ConditionalExpression assign AssignExpression; {: ret = assiExprAst(); :}
+	| ConditionalExpression assign AssignExpression; 
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression plusassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression minusassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression multassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression divassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression modassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression andassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression orassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression xorassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression notequal AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression tildeassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression leftshiftassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression rightshiftassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression unsignedrightshiftassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 	| ConditionalExpression xorxorassign AssignExpression; 
-		{: ret = assiExprAst(); :}
+		{: ret = this.assiExprAst(); :}
 
 ConditionalExpression :=
 	OrOrExpression;
@@ -170,40 +173,98 @@ TypeSpecialization :=
 	| super;
 	| return;
 
+Typeof :=
+	typeof lparen Expression rparen; {: ret = this.typOfAst(); :}
+
 TypeNT :=
 	BasicType;
-	| BasicType Declarator2;
+	| BasicType Declarator2; {: ret = this.typNTAst(); :}
 
 BasicType :=
 	BasicTypeNoIdList;
-	| dot IdentifierList;
+	| dot IdentifierList; {: ret = this.basTypAst(); :}
 	| IdentifierList;
 
 Declarator2 :=
 	BasicType2;
-	| BasicType2 Declarator2;
+	| BasicType2 Declarator2; {: ret = this.dec2aAst(); :}
+	//| lparen Declarator2 rparen DeclaratorSuffixesOpt; Check this TODO
 	| lparen Declarator2 rparen DeclaratorSuffixesOpt;
+		{: ret = this.dec2bAst(); :}
+	| lparen Declarator2 rparen;
+		{: ret = this.dec2cAst(); :}
 
 BasicType2 :=
 	tilde;
-	| lbrack rbrack;
-	| lbrack Expression rbrack;
-	| lbrack TypeNT rbrack;
+	| lbrack rbrack; 
+		{: ret = Token(this.tokenStack[-2].getLoc(), termBasicType2); :}
+	| lbrack Expression rbrack; {: ret = this.basTyp2a(); :}
+	| lbrack TypeNT rbrack; {: ret = this.basTyp2a(); :}
 	| lbrack AssignExpression dotdot AssignExpression rbrack;
+		{: ret = this.basTyp2b(); :}
 	// | delegate Parameters;
 	// | function Parameters;
 
 // some are missing here
 IdentifierList := 
-	identifier;
-	| IdentifierList dot identifier;
+	identifier %prec identifierIdenTemp;
+	| IdentifierList dot identifier; {: ret = idLstAst(); :}
+	| IdentifierList dot TemplateInstance; {: ret = idLstAst(); :}
 
 DeclaratorSuffixesOpt :=
-	DeclaratorSuffixesOpt DeclaratorSuffix;
-	| epsilon;
+	DeclaratorSuffixesOpt DeclaratorSuffix; {: ret = decSufOpaAst(); :}
+	| DeclaratorSuffix; {: ret = decSufOpbAst(); :}
+	//| epsilon; TODO check this
 
 // some are missing here
 DeclaratorSuffix :=
-	lbrack rbrack;
-	| lbrack Expression rbrack;
-	| lbrack TypeNT rbrack;
+	lbrack rbrack; 
+		{: ret = Token(this.tokenStack[-2].getLoc(), termDeclaratorSuffix); :}
+	| lbrack Expression rbrack; {: ret = this.tokenStack[-2]; :}
+	| lbrack TypeNT rbrack; {: ret = this.tokenStack[-2]; :}
+
+BasicTypeNoIdList :=
+	bool;
+	| byte;
+	| ubyte;
+	| short;
+	| ushort;
+	| int;
+	| uint;
+	| long;
+	| ulong;
+	| char;
+	| wchar;
+	| dchar;
+	| floatSym;
+	| double;
+	| real;
+	| ifloat;
+	| idouble;
+	| ireal;
+	| cfloat;
+	| cdouble;
+	| creal;
+	| void;
+	| Typeof;
+	| Typeof IdentifierList; {: ret = this.basTypNoIdLsta(); :}
+	| TypeConstructor lparen TypeNT rparen; {: ret = this.basTypNoIdLstb(); :}
+
+TemplateInstance :=
+	identifier bang lparen TemplateArgumentListOpt rparen;
+		{: ret = this.tmpInsAst(); :}
+	| identifier bang lparen rparen;
+
+TemplateArgumentListOpt :=
+	TemplateArgumentList;
+	// | epsilon; I Hope this is ok TODO
+
+TemplateArgumentList :=
+	TemplateArgumentList comma TemplateArgument; 
+		{: ret = this.tmpArgLstAst(); :}
+	| TemplateArgument;
+
+TemplateArgument :=
+	TypeNT;
+	| AssignExpression;
+	| identifier;
