@@ -92,6 +92,10 @@ CmpExpression :=
 		{: ret = this.cmpExprAst(); :}
 	| ShiftExpression in ShiftExpression; {: ret = this.cmpExprAst(); :}
 
+IsNotIs :=
+	is;
+	| bangis;
+
 ShiftExpression :=
 	AddExpression;
 	| ShiftExpression leftshift AddExpression; {: ret = this.shiExprAst(); :}
@@ -128,3 +132,78 @@ PostfixExpression :=
 	| integer; {: ret = this.posExprAst(); :}
 	| null;  {: ret = this.posExprAst(); :}
 	| true; {: ret = this.posExprAst(); :}
+	| AssertExpression;
+	| IsExpression;
+	| MixinExpression;
+
+AssertExpression :=
+	assert lparen AssignExpression rparen; {: ret = this.asseExprAst1(); :}
+	| assert lparen AssignExpression comma AssignExpression rparen;
+		{: ret = this.asseExprAst2(); :}
+
+MixinExpression :=
+	mixin lparen AssignExpression rparen; {: ret = this.mixExprAst(); :}
+
+ImportExpression :=
+	import lparen AssignExpression rparen; {: ret = this.impExprAst(); :}
+
+IsExpression :=
+	IsNotIs lparen TypeNT rparen;
+	| IsNotIs lparen TypeNT colon TypeSpecialization rparen;
+	| IsNotIs lparen TypeNT equal TypeSpecialization rparen;
+	| IsNotIs lparen TypeNT identifier rparen;
+	| IsNotIs lparen TypeNT identifier colon TypeSpecialization rparen;
+	| IsNotIs lparen TypeNT identifier equal TypeSpecialization rparen;
+	| IsNotIs lparen TypeNT identifier colon TypeSpecialization comma TemplateParameterList rparen;
+	| IsNotIs lparen TypeNT identifier equal TypeSpecialization comma TemplateParameterList rparen;
+
+TypeSpecialization :=
+	TypeNT;
+	| typedef;
+	| struct;
+	| union;
+	| class;
+	| interface;
+	| enum;
+	| function;
+	| delegate;
+	| super;
+	| return;
+
+TypeNT :=
+	BasicType;
+	| BasicType Declarator2;
+
+BasicType :=
+	BasicTypeNoIdList;
+	| dot IdentifierList;
+	| IdentifierList;
+
+Declarator2 :=
+	BasicType2;
+	| BasicType2 Declarator2;
+	| lparen Declarator2 rparen DeclaratorSuffixesOpt;
+
+BasicType2 :=
+	tilde;
+	| lbrack rbrack;
+	| lbrack Expression rbrack;
+	| lbrack TypeNT rbrack;
+	| lbrack AssignExpression dotdot AssignExpression rbrack;
+	// | delegate Parameters;
+	// | function Parameters;
+
+// some are missing here
+IdentifierList := 
+	identifier;
+	| IdentifierList dot identifier;
+
+DeclaratorSuffixesOpt :=
+	DeclaratorSuffixesOpt DeclaratorSuffix;
+	| epsilon;
+
+// some are missing here
+DeclaratorSuffix :=
+	lbrack rbrack;
+	| lbrack Expression rbrack;
+	| lbrack TypeNT rbrack;

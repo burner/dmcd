@@ -175,6 +175,40 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
+	private Token impExprAst() {
+		Token assiExpr = this.tokenStack[-2];
+		Token importToken = this.tokenStack[-4];
+		size_t pos = this.ast.insert(importToken, termMixinExpression);
+		this.ast.append(assiExpr.getTreeIdx());
+		return Token(importToken.getLoc(), termImportExpression, pos);
+	}
+
+	private Token mixExprAst() {
+		Token assiExpr = this.tokenStack[-2];
+		Token mixinToken = this.tokenStack[-4];
+		size_t pos = this.ast.insert(mixinToken, termMixinExpression);
+		this.ast.append(assiExpr.getTreeIdx());
+		return Token(mixinToken.getLoc(), termMixinExpression, pos);
+	}
+
+	private Token asseExprAst1() {
+		Token assiExpr = this.tokenStack[-2];
+		Token asse = this.tokenStack[-4];
+		size_t pos = this.ast.insert(asse, termAssertExpression);
+		this.ast.append(assiExpr.getTreeIdx());
+		return Token(asse.getLoc(), termAssertExpression, pos);
+	}
+
+	private Token asseExprAst2() {
+		Token assiExpr2 = this.tokenStack[-2];
+		Token assiExpr1 = this.tokenStack[-4];
+		Token asse = this.tokenStack[-6];
+		size_t pos = this.ast.insert(asse, termAssertExpression);
+		this.ast.append(assiExpr1.getTreeIdx());
+		this.ast.append(assiExpr2.getTreeIdx());
+		return Token(asse.getLoc(), termAssertExpression, pos);
+	}
+
 	private Token exprExprAst() {
 		Token assExpr = this.tokenStack[-1];
 		Token comma = this.tokenStack[-2];

@@ -11,7 +11,27 @@
 "!is" {: return Token(this.getLoc(), termbangis); :}
 "is" {: return Token(this.getLoc(), termis); :}
 "in" {: return Token(this.getLoc(), termin); :}
+"assert" {: return Token(this.getLoc(), termassert); :}
+"import" {: return Token(this.getLoc(), termimport); :}
+"mixin" {: return Token(this.getLoc(), termmixin); :}
+"typedef" {: return Token(this.getLoc(), termtypedef); :}
+"struct" {: return Token(this.getLoc(), termstruct); :}
+"union" {: return Token(this.getLoc(), termunion); :}
+"class" {: return Token(this.getLoc(), termclass); :}
+"interface" {: return Token(this.getLoc(), terminterface); :}
+"enum" {: return Token(this.getLoc(), termenum); :}
+"function" {: return Token(this.getLoc(), termfunction); :}
+"delegate" {: return Token(this.getLoc(), termdelegate); :}
+"super" {: return Token(this.getLoc(), termsuper); :}
+"return" {: return Token(this.getLoc(), termreturn); :}
+"," {: return Token(this.getLoc(), termcomma); :}
+"(" {: return Token(this.getLoc(), termlparen); :}
+")" {: return Token(this.getLoc(), termrparen); :}
+"\\[" {: return Token(this.getLoc(), termlbrack); :}
+"\\]" {: return Token(this.getLoc(), termrbrack); :}
 "==" {: return Token(this.getLoc(), termequal); :}
+"." {: return Token(this.getLoc(), termdot); :}
+".." {: return Token(this.getLoc(), termdotdot); :}
 "!=" {: return Token(this.getLoc(), termnotequal); :}
 "<" {: return Token(this.getLoc(), termless); :}
 "<=" {: return Token(this.getLoc(), termlessequal); :}
@@ -56,3 +76,7 @@
 "[:digit:]+" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
 "[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloat, this.lexText.getString()); :}
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
+"[:alpha:_]+" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+%%
+"[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+%%
