@@ -51,7 +51,7 @@ class Parser {
 	}
 
 	private TableItem getAction(const Token input) const {
-		auto retError = Pair!(int,TableItem)(int.min, 
+		auto retError = Pair!(int,TableItem)(-42, 
 			TableItem(TableType.Error, 0));
 
 		//log("%d %d", this.parseStack.back(), input.getTyp());
@@ -140,7 +140,8 @@ class Parser {
 			this.printTokenStack();
 			//println(this.ast.toString());
 			action = this.getAction(input); 
-			//log("%s", action.toString());
+			log(false, "input %d state %d %s", input.getTyp(), 
+				this.parseStack.back(), action.toString());
 			if(action.getTyp() == TableType.Accept) {
 				//log("%s %s", action.toString(), input.toString());
 				this.parseStack.popBack(rules[action.getNumber()].length-1);
@@ -174,13 +175,57 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
+	private Token cmpExprAst() {
+		Token shiftExpr2 = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token shiftExpr1 = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termCmpExpression);
+		this.ast.append(shiftExpr1.getTreeIdx());
+		this.ast.append(shiftExpr2.getTreeIdx());
+		return Token(shiftExpr1.getLoc(), termCmpExpression, pos);
+	}
+
+	private Token shiExprAst() {
+		Token addExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token shiftExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termShiftExpression);
+		this.ast.append(shiftExpr.getTreeIdx());
+		this.ast.append(addExpr.getTreeIdx());
+		return Token(shiftExpr.getLoc(), termShiftExpression, pos);
+	}
+
 	private Token addExprAst() {
 		Token mulExpr = this.tokenStack[-1];
 		Token op = this.tokenStack[-2];
 		Token addExpr = this.tokenStack[-3];
 		size_t pos = this.ast.insert(op, termAddExpression);
-		this.ast.append(addExpr.getTreeIdx());
 		this.ast.append(mulExpr.getTreeIdx());
+		this.ast.append(addExpr.getTreeIdx());
 		return Token(mulExpr.getLoc(), termAddExpression, pos);
+	}
+
+	private Token mulExprAst() {
+		Token unExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token mulExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termMulExpression);
+		this.ast.append(unExpr.getTreeIdx());
+		this.ast.append(mulExpr.getTreeIdx());
+		return Token(mulExpr.getLoc(), termMulExpression, pos);
+	}
+
+	private Token unExprAst() {
+		Token op = this.tokenStack[-2];
+		Token unExpr = this.tokenStack[-1];
+		size_t pos = this.ast.insert(op, termUnaryExpression);
+		this.ast.append(unExpr.getTreeIdx());
+		return Token(op.getLoc(), termUnaryExpression, pos);
+	}
+
+	private Token posExprAst() {
+		Token t = this.tokenStack.back();
+		size_t pos = this.ast.insert(t, termPostfixExpression);
+		return Token(t.getLoc(), termPostfixExpression, pos);
 	}
 }

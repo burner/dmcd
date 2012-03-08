@@ -1,84 +1,66 @@
-S := AddExpression;
+S := CmpExpression;
+
+CmpExpression :=
+	ShiftExpression;
+	| ShiftExpression equal ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression notequal ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression is ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression bangis ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression less ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression lessequal ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression greater ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression greaterequal ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression bangsquareequal ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression bangsquare ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression square ShiftExpression; {: ret = this.cmpExprAst(); :}
+	| ShiftExpression squareequal ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression banggreater ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression banggreaterequal ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression bangsmaller ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression bangsmallerequal ShiftExpression; 
+		{: ret = this.cmpExprAst(); :}
+	| ShiftExpression in ShiftExpression; {: ret = this.cmpExprAst(); :}
+%%
+NotIs :=
+	bangis; {: ret = this.notIsAst(); :}
+
+IsNotIs :=
+	is; {: ret = this.isNotIsAst(); :}
+	| bangis; {: ret = this.isNotIsAst(); :}
+%%
+
+ShiftExpression :=
+	AddExpression;
+	| ShiftExpression leftshift AddExpression; {: ret = this.shiExprAst(); :}
+	| ShiftExpression rightshift AddExpression; {: ret = this.shiExprAst(); :}
+	| ShiftExpression unsignedrightshift AddExpression; 
+		{: ret = this.shiExprAst(); :}
 
 AddExpression :=
 	MulExpression;
 	| AddExpression plus MulExpression; {: ret = this.addExprAst(); :}
-
-	| AddExpression minus MulExpression; {:
-		Token mulExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token addExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termAddExpression);
-		this.ast.append(addExpr.getTreeIdx());
-		this.ast.append(mulExpr.getTreeIdx());
-		ret = Token(mulExpr.getLoc(), termAddExpression, pos); :}
+	| AddExpression minus MulExpression; {: ret = this.addExprAst(); :}
 
 MulExpression :=
 	UnaryExpression;
-	| MulExpression star UnaryExpression; {:
-		Token unExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token mulExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termMulExpression);
-		this.ast.append(mulExpr.getTreeIdx());
-		this.ast.append(unExpr.getTreeIdx());
-		ret = Token(mulExpr.getLoc(), termMulExpression, pos); :}
-
-	| MulExpression div UnaryExpression; {:
-		Token unExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token mulExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termMulExpression);
-		this.ast.append(mulExpr.getTreeIdx());
-		this.ast.append(unExpr.getTreeIdx());
-		ret = Token(mulExpr.getLoc(), termMulExpression, pos); :}
-
-	| MulExpression modulo UnaryExpression; {:
-		Token unExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token mulExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termMulExpression);
-		this.ast.append(mulExpr.getTreeIdx());
-		this.ast.append(unExpr.getTreeIdx());
-		ret = Token(mulExpr.getLoc(), termMulExpression, pos); :}
+	| MulExpression star UnaryExpression; {: ret = this.mulExprAst(); :}
+	| MulExpression div UnaryExpression; {: ret = this.mulExprAst(); :}
+	| MulExpression modulo UnaryExpression; {: ret = this.mulExprAst(); :}
 
 UnaryExpression :=
 	PostfixExpression;
-	| increment UnaryExpression; {:Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx()); 
-		ret = Token(op.getLoc(), termUnaryExpression, pos); :}
-
-	| decrement UnaryExpression; {:Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx()); 
-		ret = Token(op.getLoc(), termUnaryExpression, pos); :}
-
-	| minus UnaryExpression; {:Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx()); 
-		ret = Token(op.getLoc(), termUnaryExpression, pos); :}
-
-	| plus UnaryExpression; {:Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx()); 
-		ret = Token(op.getLoc(), termUnaryExpression, pos); :}
-
-	| star UnaryExpression; {:Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx()); 
-		ret = Token(op.getLoc(), termUnaryExpression, pos); :}
+	| increment UnaryExpression; {: ret = this.unExprAst(); :}
+	| decrement UnaryExpression; {: ret = this.unExprAst(); :}
+	| minus UnaryExpression; {: ret = this.unExprAst(); :}
+	| plus UnaryExpression; {: ret = this.unExprAst(); :}
+	| star UnaryExpression; {: ret = this.unExprAst(); :}
 
 PostfixExpression :=
-	integer; {:Token t = this.tokenStack.back();
-		size_t pos = this.ast.insert(t, termPostfixExpression);
-		ret = Token(t.getLoc(), termPostfixExpression, pos); :}
-
-	| float; {:Token t = this.tokenStack.back();
-		size_t pos = this.ast.insert(t, termPostfixExpression);
-		ret = Token(t.getLoc(), termPostfixExpression, pos); :}
+	integer; {: ret = this.posExprAst(); :}
+	| float; {: ret = this.posExprAst(); :}

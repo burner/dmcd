@@ -9,7 +9,7 @@ import hurt.util.pair;
 import token;
 import parsetable;
 
-import std.stdio;
+import std.process;
 
 struct ASTNode {
 	private Token token;
@@ -138,10 +138,9 @@ class AST {
 		graph.writeString("splines=true overlap=false];\n");
 		graph.writeString("ratio = auto;\n");
 		for(size_t idx = 0; idx < this.tree.getSize(); idx++) {
-			writeln(this.tree[idx].toString());
 			graph.writeString(format("\"state%u\" [style = \"filled\" " ~
-				"penwidth = 1 fillcolor = \"white\" fontname = " ~
-				"\"Courier\" shape = \"Mrecord\" label =<%s>];\n", idx,
+				"penwidth = 1 fillcolor = \"white\" " ~
+				"shape = \"Mrecord\" label =<%s>];\n", idx,
 				this.tree[idx].toAST()));
 		}
 		graph.writeString("\n");
@@ -156,5 +155,7 @@ class AST {
 		graph.writeString("\n");
 		graph.writeString("}\n");
 		graph.close();
+		system("dot -T png " ~ filename ~ " > " ~ filename ~ 
+			".png");
 	}
 }

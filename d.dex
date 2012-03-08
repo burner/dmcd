@@ -5,6 +5,26 @@
 "*" {: return Token(this.getLoc(), termstar); :}
 "%" {: return Token(this.getLoc(), termmodulo); :}
 "\+" {: return Token(this.getLoc(), termplus); :}
+"<<" {: return Token(this.getLoc(), termleftshift); :}
+">>" {: return Token(this.getLoc(), termrightshift); :}
+">>>" {: return Token(this.getLoc(), termunsignedrightshift); :}
+"!is" {: return Token(this.getLoc(), termbangis); :}
+"is" {: return Token(this.getLoc(), termis); :}
+"in" {: return Token(this.getLoc(), termin); :}
+"==" {: return Token(this.getLoc(), termequal); :}
+"!=" {: return Token(this.getLoc(), termnotequal); :}
+"<" {: return Token(this.getLoc(), termless); :}
+"<=" {: return Token(this.getLoc(), termlessequal); :}
+">" {: return Token(this.getLoc(), termgreater); :}
+">=" {: return Token(this.getLoc(), termgreaterequal); :}
+"!<>=" {: return Token(this.getLoc(), termbangsquareequal); :}
+"!<>" {: return Token(this.getLoc(), termbangsquare); :}
+"<>" {: return Token(this.getLoc(), termsquare); :}
+"<>=" {: return Token(this.getLoc(), termsquareequal); :}
+"!>" {: return Token(this.getLoc(), termbanggreater); :}
+"!>=" {: return Token(this.getLoc(), termbanggreaterequal); :}
+"!<" {: return Token(this.getLoc(), termbangsmaller); :}
+"!<=" {: return Token(this.getLoc(), termbangsmallerequal); :}
 "[:digit:]+" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
 "[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloat, this.lexText.getString()); :}
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
