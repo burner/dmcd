@@ -98,7 +98,8 @@ class AST {
 
 	// insert a new token to the tree
 	public size_t insert(Token token, int typ, bool dummyToken) { 
-		this.tree.pushBack(ASTNode(token, typ, dummyToken, this.childs.getSize()));
+		this.tree.pushBack(ASTNode(token, typ, dummyToken, 
+			this.childs.getSize()));
 		return this.tree.getSize()-1;
 	}
 

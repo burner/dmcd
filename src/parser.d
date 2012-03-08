@@ -175,6 +175,89 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
+	private Token exprExprAst() {
+		Token assExpr = this.tokenStack[-1];
+		Token comma = this.tokenStack[-2];
+		Token expr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(termExpression);
+		this.ast.append(assExpr.getTreeIdx());
+		this.ast.append(expr.getTreeIdx());
+		return Token(expr.getLoc(), termExpression, pos);
+	}
+
+	private Token assiExprAst() {
+		Token assiExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token conExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termAssignExpression);
+		this.ast.append(conExpr.getTreeIdx());
+		this.ast.append(assiExpr.getTreeIdx());
+		return Token(conExpr.getLoc(), termAssignExpression, pos);
+	}
+
+	private Token condExprAst() {
+		Token condExp = this.tokenStack[-1];
+		Token colon = this.tokenStack[-2];
+		Token expr = this.tokenStack[-3];
+		Token quest = this.tokenStack[-4];
+		Token orOrExp = this.tokenStack[-5];
+		size_t pos = this.ast.insert(termConditionalExpression);
+		this.ast.append(orOrExp.getTreeIdx());
+		this.ast.append(expr.getTreeIdx());
+		this.ast.append(condExp.getTreeIdx());
+		return Token(orOrExp.getLoc(), termConditionalExpression, pos);
+	}
+
+	private Token orOrExprAst() {
+		Token andAndExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token orOrExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termXorExpression);
+		this.ast.append(orOrExpr.getTreeIdx());
+		this.ast.append(andAndExpr.getTreeIdx());
+		return Token(orOrExpr.getLoc(), termXorExpression, pos);
+	}
+
+	private Token andAndExprAst() {
+		Token orExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token andAndExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termXorExpression);
+		this.ast.append(andAndExpr.getTreeIdx());
+		this.ast.append(orExpr.getTreeIdx());
+		return Token(andAndExpr.getLoc(), termXorExpression, pos);
+	}
+
+	private Token orExprAst() {
+		Token xorExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token orExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termXorExpression);
+		this.ast.append(orExpr.getTreeIdx());
+		this.ast.append(xorExpr.getTreeIdx());
+		return Token(orExpr.getLoc(), termXorExpression, pos);
+	}
+
+	private Token xorExprAst() {
+		Token andExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token xorExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termXorExpression);
+		this.ast.append(xorExpr.getTreeIdx());
+		this.ast.append(andExpr.getTreeIdx());
+		return Token(andExpr.getLoc(), termXorExpression, pos);
+	}
+
+	private Token andExprAst() {
+		Token cmpExpr = this.tokenStack[-1];
+		Token op = this.tokenStack[-2];
+		Token andExpr = this.tokenStack[-3];
+		size_t pos = this.ast.insert(op, termAndExpression);
+		this.ast.append(andExpr.getTreeIdx());
+		this.ast.append(cmpExpr.getTreeIdx());
+		return Token(andExpr.getLoc(), termAndExpression, pos);
+	}
+
 	private Token cmpExprAst() {
 		Token shiftExpr2 = this.tokenStack[-1];
 		Token op = this.tokenStack[-2];

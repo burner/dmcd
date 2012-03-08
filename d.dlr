@@ -1,4 +1,69 @@
-S := CmpExpression;
+S := Expression;
+
+Expression :=
+	AssignExpression;
+	| Expression comma AssignExpression; {: ret = exprExprAst(); :}
+
+ExpressionOpt :=
+	Expression;
+	| epsilon;
+
+AssignExpression :=
+	ConditionalExpression;
+	| ConditionalExpression assign AssignExpression; {: ret = assiExprAst(); :}
+	| ConditionalExpression plusassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression minusassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression multassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression divassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression modassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression andassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression orassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression xorassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression notequal AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression tildeassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression leftshiftassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression rightshiftassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression unsignedrightshiftassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+	| ConditionalExpression xorxorassign AssignExpression; 
+		{: ret = assiExprAst(); :}
+
+ConditionalExpression :=
+	OrOrExpression;
+	| OrOrExpression questionmark Expression colon ConditionalExpression;
+		{: ret = this.condExprAst(); :}
+
+OrOrExpression :=
+	AndAndExpression;
+	| OrOrExpression logicor AndAndExpression; {: ret = this.orOrExprAst(); :}
+
+AndAndExpression :=
+	OrExpression;
+	| AndAndExpression logicand OrExpression; {: ret = this.andAndExprAst(); :}
+
+OrExpression :=
+	XorExpression;
+	| OrExpression or XorExpression; {: ret = this.orExprAst(); :}
+
+XorExpression :=
+	AndExpression;
+	| XorExpression xor AndExpression; {: ret = this.xorExprAst(); :}
+
+AndExpression :=
+	CmpExpression;
+	| AndExpression and CmpExpression; {: ret = this.andExprAst(); :}
 
 CmpExpression :=
 	ShiftExpression;
@@ -26,14 +91,6 @@ CmpExpression :=
 	| ShiftExpression bangsmallerequal ShiftExpression; 
 		{: ret = this.cmpExprAst(); :}
 	| ShiftExpression in ShiftExpression; {: ret = this.cmpExprAst(); :}
-%%
-NotIs :=
-	bangis; {: ret = this.notIsAst(); :}
-
-IsNotIs :=
-	is; {: ret = this.isNotIsAst(); :}
-	| bangis; {: ret = this.isNotIsAst(); :}
-%%
 
 ShiftExpression :=
 	AddExpression;
@@ -55,12 +112,19 @@ MulExpression :=
 
 UnaryExpression :=
 	PostfixExpression;
-	| increment UnaryExpression; {: ret = this.unExprAst(); :}
+	| and UnaryExpression; {: ret = this.unExprAst(); :}
+	| bang UnaryExpression; {: ret = this.unExprAst(); :}
 	| decrement UnaryExpression; {: ret = this.unExprAst(); :}
+	| increment UnaryExpression; {: ret = this.unExprAst(); :}
 	| minus UnaryExpression; {: ret = this.unExprAst(); :}
 	| plus UnaryExpression; {: ret = this.unExprAst(); :}
 	| star UnaryExpression; {: ret = this.unExprAst(); :}
+	| tilde UnaryExpression; {: ret = this.unExprAst(); :}
 
 PostfixExpression :=
-	integer; {: ret = this.posExprAst(); :}
+	dollarsym; {: ret = this.posExprAst(); :}
+	| false; {: ret = this.posExprAst(); :}
 	| float; {: ret = this.posExprAst(); :}
+	| integer; {: ret = this.posExprAst(); :}
+	| null;  {: ret = this.posExprAst(); :}
+	| true; {: ret = this.posExprAst(); :}
