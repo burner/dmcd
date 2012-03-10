@@ -175,6 +175,66 @@ class Parser {
 		//log("%s", this.ast.toString());
 	}
 
+	private Token isExprAstA() {
+		Token typNT = this.tokenStack[-2];
+		Token iNi = this.tokenStack[-4];
+		size_t pos = this.ast.insert(iNi, termIsExpression);
+		this.ast.append(typNT.getTreeIdx());
+		return Token(iNi.getLoc(), termIsExpression, pos);
+	}
+
+	private Token isExprAstB() {
+		Token typSpe = this.tokenStack[-2];
+		Token op = this.tokenStack[-3];
+		Token typNT = this.tokenStack[-4];
+		Token iNi = this.tokenStack[-6];
+		size_t pos = this.ast.insert(iNi, termIsExpression);
+		this.ast.append(typNT.getTreeIdx());
+		this.ast.append(op.getTreeIdx());
+		this.ast.append(typSpe.getTreeIdx());
+		return Token(iNi.getLoc(), termIsExpression, pos);
+	}
+
+	private Token isExprAstC() {
+		Token iden = this.tokenStack[-2];
+		Token typNT = this.tokenStack[-3];
+		Token iNi = this.tokenStack[-5];
+		size_t pos = this.ast.insert(iNi, termIsExpression);
+		this.ast.append(typNT.getTreeIdx());
+		this.ast.append(iden.getTreeIdx());
+		return Token(iNi.getLoc(), termIsExpression, pos);
+	}
+
+	private Token isExprAstD() {
+		Token typSpe = this.tokenStack[-2];
+		Token op = this.tokenStack[-3];
+		Token iden = this.tokenStack[-4];
+		Token typNT = this.tokenStack[-5];
+		Token iNi = this.tokenStack[-7];
+		size_t pos = this.ast.insert(iNi, termIsExpression);
+		this.ast.append(typNT.getTreeIdx());
+		this.ast.append(iden.getTreeIdx());
+		this.ast.append(op.getTreeIdx());
+		this.ast.append(typSpe.getTreeIdx());
+		return Token(iNi.getLoc(), termIsExpression, pos);
+	}
+
+	private Token isExprAstE() {
+		Token tmpParList = this.tokenStack[-2];
+		Token typSpe = this.tokenStack[-4];
+		Token op = this.tokenStack[-5];
+		Token iden = this.tokenStack[-6];
+		Token typNT = this.tokenStack[-7];
+		Token iNi = this.tokenStack[-9];
+		size_t pos = this.ast.insert(iNi, termIsExpression);
+		this.ast.append(tmpParList.getTreeIdx());
+		this.ast.append(typSpe.getTreeIdx());
+		this.ast.append(op.getTreeIdx());
+		this.ast.append(iden.getTreeIdx());
+		this.ast.append(typNT.getTreeIdx());
+		return Token(iNi.getLoc(), termIsExpression, pos);
+	}
+
 	private Token typOfAst() {
 		Token exp = this.tokenStack[-2];
 		size_t pos = this.ast.insert(termTypeof);

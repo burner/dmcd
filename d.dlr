@@ -1,6 +1,526 @@
 %left identifierIdenTemp
 
-S := Declarator2;
+S := seatdModule;
+
+seatdModule :=
+	DeclDefsOpt;
+	| ModuleKeyword ModuleName semicolon;
+	| ModuleKeyword ModuleName semicolon DeclDefsOpt;
+
+//ModuleDeclarationOpt :=
+//	ModuleKeyword ModuleName semicolon;
+//	| epsilon;
+
+ModuleKeyword :=
+	module;
+
+ModuleName :=
+	ModuleName dot identifier;
+	| identifier;
+
+DeclDefsOpt :=
+	DeclDefsOpt DeclDef;
+	DeclDef;
+
+DeclDef :=
+	ConditionalDeclaration;
+	| DeclDefNoConditional;
+
+DeclDefNoConditional :=
+	AttributeSpecifier;
+	| StaticAssert;
+	| Declaration;
+	| ImportDeclaration;
+	| EnumDeclaration;
+	| TemplateMixin;
+	| TemplateDeclaration;
+	| FunctionTemplateDeclaration;
+	| ClassTemplateDeclaration;
+	| InterfaceTemplateDeclaration;
+	| StructTemplateDeclaration;
+	| ClassDeclaration;
+	| InterfaceDeclaration;
+	| AggregateDeclaration;
+	| Constructor;
+	| Destructor;
+	| Invariant;
+	| UnitTest;
+	| StaticConstructor;
+	| StaticDestructor;
+	| MixinDeclaration;
+	| semicolon;
+	| DebugSpecification;
+	| VersionSpecification;
+
+ConditionalDeclaration :=
+	Condition colon;
+	| Condition DeclarationBlock;
+	| Condition DeclarationBlock else DeclarationBlock;
+
+Condition :=
+	VersionCondition;
+	| DebugCondition;
+	| StaticIfCondition;
+
+VersionCondition :=
+	version lparen integer rparen;
+	| version lparen identifier rparen;
+
+VersionSpecification :=
+	version assign integer semicolon;
+	| version assign identifier semicolon;
+
+DebugCondition :=
+	debug lparen integer rparen;
+	| debug lparen identifier rparen;
+	| debug;
+
+DebugSpecification :=
+	debug assign identifier semicolon;
+	| debug assign integer semicolon;
+
+StaticIfCondition :=
+	static if lparen AssignExpression rparen;
+
+StaticAssert :=
+	static assert lparen AssignExpression comma AssignExpression rparen 
+		semicolon;
+	| static assert lparen AssignExpression rparen semicolon;
+
+ImportDeclaration :=
+	import ImportList semicolon;
+
+ImportList :=
+	Import comma ImportList;
+	| Import ImportBindListOpt;
+	| Import;
+
+Import :=
+	identifier assign ModuleName;
+	| ModuleName;
+
+ImportBindListOpt :=
+	colon ImportBindList;
+	| epsilon;
+
+ImportBindList :=
+	ImportBindList comma ImportBind;
+	| ImportBind;
+
+ImportBind :=
+	identifier assign identifier;
+	| identifier;
+
+AttributeSpecifier :=
+	Attributes colon DeclDefsOpt;
+	| Attributes DeclarationBlock;
+
+Attributes :=
+	Attributes Attribute;
+	| Attribute;
+
+Attribute :=
+	StorageClassAttribute;
+	| ProtectionAttribute;
+	| LinkageAttribute;
+	| AlignAttribute;
+	| Pragma;
+
+StorageClassAttribute :=
+	synchronized;
+	| deprecated;
+	| static;
+	| final;
+	| override;
+	| abstract;
+	| const;
+	| auto;
+	| scope;
+
+ProtectionAttribute :=
+	private;
+	| package;
+	| protected;
+	| public;
+	| export;
+
+
+LinkageAttribute :=
+	extern lparen identifier rparen;
+	| extern lparen identifier increment rparen;
+	| extern;
+
+AlignAttribute :=
+	align lparen integer rparen;
+	| align;
+
+Pragma :=
+	pragma lparen identifier comma Expression rparen;
+	| pragma lparen identifier rparen;
+
+FunctionBody :=
+	InStatement OutStatement BodyStatement;
+	| OutStatement InStatement BodyStatement;
+	| InStatement BodyStatement;
+	| OutStatement BodyStatement;
+	| BodyStatement;
+
+FunctionBodyOpt :=
+	FunctionBody;
+	| semicolon;
+
+InStatement :=
+	in BlockStatement;
+
+OutStatement :=
+	out lparen identifier rparen BlockStatement;
+	| out BlockStatement;
+
+BodyStatement :=
+	body BlockStatement;
+	| BlockStatement;
+
+ClassDeclaration :=
+	class identifier BaseClassListOpt ClassBody;
+
+BaseClassListOpt :=
+	colon BaseClassList;
+	| epsilon;
+
+BaseClassList :=
+	BaseClassList comma SuperClass;
+	| SuperClass;
+
+SuperClass :=
+	ProtectionNT IdentifierList;
+	| IdentifierList;
+
+ProtectionNT :=
+	private;
+	| package;
+	| public;
+	| export;
+
+ClassBody:=
+	lcurly rcurly;
+	| lcurly ClassBodyDeclarations rcurly;
+
+ClassBodyDeclarations :=
+	ClassBodyDeclarations ClassBodyDeclaration;
+	| ClassBodyDeclaration;
+
+ClassBodyDeclaration :=
+	DeclDef;
+	| ClassAllocator;
+	| ClassDeallocator;
+
+Constructor :=
+	this Parameters FunctionBodyOpt;
+
+Destructor :=
+	tilde this lparen rparen FunctionBodyOpt;
+
+StaticConstructor :=
+	static this lparen rparen FunctionBody;
+
+StaticDestructor :=
+	static tilde this lparen rparen FunctionBody;
+
+Invariant :=
+	invariant BlockStatement;
+	| invariant lparen rparen BlockStatement;
+
+UnitTest :=
+	unittest FunctionBody;
+
+ClassAllocator :=
+	new Parameters FunctionBody;
+
+ClassDeallocator :=
+	delete Parameters FunctionBody;
+
+InterfaceDeclaration :=
+	interface identifier SuperInterfaceListOpt InterfaceBody;
+
+SuperInterfaceListOpt :=
+	colon SuperInterfaces;
+	| epsilon;
+
+SuperInterfaces :=
+	SuperInterfaces comma SuperInterface;
+	| SuperInterface;
+
+SuperInterface :=
+	ProtectionNT IdentifierList;
+	| IdentifierList;
+
+InterfaceBody :=
+	lcurly DeclDefsOpt rcurly;
+
+AggregateDeclaration :=
+	Tag IdentifierOpt StructBody;
+	| Tag IdentifierOpt semicolon;
+
+Tag :=
+	struct;
+	| union;
+
+StructBody :=
+	lcurly rcurly;
+	| lcurly rcurly semicolon;
+	| lcurly StructBodyDeclarations rcurly;
+	| lcurly StructBodyDeclarations rcurly semicolon;
+
+StructBodyDeclarations :=
+	StructBodyDeclarations StructBodyDeclaration;
+	| StructBodyDeclaration;
+
+StructBodyDeclaration :=
+	DeclDef;
+	| StructAllocator;
+	| StructDeallocator;
+
+StructAllocator :=
+	ClassAllocator;
+
+StructDeallocator :=
+	ClassDeallocator;
+
+ConditionalStatement :=
+	Condition Statement else Statement;
+	| Condition Statement;
+
+Statement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+StatementList :=
+	StatementList Statement;
+	| Statement;
+
+NoScopeNonEmptyStatement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+NoScopeStatement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+NonEmptyStatement :=
+	DeclDefNoConditional;
+	| NonEmptyNoDeclStatement;
+
+NonEmptyNoDeclStatement :=
+	LabeledStatement;
+	| ExpressionStatement;
+	| IfStatement;
+	| ConditionalStatement;
+	| WhileStatement;
+	| DoStatement;
+	| ForStatement;
+	| ForeachStatement;
+	| ForeachRangeStatement;
+	| SwitchStatement;
+	| CaseStatement;
+	| DefaultStatement;
+	| ContinueStatement;
+	| BreakStatement;
+	| ReturnStatement;
+	| GotoStatement;
+	| WithStatement;
+	| SynchronizedStatement;
+	| TryStatement;
+	| ScopeGuardStatement;
+	| ThrowStatement;
+	| VolatileStatement;
+	| AsmStatement;
+	| PragmaStatement;
+
+ScopeStatement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+NoDeclScopeStatement :=
+	NonEmptyNoDeclStatement;
+	| BlockStatement;
+
+LabeledStatement :=
+	identifier colon NoScopeStatement;
+
+BlockStatement :=
+	lcurly rcurly;
+	| lcurly StatementList rcurly;
+
+ExpressionStatement :=
+	Expression semicolon;
+
+IfStatement :=
+	if lparen IfCondition rparen ScopeStatement;
+	| if lparen IfCondition rparen ScopeStatement else ScopeStatement;
+
+IfCondition :=
+	Expression;
+	| auto identifier assign Expression;
+	| BasicType Declarator assign Expression;
+
+WhileStatement :=
+	while lparen Expression rparen ScopeStatement;
+
+DoStatement :=
+	do ScopeStatement while lparen Expression rparen;
+
+ForStatement :=
+	for lparen NoScopeNonEmptyStatement ExpressionOpt semicolon ExpressionOpt 
+		rparen ScopeStatement;
+
+ForeachStatement :=
+	Foreach lparen ForeachTypeList semicolon Expression rparen ScopeStatement;
+
+Foreach :=
+	foreach;
+	| foreach_reverse;
+
+ForeachTypeList :=
+	ForeachTypeList comma ForeachType;
+	| ForeachType;
+
+ForeachType :=
+	inout TypeNT identifier;
+	| ref TypeNT identifier;
+	| TypeNT identifier;
+	| inout identifier;
+	| ref identifier;
+	| identifier;
+
+ForeachRangeStatement :=
+	Foreach lparen ForeachType semicolon AssignExpression dotdot 
+		AssignExpression rparen ScopeStatement;
+
+SwitchStatement :=
+	switch lparen Expression rparen BlockStatement;
+
+CaseStatement :=
+	case Expression colon ;
+
+DefaultStatement :=
+	default colon;
+
+ContinueStatement :=
+	continue semicolon;
+	| continue identifier semicolon;
+
+BreakStatement :=
+	break semicolon;
+	| break identifier semicolon;
+
+ReturnStatement :=
+	return semicolon;
+	| return Expression semicolon;
+
+GotoStatement :=
+	goto identifier semicolon;
+	| goto default semicolon;
+	| goto case semicolon;
+	| goto case Expression semicolon;
+
+WithStatement :=
+	with lparen Expression rparen ScopeStatement;
+	| with lparen TemplateInstance rparen ScopeStatement;
+
+SynchronizedStatement :=
+	synchronized NoDeclScopeStatement;
+	| synchronized lparen Expression rparen ScopeStatement;
+
+TryStatement :=
+	try ScopeStatement Catches;
+	| try ScopeStatement Catches FinallyStatement;
+	| try ScopeStatement FinallyStatement;
+
+Catches :=
+	LastCatch;
+	| Catch Catches;
+	| Catch;
+
+LastCatch :=
+	catch NoScopeNonEmptyStatement;
+
+Catch :=
+	catch lparen Parameter rparen NoScopeNonEmptyStatement;
+
+FinallyStatement :=
+	finally NoScopeNonEmptyStatement;
+
+ThrowStatement :=
+	throw Expression semicolon;
+
+ScopeGuardStatement :=
+	scope lparen identifier rparen Statement;
+
+VolatileStatement :=
+	volatile Statement;
+	| volatile semicolon;
+
+AsmStatement :=
+	asm lcurly rcurly;
+	| asm lcurly AsmInstructionList rcurly;
+
+AsmInstructionList :=
+	AsmInstructionList AsmInstruction;
+	| AsmInstruction;
+
+AsmInstruction :=
+	epsilon;
+
+PragmaStatement :=
+	Pragma NoScopeStatement;
+
+DeclarationBlock :=
+	lcurly DeclDefsOpt rcurly;
+	| DeclDef;
+
+MixinDeclaration :=
+	mixin lparen Expression rparen semicolon;
+
+Declaration :=
+	TypedefAlias Declaration2;
+	| TypedefAlias Attributes Declaration2;
+	| TypedefAlias Attributes identifier assign AssignExpression semicolon;
+	| Attributes Declaration2;
+	| Attributes IdentifierSimpleInitializerList semicolon;
+	| Declaration2;
+
+TypedefAlias :=
+	typedef;
+	| alias;
+
+Declaration2 :=
+	BasicType Declarator FunctionBody;
+	| BasicType Declarators semicolon;
+
+IdentifierSimpleInitializerList :=
+	IdentifierSimpleInitializerList comma identifier assign AssignExpression;
+	| identifier assign AssignExpression;
+
+Declarators :=
+	DeclaratorInitializer;
+	| DeclaratorInitializer comma IdentifierInitializerList;
+
+DeclaratorInitializer :=
+	Declarator;
+	| Declarator assign Initializer;
+
+IdentifierInitializerList :=
+	IdentifierInitializerList comma IdentifierInitializer;
+	| IdentifierInitializer;
+
+IdentifierInitializer :=
+	identifier;
+	| identifier assign Initializer;
+
+BasicType :=
+	BasicTypeNoIdList;
+	| dot IdentifierList;
+	| IdentifierList;
 
 Expression :=
 	AssignExpression;
@@ -151,14 +671,22 @@ ImportExpression :=
 	import lparen AssignExpression rparen; {: ret = this.impExprAst(); :}
 
 IsExpression :=
-	IsNotIs lparen TypeNT rparen;
-	| IsNotIs lparen TypeNT colon TypeSpecialization rparen;
-	| IsNotIs lparen TypeNT equal TypeSpecialization rparen;
+	IsNotIs lparen TypeNT rparen; 
+		{: ret = this.isExprAstA(); :}
+	| IsNotIs lparen TypeNT colon TypeSpecialization rparen; 
+		{: ret = this.isExprAstB(); :}
+	| IsNotIs lparen TypeNT equal TypeSpecialization rparen; 
+		{: ret = this.isExprAstB(); :}
 	| IsNotIs lparen TypeNT identifier rparen;
+		{: ret = this.isExprAstC(); :}
 	| IsNotIs lparen TypeNT identifier colon TypeSpecialization rparen;
+		{: ret = this.isExprAstD(); :}
 	| IsNotIs lparen TypeNT identifier equal TypeSpecialization rparen;
+		{: ret = this.isExprAstD(); :}
 	| IsNotIs lparen TypeNT identifier colon TypeSpecialization comma TemplateParameterList rparen;
+		{: ret = this.isExprAstE(); :}
 	| IsNotIs lparen TypeNT identifier equal TypeSpecialization comma TemplateParameterList rparen;
+		{: ret = this.isExprAstE(); :}
 
 TypeSpecialization :=
 	TypeNT;
@@ -185,10 +713,10 @@ BasicType :=
 	| dot IdentifierList; {: ret = this.basTypAst(); :}
 	| IdentifierList;
 
+//| lparen Declarator2 rparen DeclaratorSuffixesOpt; Check this TODO
 Declarator2 :=
 	BasicType2;
 	| BasicType2 Declarator2; {: ret = this.dec2aAst(); :}
-	//| lparen Declarator2 rparen DeclaratorSuffixesOpt; Check this TODO
 	| lparen Declarator2 rparen DeclaratorSuffixesOpt;
 		{: ret = this.dec2bAst(); :}
 	| lparen Declarator2 rparen;
@@ -202,8 +730,8 @@ BasicType2 :=
 	| lbrack TypeNT rbrack; {: ret = this.basTyp2a(); :}
 	| lbrack AssignExpression dotdot AssignExpression rbrack;
 		{: ret = this.basTyp2b(); :}
-	// | delegate Parameters;
-	// | function Parameters;
+	| delegate Parameters;
+	| function Parameters;
 
 // some are missing here
 IdentifierList := 
@@ -251,13 +779,13 @@ BasicTypeNoIdList :=
 	| TypeConstructor lparen TypeNT rparen; {: ret = this.basTypNoIdLstb(); :}
 
 TemplateInstance :=
-	identifier bang lparen TemplateArgumentListOpt rparen;
+	identifier bang lparen TemplateArgumentList rparen;
 		{: ret = this.tmpInsAst(); :}
 	| identifier bang lparen rparen;
 
+// | epsilon; I Hope this is ok TODO
 TemplateArgumentListOpt :=
 	TemplateArgumentList;
-	// | epsilon; I Hope this is ok TODO
 
 TemplateArgumentList :=
 	TemplateArgumentList comma TemplateArgument; 
@@ -268,3 +796,57 @@ TemplateArgument :=
 	TypeNT;
 	| AssignExpression;
 	| identifier;
+
+TemplateParameterListOpt :=
+	TemplateParameterList;
+	| epsilon;
+
+TemplateParameterList :=
+	TemplateParameterList comma TemplateParameter;
+	| TemplateParameter;
+
+TemplateParameter :=
+	TemplateAliasParameter;
+	| TemplateTupleParameter;
+	| TemplateValueParameter;
+	| TemplateTypeParameter;
+
+TemplateTypeParameter :=
+	identifier colon TypeNT;
+	| identifier colon TypeNT assign TypeNT;
+	| identifier;
+
+//BasicType Declarator TemplateValueParameterSpecializationOpt TemplateValueParameterDefaultOpt;
+TemplateValueParameter :=
+	BasicType Declarator;
+	| BasicType Declarator colon ConditionalExpression;
+	| BasicType Declarator assign ConditionalExpression;
+	| BasicType Declarator colon ConditionalExpression assign ConditionalExpression;
+
+//TemplateValueParameterSpecializationOpt :=
+//	colon ConditionalExpression;
+//	| epsilon;
+//
+//TemplateValueParameterDefaultOpt :=
+//	assign ConditionalExpression;
+//	| epsilon;
+
+//alias identifier TemplateAliasParameterSpecializationOpt 
+//TemplateAliasParameterDefaultOpt;
+TemplateAliasParameter :=
+	alias identifier colon TypeNT assign TypeNT; 
+	| alias identifier assign TypeNT; 
+	| alias identifier colon TypeNT; 
+	| alias identifier; 
+
+//TemplateAliasParameterSpecializationOpt :=
+//	colon TypeNT;
+//	| epsilon;
+//
+//TemplateAliasParameterDefaultOpt :=
+//	assign TypeNT;
+//	| epsilon;
+
+TemplateTupleParameter :=
+	identifier dotdotdot;
+

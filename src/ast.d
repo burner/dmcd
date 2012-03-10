@@ -19,13 +19,14 @@ struct ASTNode {
 
 	public this(immutable(int) typ, size_t childPos) {
 		this.typ = typ;
-		this.dummyToken = false;
+		this.dummyToken = true;
 		//this.childs = new Deque!(size_t)(16);
 		this.initChilds(childPos);
 	}
 
 	public this(Token token, int typ, size_t childPos) {
 		this(typ, childPos);
+		this.dummyToken = false;
 		this.token = token;
 	}
 

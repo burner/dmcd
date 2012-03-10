@@ -4,6 +4,7 @@ import hurt.container.deque;
 import hurt.time.stopwatch;
 import hurt.io.stdio;
 import hurt.util.getopt;
+import hurt.util.slog;
 
 import lexer;
 import token;
