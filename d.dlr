@@ -101,7 +101,6 @@ Import :=
 
 ImportBindListOpt :=
 	colon ImportBindList;
-	| epsilon;
 
 ImportBindList :=
 	ImportBindList comma ImportBind;
@@ -113,6 +112,7 @@ ImportBind :=
 
 AttributeSpecifier :=
 	Attributes colon DeclDefsOpt;
+	Attributes colon;
 	| Attributes DeclarationBlock;
 
 Attributes :=
@@ -182,10 +182,11 @@ BodyStatement :=
 
 ClassDeclaration :=
 	class identifier BaseClassListOpt ClassBody;
+	class identifier ClassBody;
 
+// had epsilon
 BaseClassListOpt :=
 	colon BaseClassList;
-	| epsilon;
 
 BaseClassList :=
 	BaseClassList comma SuperClass;
@@ -241,10 +242,10 @@ ClassDeallocator :=
 
 InterfaceDeclaration :=
 	interface identifier SuperInterfaceListOpt InterfaceBody;
+	interface identifier InterfaceBody;
 
 SuperInterfaceListOpt :=
 	colon SuperInterfaces;
-	| epsilon;
 
 SuperInterfaces :=
 	SuperInterfaces comma SuperInterface;
@@ -256,6 +257,7 @@ SuperInterface :=
 
 InterfaceBody :=
 	lcurly DeclDefsOpt rcurly;
+	lcurly rcurly;
 
 AggregateDeclaration :=
 	Tag IdentifierOpt StructBody;
@@ -372,6 +374,10 @@ DoStatement :=
 ForStatement :=
 	for lparen NoScopeNonEmptyStatement ExpressionOpt semicolon ExpressionOpt 
 		rparen ScopeStatement;
+	for lparen NoScopeNonEmptyStatement semicolon ExpressionOpt 
+		rparen ScopeStatement;
+	for lparen NoScopeNonEmptyStatement ExpressionOpt semicolon rparen 
+		ScopeStatement;
 
 ForeachStatement :=
 	Foreach lparen ForeachTypeList semicolon Expression rparen ScopeStatement;
@@ -460,22 +466,23 @@ VolatileStatement :=
 	volatile Statement;
 	| volatile semicolon;
 
+//| asm lcurly AsmInstructionList rcurly;
 AsmStatement :=
 	asm lcurly rcurly;
-	| asm lcurly AsmInstructionList rcurly;
 
-AsmInstructionList :=
-	AsmInstructionList AsmInstruction;
-	| AsmInstruction;
-
-AsmInstruction :=
-	epsilon;
+//AsmInstructionList :=
+//	AsmInstructionList AsmInstruction;
+//	| AsmInstruction;
+//
+//AsmInstruction :=
+//	epsilon;
 
 PragmaStatement :=
 	Pragma NoScopeStatement;
 
 DeclarationBlock :=
 	lcurly DeclDefsOpt rcurly;
+	lcurly rcurly;
 	| DeclDef;
 
 MixinDeclaration :=
@@ -522,13 +529,260 @@ BasicType :=
 	| dot IdentifierList;
 	| IdentifierList;
 
+BasicTypeNoIdList :=
+	bool;
+	| byte;
+	| ubyte;
+	| short;
+	| ushort;
+	| int;
+	| uint;
+	| long;
+	| ulong;
+	| char;
+	| wchar;
+	| dchar;
+	| floatSym;
+	| double;
+	| real;
+	| ifloat;
+	| idouble;
+	| ireal;
+	| cfloat;
+	| cdouble;
+	| creal;
+	| void;
+	| Typeof;
+	| Typeof IdentifierList; {: ret = this.basTypNoIdLsta(); :}
+	| TypeConstructor lparen TypeNT rparen; {: ret = this.basTypNoIdLstb(); :}
+
+BasicType2 :=
+	tilde;
+	| lbrack rbrack;
+	| lbrack Expression rbrack;
+	| lbrack TypeNT rbrack;
+	| lbrack AssignExpression dotdot AssignExpression rbrack;
+	| delegate Parameters;
+	| function Parameters;
+
+TypeConstructor :=
+	const;
+	| invariant;
+
+Declarator :=
+	BasicType2 DeclaratorOpt;
+	| identifier DeclaratorSuffixesOpt;
+	| lparen Declarator rparen DeclaratorSuffixesOpt;
+
+
+// | epsilon; I Hope this is ok TODO
+TemplateArgumentListOpt :=
+	TemplateArgumentList;
+
+TemplateArgumentList :=
+	TemplateArgumentList comma TemplateArgument; 
+		{: ret = this.tmpArgLstAst(); :}
+	| TemplateArgument;
+
+Declarator2 :=
+	BasicType2;
+	| BasicType2 Declarator2;
+	| lparen Declarator2 rparen DeclaratorSuffixesOpt;
+
+Parameters :=
+	lparen rparen;
+	| lparen ParameterList rparen;
+
+ParameterListOpt :=
+	ParameterList;
+	| epsilon;
+
+ParameterList :=
+	Parameter;
+	| Parameter comma ParameterList;
+	| Parameter dotdotdot;
+	| dotdotdot;
+
+Parameter :=
+	Parameter2;
+	| InOut Parameter2;
+	| ParameterStorageClasses Parameter2;
+	| InOut ParameterStorageClasses Parameter2;
+
+Parameter2 :=
+	BasicType DeclaratorOpt;
+	| BasicType DeclaratorOpt assign AssignExpression;
+
+ParameterStorageClasses :=
+	ParameterStorageClasses ParameterStorageClass;
+	| ParameterStorageClass;
+
+ParameterStorageClass :=
+	const;
+	| invariant;
+	| final;
+	| scope;
+	| static;
+
+InOut :=
+	inout;
+	| in;
+	| out;
+	| ref;
+	| lazy;
+
+Initializer :=
+	void;
+	| NonVoidInitializer;
+
+NonVoidInitializer :=
+	AssignExpression;
+	| ArrayInitializer;
+	| StructInitializer;
+
+ArrayInitializer :=
+	lbrack rbrack;
+	| lbrack ArrayStructMemberInitializers rbrack;
+
+StructInitializer :=
+	lcurly rcurly;
+	| lcurly ArrayStructMemberInitializers rcurly;
+
+ArrayStructMemberInitializers :=
+	ArrayStructMemberInitializers comma ArrayStructMemberInitializer;
+	| ArrayStructMemberInitializers comma;
+	| ArrayStructMemberInitializer;
+
+ArrayStructMemberInitializer :=
+	NonVoidInitializer;
+	| identifier colon NonVoidInitializer;
+
+EnumDeclaration :=
+	enum identifier EnumBaseTypeOpt EnumBody;
+	| enum EnumBaseTypeOpt EnumBody;
+
+EnumBaseTypeOpt :=
+	colon TypeNT;
+	| epsilon;
+
+EnumBody :=
+	semicolon;
+	| lcurly EnumMembers rcurly;
+
+EnumMembers :=
+	EnumMembers comma EnumMember;
+	| EnumMembers comma;
+	| EnumMember;
+
+EnumMember :=
+	identifier EnumInitializerOpt;
+
+EnumInitializerOpt :=
+	assign AssignExpression;
+	| epsilon;
+
+TemplateDeclaration :=
+	template identifier lparen TemplateParameterListOpt rparen lcurly 
+		DeclDefsOpt rcurly;
+
+
+TemplateParameterListOpt :=
+	TemplateParameterList;
+	| epsilon;
+
+TemplateParameterList :=
+	TemplateParameterList comma TemplateParameter;
+	| TemplateParameter;
+
+TemplateParameter :=
+	TemplateAliasParameter;
+	| TemplateTupleParameter;
+	| TemplateValueParameter;
+	| TemplateTypeParameter;
+
+TemplateTypeParameter :=
+	identifier colon TypeNT;
+	| identifier colon TypeNT assign TypeNT;
+	| identifier;
+
+//BasicType Declarator TemplateValueParameterSpecializationOpt TemplateValueParameterDefaultOpt;
+TemplateValueParameter :=
+	BasicType Declarator;
+	| BasicType Declarator colon ConditionalExpression;
+	| BasicType Declarator assign ConditionalExpression;
+	| BasicType Declarator colon ConditionalExpression assign ConditionalExpression;
+
+//TemplateValueParameterSpecializationOpt :=
+//	colon ConditionalExpression;
+//	| epsilon;
+//
+//TemplateValueParameterDefaultOpt :=
+//	assign ConditionalExpression;
+//	| epsilon;
+
+//alias identifier TemplateAliasParameterSpecializationOpt 
+//TemplateAliasParameterDefaultOpt;
+TemplateAliasParameter :=
+	alias identifier colon TypeNT assign TypeNT; 
+	| alias identifier assign TypeNT; 
+	| alias identifier colon TypeNT; 
+	| alias identifier; 
+
+//TemplateAliasParameterSpecializationOpt :=
+//	colon TypeNT;
+//	| epsilon;
+//
+//TemplateAliasParameterDefaultOpt :=
+//	assign TypeNT;
+//	| epsilon;
+
+TemplateTupleParameter :=
+	identifier dotdotdot;
+
+ClassTemplateDeclaration :=
+	class identifier lparen TemplateParameterListOpt rparen BaseClassListOpt 
+		ClassBody;
+
+InterfaceTemplateDeclaration :=
+	interface identifier lparen TemplateParameterListOpt rparen 
+		SuperInterfaceListOpt InterfaceBody;
+
+StructTemplateDeclaration :=
+	struct identifier lparen TemplateParameterListOpt rparen StructBody;
+
+FunctionTemplateDeclaration :=
+	TypeIdent lparen TemplateParameterList rparen lparen ParameterListOpt 
+		rparen FunctionBody;
+
+TypeIdent :=
+	BasicType identifier;
+	| TypeNT identifier;
+
+TemplateInstance :=
+	identifier bang lparen TemplateArgumentList rparen;
+		{: ret = this.tmpInsAst(); :}
+	| identifier bang lparen rparen;
+
+TemplateArgument :=
+	TypeNT;
+	| AssignExpression;
+	| identifier;
+
+TemplateMixin :=
+	mixin identifier TemplateMixin2 IdentifierOpt semicolon;
+	mixin identifier IdentifierOpt semicolon;
+
+TemplateMixin2 :=
+	bang lparen TemplateArgumentListOpt rparen;
+	bang lparen rparen;
+
 Expression :=
 	AssignExpression;
 	| Expression comma AssignExpression; {: ret = exprExprAst(); :}
 
+// had epsilon;
 ExpressionOpt :=
 	Expression;
-	| epsilon;
 
 AssignExpression :=
 	ConditionalExpression;
@@ -630,6 +884,10 @@ AddExpression :=
 	MulExpression;
 	| AddExpression plus MulExpression; {: ret = this.addExprAst(); :}
 	| AddExpression minus MulExpression; {: ret = this.addExprAst(); :}
+	| CatExpression;
+
+CatExpression :=
+	AddExpression tilde MulExpression;
 
 MulExpression :=
 	UnaryExpression;
@@ -647,6 +905,10 @@ UnaryExpression :=
 	| plus UnaryExpression; {: ret = this.unExprAst(); :}
 	| star UnaryExpression; {: ret = this.unExprAst(); :}
 	| tilde UnaryExpression; {: ret = this.unExprAst(); :}
+	| lparen TypeNT rparen dot identifier;
+	| NewExpression;
+	| delete UnaryExpression;
+	| cast lparen TypeNT rparen UnaryExpression;
 
 PostfixExpression :=
 	dollarsym; {: ret = this.posExprAst(); :}
@@ -656,19 +918,50 @@ PostfixExpression :=
 	| null;  {: ret = this.posExprAst(); :}
 	| true; {: ret = this.posExprAst(); :}
 	| AssertExpression;
-	| IsExpression;
 	| MixinExpression;
+	| IsExpression;
+	| PostfixExpression2;
+
+PostfixExpression2 :=
+	PrimaryExpression;
+	| PostfixExpression2 dot identifier;
+	| PostfixExpression2 dot TemplateInstance;
+	| PostfixExpression2 increment;
+	| PostfixExpression2 decrement;
+	| PostfixExpression2 lparen ArgumentList rparen;
+	| PostfixExpression2 lparen rparen;
+	| PostfixExpression2 lbrack ArgumentList rbrack;
+	| PostfixExpression2 lbrack rbrack;
+	| PostfixExpression2 lbrack AssignExpression dotdot AssignExpression 
+		rbrack;
+
+PrimaryExpression :=
+	identifier;
+	| dot identifier;
+	| TemplateInstance;
+	| dot TemplateInstance;
+	| this;
+	| super;
+	| characterliteral;
+	| StringLiterals;
+	| ArrayLiteral;
+	| AssocArrayLiteral;
+	| FunctionLiteral;
+	| ImportExpression;
+	| BasicTypeNoIdList dot identifier;
+	| typeid lparen TypeNT rparen;
+	| lparen Expression rparen;
+	| TraitsExpression;
 
 AssertExpression :=
-	assert lparen AssignExpression rparen; {: ret = this.asseExprAst1(); :}
+	assert lparen AssignExpression rparen;
 	| assert lparen AssignExpression comma AssignExpression rparen;
-		{: ret = this.asseExprAst2(); :}
 
 MixinExpression :=
-	mixin lparen AssignExpression rparen; {: ret = this.mixExprAst(); :}
+	mixin lparen AssignExpression rparen;
 
 ImportExpression :=
-	import lparen AssignExpression rparen; {: ret = this.impExprAst(); :}
+	import lparen AssignExpression rparen;
 
 IsExpression :=
 	IsNotIs lparen TypeNT rparen; 
@@ -701,152 +994,64 @@ TypeSpecialization :=
 	| super;
 	| return;
 
-Typeof :=
-	typeof lparen Expression rparen; {: ret = this.typOfAst(); :}
+StringLiterals :=
+	astring;
+	| StringLiterals astring;
 
-TypeNT :=
-	BasicType;
-	| BasicType Declarator2; {: ret = this.typNTAst(); :}
+ArrayLiteral :=
+	lbrack ArgumentList rbrack;
+	| lbrack rbrack;
 
-BasicType :=
-	BasicTypeNoIdList;
-	| dot IdentifierList; {: ret = this.basTypAst(); :}
-	| IdentifierList;
+AssocArrayLiteral :=
+	lbrack KeyValuePairs rbrack;
 
-//| lparen Declarator2 rparen DeclaratorSuffixesOpt; Check this TODO
-Declarator2 :=
-	BasicType2;
-	| BasicType2 Declarator2; {: ret = this.dec2aAst(); :}
-	| lparen Declarator2 rparen DeclaratorSuffixesOpt;
-		{: ret = this.dec2bAst(); :}
-	| lparen Declarator2 rparen;
-		{: ret = this.dec2cAst(); :}
+KeyValuePairs:=
+	KeyValuePair;
+	| KeyValuePair comma KeyValuePairs;
 
-BasicType2 :=
-	tilde;
-	| lbrack rbrack; 
-		{: ret = Token(this.tokenStack[-2].getLoc(), termBasicType2); :}
-	| lbrack Expression rbrack; {: ret = this.basTyp2a(); :}
-	| lbrack TypeNT rbrack; {: ret = this.basTyp2a(); :}
-	| lbrack AssignExpression dotdot AssignExpression rbrack;
-		{: ret = this.basTyp2b(); :}
-	| delegate Parameters;
-	| function Parameters;
+KeyValuePair :=
+	ConditionalExpression colon ConditionalExpression;
 
-// some are missing here
-IdentifierList := 
-	identifier %prec identifierIdenTemp;
-	| IdentifierList dot identifier; {: ret = idLstAst(); :}
-	| IdentifierList dot TemplateInstance; {: ret = idLstAst(); :}
+FunctionLiteral :=
+	function TypeOpt lparen ParameterListOpt rparen FunctionBody;
+	| delegate TypeOpt lparen ParameterListOpt rparen FunctionBody;
+	| function TypeOpt FunctionBody;
+	| delegate TypeOpt FunctionBody;
+	| lparen ParameterListOpt rparen FunctionBody;
+	| FunctionBody;
 
-DeclaratorSuffixesOpt :=
-	DeclaratorSuffixesOpt DeclaratorSuffix; {: ret = decSufOpaAst(); :}
-	| DeclaratorSuffix; {: ret = decSufOpbAst(); :}
-	//| epsilon; TODO check this
+NewExpression :=
+	NewArguments TypeNT lbrack AssignExpression rbrack;
+	| NewArguments TypeNT lparen ArgumentList rparen;
+	| NewArguments TypeNT lparen rparen;
+	| NewArguments TypeNT;
+	| NewArguments ClassArguments BaseClassListOpt lcurly DeclDefsOpt rcurly;
 
-// some are missing here
-DeclaratorSuffix :=
-	lbrack rbrack; 
-		{: ret = Token(this.tokenStack[-2].getLoc(), termDeclaratorSuffix); :}
-	| lbrack Expression rbrack; {: ret = this.tokenStack[-2]; :}
-	| lbrack TypeNT rbrack; {: ret = this.tokenStack[-2]; :}
+NewArguments :=
+	new lparen ArgumentList rparen;
+	new lparen rparen;
+	| new;
 
-BasicTypeNoIdList :=
-	bool;
-	| byte;
-	| ubyte;
-	| short;
-	| ushort;
-	| int;
-	| uint;
-	| long;
-	| ulong;
-	| char;
-	| wchar;
-	| dchar;
-	| floatSym;
-	| double;
-	| real;
-	| ifloat;
-	| idouble;
-	| ireal;
-	| cfloat;
-	| cdouble;
-	| creal;
-	| void;
-	| Typeof;
-	| Typeof IdentifierList; {: ret = this.basTypNoIdLsta(); :}
-	| TypeConstructor lparen TypeNT rparen; {: ret = this.basTypNoIdLstb(); :}
+ClassArguments :=
+	class lparen ArgumentList rparen;
+	class lparen rparen;
+	| class;
 
-TemplateInstance :=
-	identifier bang lparen TemplateArgumentList rparen;
-		{: ret = this.tmpInsAst(); :}
-	| identifier bang lparen rparen;
+// hat an epsilon;
+ArgumentList :=
+	Expression;
 
-// | epsilon; I Hope this is ok TODO
-TemplateArgumentListOpt :=
-	TemplateArgumentList;
+TraitsExpression :=
+	__traits lparen identifier comma TraitsArguments rparen;
 
-TemplateArgumentList :=
-	TemplateArgumentList comma TemplateArgument; 
-		{: ret = this.tmpArgLstAst(); :}
-	| TemplateArgument;
+TraitsArguments :=
+	TraitsArguments comma TraitsArgument;
+	| TraitsArgument;
 
-TemplateArgument :=
-	TypeNT;
-	| AssignExpression;
-	| identifier;
+TraitsArgument :=
+	AssignExpression;
+	| TypeNT;
 
-TemplateParameterListOpt :=
-	TemplateParameterList;
+IdentifierOpt :=
+	identifier;
 	| epsilon;
-
-TemplateParameterList :=
-	TemplateParameterList comma TemplateParameter;
-	| TemplateParameter;
-
-TemplateParameter :=
-	TemplateAliasParameter;
-	| TemplateTupleParameter;
-	| TemplateValueParameter;
-	| TemplateTypeParameter;
-
-TemplateTypeParameter :=
-	identifier colon TypeNT;
-	| identifier colon TypeNT assign TypeNT;
-	| identifier;
-
-//BasicType Declarator TemplateValueParameterSpecializationOpt TemplateValueParameterDefaultOpt;
-TemplateValueParameter :=
-	BasicType Declarator;
-	| BasicType Declarator colon ConditionalExpression;
-	| BasicType Declarator assign ConditionalExpression;
-	| BasicType Declarator colon ConditionalExpression assign ConditionalExpression;
-
-//TemplateValueParameterSpecializationOpt :=
-//	colon ConditionalExpression;
-//	| epsilon;
-//
-//TemplateValueParameterDefaultOpt :=
-//	assign ConditionalExpression;
-//	| epsilon;
-
-//alias identifier TemplateAliasParameterSpecializationOpt 
-//TemplateAliasParameterDefaultOpt;
-TemplateAliasParameter :=
-	alias identifier colon TypeNT assign TypeNT; 
-	| alias identifier assign TypeNT; 
-	| alias identifier colon TypeNT; 
-	| alias identifier; 
-
-//TemplateAliasParameterSpecializationOpt :=
-//	colon TypeNT;
-//	| epsilon;
-//
-//TemplateAliasParameterDefaultOpt :=
-//	assign TypeNT;
-//	| epsilon;
-
-TemplateTupleParameter :=
-	identifier dotdotdot;
-
