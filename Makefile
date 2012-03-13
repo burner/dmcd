@@ -8,12 +8,15 @@ all: build
 run: build
 	./dmcd
 
+parsetable: d2.dlr
+	../dalr/Dalr -i d2.dlr -r src/parsetable.d -rm parsetable
+
 build: $(GEN) $(OBJS) Makefile
 	sh IncreBuildId.sh
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
-src/parsetable.d: d.dlr Makefile
-	../dalr/Dalr -i d.dlr -r src/parsetable.d -rm parsetable
+src/parsetable.d: d2.dlr Makefile
+	../dalr/Dalr -i d2.dlr -r src/parsetable.d -rm parsetable
 
 src/lextable.d: d.dlr d.dex Makefile
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable

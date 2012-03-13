@@ -1,0 +1,557 @@
+S := Module;
+
+Module :=
+	ModuleDeclaration DeclDefs;
+	| ModuleDeclaration;
+	| DeclDefs;
+
+ModuleDeclaration :=
+	module ModuleFullyQualifiedName semicolon;
+
+ModuleFullyQualifiedName :=
+	ModuleName;
+	| Packages dot ModuleName;
+
+ModuleName :=
+	Identifier;
+
+Packages :=
+	PackageName;
+	| Packages dot PackageName;
+
+PackageName :=
+	Identifier;
+
+DeclDefs:=
+	DeclDef;
+	| DeclDef DeclDefs;
+
+DeclDef:=
+	AttributeSpecifier;
+	| ImportDeclaration;
+	| EnumDeclaration;
+	| ClassDeclaration;
+	| InterfaceDeclaration;
+	| AggregateDeclaration;
+	| Declaration;
+	| Constructor;
+	| Destructor;
+	| Invariant;
+	| UnitTest;
+	| DebugSpecification;
+	| VersionSpecification;
+	| SharedStaticConstructor;
+	| SharedStaticDestructor;
+	| ConditionalDeclaration;
+	| StaticAssert;
+	| TemplateDeclaration;
+	| TemplateMixinDeclaration;
+	| TemplateMixin;
+	| MixinDeclaration;
+	| ClassAllocator;
+	| ClassDeallocator;
+	| AliasThis;
+	| semicolon;
+
+ImportDeclaration:=
+	import ImportList semicolon;
+
+ImportList :=
+	Import;
+	| ImportBindings;
+	| Import comma ImportList;
+
+Import :=
+	ModuleFullyQualifiedName;
+	| ModuleAliasIdentifier assign ModuleFullyQualifiedName;
+
+ImportBindings :=
+	Import colon ImportBindList;
+
+ImportBindList :=
+	ImportBind;
+	| ImportBind comma ImportBindList;
+
+ImportBind :=
+	Identifier;
+	| Identifier assign Identifier;
+
+ModuleAliasIdentifier :=
+	Identifier;
+
+MixinDeclaration :=
+	mixin lparen AssignExpression rparen semicolon;
+
+Declaration :=
+	alias Decl;
+	| typedef Decl;
+	| Decl;
+
+Decl :=
+	StorageClasses Decl;
+	| BasicType BasicTypes2 Declarators semicolon;
+	| BasicType BasicTypes2 Declarator FunctionBody;
+	| BasicType Declarators semicolon;
+	| BasicType Declarator FunctionBody;
+	| AutoDeclaration;
+
+Declarators :=
+	DeclaratorInitializer;
+	| DeclaratorInitializer comma DeclaratorIdentifierList;
+
+DeclaratorInitializer :=
+	Declarator;
+	| Declarator assgin Initializer;
+
+DeclaratorIdentifierList :=
+	DeclaratorIdentifier;
+	| DeclaratorIdentifier comma DeclaratorIdentifierList;
+
+DeclaratorIdentifier :=
+	Identifier;
+	| Identifier assgin Initializer;
+
+BasicType :=
+	BasicTypeX;
+	| dot IdentifierList;
+	| IdentifierList;
+	| Typeof;
+	| Typeof dot IdentifierList;
+	| const lparen Type rparen;
+	| immutable lparen Type rparen;
+	| shared lparen Type rparen;
+	| inout lparen Type rparen;
+
+BasicTypeX :=
+	bool;
+	| byte;
+	| ubyte;
+	| short;
+	| ushort;
+	| int;
+	| uint;
+	| long;
+	| ulong;
+	| char;
+	| wchar;
+	| dchar;
+	| float;
+	| double;
+	| real;
+	| ifloat;
+	| idouble;
+	| ireal;
+	| cfloat;
+	| cdouble;
+	| creal;
+	| void;
+
+BasicType2 :=
+	star;
+	| lbrack rbrack;
+	| lbrack AssignExpression rbrack;
+	| lbrack AssignExpression dotdot AssignExpression rbrack;
+	| lbrack Type rbrack;
+	| delegate Parameters FunctionAttributes;
+	| function Parameters FunctionAttributes;
+	| delegate Parameters;
+	| function Parameters;
+
+BasicTypes2 :=
+	BasicType2;
+	| BasicType2 BasicTypes2;
+
+Declarator :=
+	Identifier DeclaratorSuffixes;
+	| Identifier;
+
+DeclaratorSuffixes :=
+	DeclaratorSuffix;
+	| DeclaratorSuffix DeclaratorSuffixes;
+
+DeclaratorSuffix :=
+	lbrack rbrack;
+	| lbrack AssignExpression rbrack;
+	| lbrack Type rbrack;
+	| Parameters;
+	| Parameters Constraint;
+	| Parameters MemberFunctionAttributes Constraint;
+	| Parameters MemberFunctionAttributes;
+	| TemplateParameterList Parameters Constraint;
+	| TemplateParameterList Parameters MemberFunctionAttributes;
+	| TemplateParameterList Parameters MemberFunctionAttributes Constraint;
+	| TemplateParameterList Parameters;
+
+GlobalIdentifierList :=
+	IdentifierList;
+	| dot IdentifierList;
+
+
+IdentifierList :=
+	Identifier;
+	| Identifier dot IdentifierList;
+	| TemplateInstance;
+	| TemplateInstance dot IdentifierList;
+
+StorageClasses :=
+	StorageClass;
+	| StorageClass StorageClasses;
+
+StorageClass :=
+	abstract;
+	| auto;
+	| const;
+	| deprecated;
+	| extern;
+	| final;
+	| immutable;
+	| inout;
+	| shared;
+	| nothrow;
+	| override;
+	| pure;
+	| ref;
+	| scope;
+	| static;
+	| synchronized;
+	| __gshared;
+	| __thread;
+
+Type :=
+	BasicType;
+	| BasicType Declarator2;
+
+Declarator2 :=
+	BasicTypes2 Declarator2;
+	| lparen Declarator2 rparen;
+	| lparen Declarator2 rparen DeclaratorSuffixes;
+
+TypeWithModifier :=
+	Type;
+	| const TypeWithModifier;
+	| immutable TypeWithModifier;
+	| inout TypeWithModifier;
+	| shared TypeWithModifier;
+
+Parameters :=
+	lparen ParameterList rparen;
+	lparen rparen;
+
+ParameterList :=
+	Parameter;
+	Parameter comma ParameterList;
+	Parameter dotdotdot;
+	dotdotdot;
+
+Parameter :=
+	InOut ParameterDeclarator DefaultInitializerExpression;
+	| InOut ParameterDeclarator;
+	| ParameterDeclarator DefaultInitializerExpression;
+	| ParameterDeclarator;
+
+ParameterDeclarator :=
+	StorageClasses BasicType BasicTypes2 Declarator;
+	| StorageClasses BasicType Declarator;
+	| StorageClasses BasicType BasicTypes2;
+	| StorageClasses BasicType;
+	| BasicType BasicTypes2 Declarator;
+	| BasicType BasicTypes2;
+	| BasicType Declarator;
+	| BasicType;
+
+InOut :=
+	in;
+	| out;
+	| ref;
+	| lazy;
+	| scope;
+
+FunctionAttributes :=
+	FunctionAttribute;
+	| FunctionAttribute FunctionAttributes;
+
+FunctionAttribute :=
+	nothrow;
+	| pure;
+
+MemberFunctionAttributes :=
+	MemberFunctionAttribute;
+	| MemberFunctionAttribute MemberFunctionAttributes;
+
+MemberFunctionAttribute :=
+	const;
+	| immutable;
+	| inout;
+	| shared;
+	| FunctionAttribute;
+
+DefaultInitializerExpression :=
+	assign AssignExpression;
+
+Initializer :=
+	VoidInitializer;
+	| NonVoidInitializer;
+
+NonVoidInitializer :=
+	AssignExpression;
+	| ArrayInitializer;
+	| StructInitializer;
+
+ArrayInitializer:
+	ArrayLiteral;
+
+StructInitializer:
+	StructLiteral;
+
+AutoDeclaration :=
+	StorageClasses Identifier assign AssignExpression semicolon;
+
+Typeof :=
+	typeof lparen Expression rparen;
+	| typeof lparen return rparen;
+
+VoidInitializer :=
+	void;
+
+AttributeSpecifier :=
+	Attribute colon;
+	| Attribute DeclarationBlock;
+
+Attribute :=
+	LinkageAttribute;
+	| AlignAttribute;
+	| Pragma;
+	| deprecated;
+	| ProtectionAttribute;
+	| static;
+	| final;
+	| override;
+	| abstract;
+	| const;
+	| auto;
+	| scope;
+	| __gshared;
+	| shared;
+	| immutable;
+	| inout;
+	| ref;
+	| extern;
+	| synchronized;
+	| __thread;
+	| @disable;
+	| @property;
+	| @safe;
+	| @system;
+	| @trusted;
+
+DeclarationBlock :=
+	DeclDef;
+	| lcurly DeclDefs rcurly;
+	| lcurly rcurly;
+
+LinkageAttribute :=
+	extern lparen LinkageType rparen;
+
+LinkageType :=
+	C;
+	| Cplusplus;
+	| D;
+	| Windows;
+	| Pascal;
+	| System;
+
+AlignAttribute :=
+	align;
+	| align lparen Integer rparen;
+
+ProtectionAttribute :=
+	private;
+	| package;
+	| protected;
+	| public;
+	| export;
+
+Pragma :=
+	pragma lparen Identifier rparen;
+	| pragma lparen Itentifier comma TemplateArgumentList rparen;
+
+Expression :=
+	CommaExpression;
+
+CommaExpression :=
+	AssignExpression;
+	| AssignExpression comma CommaExpression;
+
+AssignExpression :=
+	ConditionalExpression;
+	| ConditionalExpression assign AssignExpression;
+	| ConditionalExpression plusassign AssignExpression;
+	| ConditionalExpression minusassign AssignExpression;
+	| ConditionalExpression starassign AssignExpression;
+	| ConditionalExpression divassign AssignExpression;
+	| ConditionalExpression moduloassign AssignExpression;
+	| ConditionalExpression andassign AssignExpression;
+	| ConditionalExpression orassign AssignExpression;
+	| ConditionalExpression xorassign AssignExpression;
+	| ConditionalExpression tildeassign AssignExpression;
+	| ConditionalExpression leftshiftassign AssignExpression;
+	| ConditionalExpression rightshiftassign AssignExpression;
+	| ConditionalExpression unsignedrightshiftassign AssignExpression;
+	| ConditionalExpression xorxorassign AssignExpression;
+
+ConditionalExpression :=
+	OrOrExpression;
+	| OrOrExpression questionmark Expression colon ConditionalExpression;
+
+OrOrExpression :=
+	AndAndExpression;
+	| OrOrExpression logicalor AndAndExpression;
+
+AndAndExpression :=
+	OrExpression;
+	| AndAndExpression logicaland OrExpression;
+	| CmpExpression;
+	| AndAndExpression logicaland CmpExpression;
+
+OrExpression :=
+	XorExpression;
+	| OrExpression or XorExpression;
+
+XorExpression :=
+	AndExpression;
+	| XorExpression xor AndExpression;
+
+AndExpression :=
+	ShiftExpression;
+	| AndExpression and ShiftExpression;
+
+ShiftExpression :=
+	AddExpression;
+	| ShiftExpression leftshift AddExpression;
+	| ShiftExpression rightshift AddExpression;
+	| ShiftExpression unsignedrightshift AddExpression;
+
+AddExpression :=
+	MulExpression;
+	| AddExpression plus MulExpression;
+	| AddExpression minus MulExpression;
+	| CatExpression;
+
+CatExpression :=
+	AddExpression tilde MulExpression;
+
+MulExpression :=
+	PowExpression;
+	| MulExpression star PowExpression;
+	| MulExpression div PowExpression;
+	| MulExpression modulo PowExpression;
+
+PowExpression :=
+	UnaryExpression;
+	| UnaryExpression xorxor PowExpression;
+
+UnaryExpression :=
+	PostfixExpression;
+	| and UnaryExpression;
+	| plusplus UnaryExpression;
+	| minusminus UnaryExpression;
+	| star UnaryExpression;
+	| minus UnaryExpression;
+	| plus UnaryExpression;
+	| bang UnaryExpression;
+	| tilde UnaryExpression;
+	| NewExpression;
+	| DeleteExpression;
+	| CastExpression;
+
+NewExpression :=
+	NewArguments Type lbrack AssignExpression rbrack;
+	| NewArguments Type rparen ArgumentList lparen;
+	| NewArguments Type;
+	| NewArguments ClassArguments BaseClassesopt lcurly DeclDefsopt rcurly;
+
+NewArguments :=
+	new lparen ArgumentList rparen;
+	| new lparen rparen;
+	| new;
+
+ClassArguments :=
+	class lparen ArgumentList rparen;
+	| class lparen rparen;
+	| class;
+
+ArgumentList :=
+	AssignExpression;
+	| AssignExpression comma;
+	| AssignExpression comma ArgumentList;
+
+Arguments :=
+	lparen rparen;
+	| lparen ArgumentList rparen;
+
+DeleteExpression :=
+	delete UnaryExpression;
+
+CastExpression :=
+	cast lparen TypeWithModifier rparen UnaryExpression;
+	| cast lparen rparen UnaryExpression;
+	| cast lparen const rparen UnaryExpression;
+	| cast lparen const shared rparen UnaryExpression;
+	| cast lparen immutable rparen UnaryExpression;
+	| cast lparen inout rparen UnaryExpression;
+	| cast lparen inout shared rparen UnaryExpression;
+	| cast lparen shared rparen UnaryExpression;
+	| cast lparen shared const rparen UnaryExpression;
+	| cast lparen shared inout rparen UnaryExpression;
+
+PostfixExpression :=
+	PrimaryExpression;
+	| PostfixExpression dot IdentifierOrTemplateInstance;
+	| PostfixExpression dot NewExpression;
+	| PostfixExpression plusplus;
+	| PostfixExpression minusminus;
+	| PostfixExpression lparen rparen;
+	| PostfixExpression lparen ArgumentList rparen;
+	| IndexExpression;
+	| SliceExpression;
+
+IndexExpression:
+        PostfixExpression [ ArgumentList ]
+
+SliceExpression:
+        PostfixExpression [ ]
+        PostfixExpression [ AssignExpression .. AssignExpression ]
+
+PrimaryExpression:
+	Identifier
+	dot Identifier
+	TemplateInstance
+	this
+	super
+	null
+	true
+	false
+	dolloar
+	file
+	line
+	IntegerLiteral
+	FloatLiteral
+	CharacterLiteral
+	StringLiterals
+	ArrayLiteral
+	AssocArrayLiteral
+	FunctionLiteral
+	StructLiteral
+	AssertExpression
+	MixinExpression
+	ImportExpression
+	BasicType dot IdentifierOrTemplateInstance
+	Typeof dot IdentifierOrTemplateInstance
+	lparen Type rparen dot IdentifierOrTemplateInstance
+	BasicType Arguments
+	Typeof Arguments
+	lparen Type rparen Arguments
+	TypeidExpression
+	IsExpression
+	lparen Expression rparen
+	TraitsExpression
