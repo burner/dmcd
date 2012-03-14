@@ -468,7 +468,10 @@ NewExpression :=
 	NewArguments Type lbrack AssignExpression rbrack;
 	| NewArguments Type rparen ArgumentList lparen;
 	| NewArguments Type;
-	| NewArguments ClassArguments BaseClassesopt lcurly DeclDefsopt rcurly;
+	| NewArguments ClassArguments BaseClasses lcurly DeclDefsrcurly;
+	| NewArguments ClassArguments BaseClasses lcurly rcurly;
+	| NewArguments ClassArguments lcurly DeclDefsrcurly;
+	| NewArguments ClassArguments lcurly rcurly;
 
 NewArguments :=
 	new lparen ArgumentList rparen;
@@ -515,43 +518,738 @@ PostfixExpression :=
 	| IndexExpression;
 	| SliceExpression;
 
-IndexExpression:
-        PostfixExpression [ ArgumentList ]
+IndexExpression :=
+	PostfixExpression lbrack ArgumentList rbrack;
 
-SliceExpression:
-        PostfixExpression [ ]
-        PostfixExpression [ AssignExpression .. AssignExpression ]
+SliceExpression :=
+	PostfixExpression lbrack rbrack;
+	| PostfixExpression lbrack AssignExpression dotdot AssignExpression rbrack;
 
-PrimaryExpression:
-	Identifier
-	dot Identifier
-	TemplateInstance
-	this
-	super
-	null
-	true
-	false
-	dolloar
-	file
-	line
-	IntegerLiteral
-	FloatLiteral
-	CharacterLiteral
-	StringLiterals
-	ArrayLiteral
-	AssocArrayLiteral
-	FunctionLiteral
-	StructLiteral
-	AssertExpression
-	MixinExpression
-	ImportExpression
-	BasicType dot IdentifierOrTemplateInstance
-	Typeof dot IdentifierOrTemplateInstance
-	lparen Type rparen dot IdentifierOrTemplateInstance
-	BasicType Arguments
-	Typeof Arguments
-	lparen Type rparen Arguments
-	TypeidExpression
-	IsExpression
-	lparen Expression rparen
-	TraitsExpression
+PrimaryExpression :=
+	Identifier;
+	| dot Identifier;
+	| TemplateInstance;
+	| this;
+	| super;
+	| null;
+	| true;
+	| false;
+	| dolloar;
+	| file;
+	| line;
+	| IntegerLiteral;
+	| FloatLiteral;
+	| CharacterLiteral;
+	| StringLiterals;
+	| ArrayLiteral;
+	| AssocArrayLiteral;
+	| FunctionLiteral;
+	| StructLiteral;
+	| AssertExpression;
+	| MixinExpression;
+	| ImportExpression;
+	| BasicType dot IdentifierOrTemplateInstance;
+	| Typeof dot IdentifierOrTemplateInstance;
+	| lparen Type rparen dot IdentifierOrTemplateInstance;
+	| BasicType Arguments;
+	| Typeof Arguments;
+	| lparen Type rparen Arguments;
+	| TypeidExpression;
+	| IsExpression;
+	| lparen Expression rparen;
+	| TraitsExpression;
+
+StringLiterals :=
+	StringLiteral;
+	| StringLiterals StringLiteral;
+
+ArrayLiteral :=
+	lbrack ArgumentList rbrack;
+
+AssocArrayLiteral :=
+	lbrack KeyValuePairs rbrack;
+
+ArrayValueList :=
+	ArrayValue;
+	| ArrayValue comma ArrayValue;
+
+ArrayValue :=
+	AssignExpression;
+	| AssignExpression colon AssignExpression;
+
+FunctionLiteral :=
+	function Type ParameterAttributes FunctionBody;
+	| function ParameterAttributes FunctionBody;
+	| function Type FunctionBody;
+	| function FunctionBody;
+	| delegate Type ParameterAttributes FunctionBody;
+	| delegate ParameterAttributes FunctionBody;
+	| delegate Type FunctionBody;
+	| delegate FunctionBody;
+	| ParameterAttributes FunctionBody;
+	| FunctionBody;
+
+ParameterAttributes :=
+	Parameters;
+	| Parameters FunctionAttributes;
+
+StructLiteral :=
+	lcurly ArrayValueList rculry;
+
+ssertExpression :=
+	assert lparen AssignExpression rparen;
+	| assert lparen AssignExpression comma AssignExpression rparen;
+
+MixinExpression :=
+	mixin lparen AssignExpression rparen;
+
+ImportExpression :=
+	import lparen AssignExpression rparen;
+
+TypeidExpression :=
+	typeid lparen Type rparen;
+	| typeid lparen Expression rparen;
+
+IsExpression :=
+	is lparen Type rparen;
+	| is lparen Type colon TypeSpecialization rparen;
+	| is lparen Type equal TypeSpecialization rparen;
+	| is lparen Type Identifier rparen;
+	| is lparen Type Identifier colon TypeSpecialization rparen;
+	| is lparen Type Identifier equal TypeSpecialization rparen;
+	| is lparen Type Identifier equal TypeSpecialization comma TemplateParameterList rparen;
+
+TypeSpecialization :=
+	TypeWithModifier;
+	| struct;
+	| union;
+	| class;
+	| interface;
+	| enum;
+	| function;
+	| delegate;
+	| super;
+	| const;
+	| immutable;
+	| inout;
+	| shared;
+	| return;
+
+TraitsExpression :=
+	__traits lparen TraitsKeyword comma TraitsArguments rparen;
+
+TraitsKeyword :=
+	isAbstractClass;
+	| isArithmetic;
+	| isAssociativeArray;
+	| isFinalClass;
+	| isFloating;
+	| isIntegral;
+	| isScalar;
+	| isStaticArray;
+	| isUnsigned;
+	| isVirtualFunction;
+	| isAbstractFunction;
+	| isFinalFunction;
+	| isStaticFunction;
+	| isRef;
+	| isOut;
+	| isLazy;
+	| hasMember;
+	| identifier;
+	| getMember;
+	| getOverloads;
+	| getVirtualFunctions;
+	| classInstanceSize;
+	| allMembers;
+	| derivedMembers;
+	| isSame;
+	| compiles;
+
+TraitsArguments :=
+	TraitsArgument;
+	| TraitsArgument comma TraitsArguments;
+
+TraitsArgument :=
+	AssignExpression;
+	| Type;
+
+Statement :=
+	ScopeStatement;
+
+ScopeStatement :=
+	semicolon;
+	| NonEmptyStatement;
+	| ScopeBlockStatement;
+
+ScopeBlockStatement :=
+	 BlockStatement;
+
+ScopeNonEmptyStatement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+NoScopeNonEmptyStatement :=
+	NonEmptyStatement;
+	| BlockStatement;
+
+NoScopeStatement :=
+	semicolon;
+	| NonEmptyStatement;
+	| BlockStatement;
+
+NonEmptyStatement:
+	LabeledStatement;
+	| ExpressionStatement;
+	| DeclarationStatement;
+	| IfStatement;
+	| WhileStatement;
+	| DoStatement;
+	| ForStatement;
+	| ForeachStatement;
+	| SwitchStatement;
+	| FinalSwitchStatement;
+	| CaseStatement;
+	| CaseRangeStatement;
+	| DefaultStatement;
+	| ContinueStatement;
+	| BreakStatement;
+	| ReturnStatement;
+	| GotoStatement;
+	| WithStatement;
+	| SynchronizedStatement;
+	| TryStatement;
+	| ScopeGuardStatement;
+	| ThrowStatement;
+	| AsmStatement;
+	| PragmaStatement;
+	| MixinStatement;
+	| ForeachRangeStatement;
+	| ConditionalStatement;
+	| StaticAssert;
+	| TemplateMixin;
+	| EnumDeclaration;
+	| ClassDeclaration;
+	| InterfaceDeclaration;
+	| AggregateDeclaration;
+	| TemplateDeclaration;
+
+LabeledStatement :=
+	Identifier colon NoScopeStatement;
+
+BlockStatement :=
+	lcurly rcurly;
+	| lcurly StatementList rcurly;
+
+StatementList :=
+	Statement;
+	| Statement StatementList;
+
+ExpressionStatement :=
+	Expression semicolon;
+
+DeclarationStatement :=
+	Declaration;
+
+IfStatement :=
+	if lparen IfCondition rparen ThenStatement;
+	| if lparen IfCondition rparen ThenStatement else ElseStatement;
+
+IfCondition :=
+	Expression;
+	| auto Identifier assign Expression;
+	| BasicType BasicTypes2 Declarator assign Expression;
+	| BasicType Declarator assign Expression;
+
+ThenStatement :=
+	ScopeNonEmptyStatement;
+
+ElseStatement :=
+	ScopeNonEmptyStatement;
+
+WhileStatement :=
+	while lparen Expression rparen ScopeNonEmptyStatement;
+
+DoStatement :=
+	do ScopeNonEmptyStatement while lparen Expression rparen semicolon;
+
+ForStatement :=
+	for lparen Initialize Test semicolon Increment rparen ScopeNonEmptyStatement;
+	| for lparen Initialize semicolon Increment rparen ScopeNonEmptyStatement;
+	| for lparen Initialize Test semicolon rparen ScopeNonEmptyStatement;
+	| for lparen Initialize semicolon rparen ScopeNonEmptyStatement;
+
+Initialize :=
+	semicolon;
+	| NoScopeNonEmptyStatement;
+
+// expression was opt
+Test :=
+	Expression;
+
+// expression was opt
+Increment :=
+	Expression;
+
+ForeachStatement :=
+	Foreach lparen ForeachTypeList semicolon Aggregate rparen NoScopeNonEmptyStatement;
+
+Foreach :=
+	foreach;
+	| foreach_reverse;
+
+ForeachTypeList :=
+	ForeachType;
+	| ForeachType comma ForeachTypeList;
+
+ForeachType :=
+	ref Type Identifier;
+	| ref Identifier;
+	| Type Identifier;
+	| Identifier;
+
+Aggregate :=
+	Expression;
+
+SwitchStatement :=
+	switch lparen Expression rparen ScopeNonEmptyStatement;
+
+CaseStatement :=
+	case ArgumentList colon Statement;
+	| case ArgumentList colon;
+
+CaseRangeStatement :=
+	case FirstExp colon dotdot case LastExp colon Statement;
+	| case FirstExp colon dotdot case LastExp colon;
+
+FirstExp :=
+	AssignExpression;
+
+LastExp :=
+	AssignExpression;
+
+DefaultStatement :=
+	default colon Statement;
+	| default colon;
+
+FinalSwitchStatement :=
+	final switch lparen Expression rparen ScopeNonEmptyStatement;
+
+ContinueStatement :=
+	continue semicolon;
+	| continue Identifier semicolon;
+
+BreakStatement :=
+	break semicolon;
+	| break Identifier semicolon;
+
+ReturnStatement :=
+	return semicolon;
+	| return Expression semicolon;
+
+GotoStatement :=
+	goto Identifier semicolon;
+	| goto default semicolon;
+	| goto case semicolon;
+	| goto case Expression semicolon;
+
+WithStatement :=
+	with lparen Expression rparen ScopeNonEmptyStatement;
+	| with lparen Symbol rparen ScopeNonEmptyStatement;
+	| with lparen TemplateInstance rparen ScopeNonEmptyStatement;
+
+SynchronizedStatement :=
+	synchronized ScopeNonEmptyStatement;
+	| synchronized lparen Expression rparen ScopeNonEmptyStatement;
+
+TryStatement :=
+	try ScopeNonEmptyStatement Catches;
+	| try ScopeNonEmptyStatement Catches FinallyStatement;
+	| try ScopeNonEmptyStatement FinallyStatement;
+
+Catches :=
+	LastCatch;
+	| Catch;
+	| Catch Catches;
+
+LastCatch :=
+	catch NoScopeNonEmptyStatement;
+
+Catch :=
+	catch lparen CatchParameter rparen NoScopeNonEmptyStatement;
+
+CatchParameter :=
+	BasicType Identifier;
+
+FinallyStatement :=
+	finally NoScopeNonEmptyStatement;
+
+ThrowStatement :=
+	throw Expression semicolon;
+
+ScopeGuardStatement :=
+	scope lparen exit rparen ScopeNonEmptyStatement;
+	| scope lparen success rparen ScopeNonEmptyStatement;
+	| scope lparen failure rparen ScopeNonEmptyStatement;
+
+AsmStatement :=
+	asm lcurly rcurly;
+	| asm lcurly AsmInstructionList rcurly;
+
+AsmInstructionList :=
+	AsmInstruction semicolon;
+	| AsmInstruction semicolon AsmInstructionList;
+
+PragmaStatement :=
+	Pragma NoScopeStatement;
+
+MixinStatement :=
+	mixin lparen AssignExpression rparen semicolon;
+
+ForeachRangeStatement :=
+	Foreach lparen ForeachType semicolon LwrExpression dotdot UprExpression rparen ScopeNonEmptyStatement;
+
+LwrExpression :=
+	Expression;
+
+UprExpression :=
+	Expression;
+
+AggregateDeclaration :=
+	struct Identifier StructBody;
+	| union Identifier StructBody;
+	| struct Identifier semicolon;
+	| union Identifier semicolon;
+	| StructTemplateDeclaration;
+	| UnionTemplateDeclaration;
+
+StructBody :=
+	lcurly DeclDefs rcurly;
+	| lcurly rcurly;
+
+ClassDeclaration :=
+	class Identifier BaseClassList ClassBody;
+	| class Identifier ClassBody;
+	| ClassTemplateDeclaration;
+	| class Identifier semicolon;
+
+BaseClassList :=
+	colon SuperClass;
+	| colon SuperClass comma InterfaceClasses;
+
+SuperClass :=
+	GlobalIdentifierList;
+	| Protection GlobalIdentifierList;
+
+InterfaceClasses :=
+	InterfaceClass;
+	| InterfaceClass comma InterfaceClasses;
+
+InterfaceClass :=
+	GlobalIdentifierList;
+	| Protection GlobalIdentifierList;
+
+Protection :=
+	private;
+	| package;
+	| public;
+	| export;
+
+ClassBody :=
+	lcurly rcurly;
+	| lcurly DeclDefs rcurly;
+
+Constructor :=
+	this Parameters MemberFunctionAttributes Constraint FunctionBody;
+	| this Parameters MemberFunctionAttributes FunctionBody;
+	| this TemplateParameters Parameters Constraint FunctionBody;
+	| this TemplateParameters Parameters FunctionBody;
+	| this TemplateParameters Parameters MemberFunctionAttributes Constraint FunctionBody;
+	| this TemplateParameters Parameters MemberFunctionAttributes FunctionBody;
+	| this lparen this rparen Constraint FunctionBody;
+
+Destructor :=
+	tilde this lparen rparen FunctionBody;
+
+StaticConstructor :=
+	static this lparen rparen FunctionBody;
+
+StaticDestructor :=
+	static tilde this lparen rparen FunctionBody;
+
+SharedStaticConstructor :=
+	shared static this lparen rparen FunctionBody;
+
+SharedStaticDestructor :=
+	shared static tilde this lparen rparen FunctionBody;
+
+Invariant :=
+	invariant lparen rparen BlockStatement;
+
+ClassAllocator :=
+	new Parameters FunctionBody;
+
+ClassDeallocator :=
+	delete Parameters FunctionBody;
+
+AliasThis :=
+	alias Identifier this semicolon;
+
+InterfaceDeclaration :=
+	interface Identifier BaseInterfaceList InterfaceBody;
+	| interface Identifier InterfaceBody;
+	| InterfaceTemplateDeclaration;
+	| interface Identifier semicolon;
+
+BaseInterfaceList :=
+	colon InterfaceClasses;
+
+InterfaceBody :=
+	lcurly DeclDefs rcurly;
+	| lcurly rcurly;
+
+EnumDeclaration :=
+	enum EnumTag EnumBody;
+	| enum EnumBody;
+	| enum EnumTag colon EnumBaseType EnumBody;
+	| enum colon EnumBaseType EnumBody;
+	| enum EnumTag semicolon;
+	| enum EnumInitializer semicolon;
+	| enum Type EnumInitializers semicolon;
+
+EnumTag :=
+	Identifier;
+
+EnumBaseType :=
+	Type;
+
+EnumInitializers :=
+	EnumInitializer;
+	| EnumInitializers colon EnumInitializer;
+
+EnumInitializer :=
+	Identifier assign AssignExpression;
+
+EnumBody :=
+	semicolon;
+	| lcurly EnumMembers rcurly;
+
+EnumMembers :=
+	EnumMember;
+	| EnumMember comma;
+	| EnumMember comma EnumMembers;
+
+EnumMember :=
+	 Identifier;
+	 | Identifier assign AssignExpression;
+	 | Type Identifier assign AssignExpression;
+
+FunctionBody :=
+	 BlockStatement;
+	 | BodyStatement;
+	 | InStatement BodyStatement;
+	 | OutStatement BodyStatement;
+	 | InStatement OutStatement BodyStatement;
+	 | OutStatement InStatement BodyStatement;
+
+InStatement :=
+	 in BlockStatement;
+
+OutStatement :=
+	 out BlockStatement;
+	 | out lparen Identifier rparen BlockStatement;
+
+BodyStatement :=
+	 body BlockStatement;
+
+ConditionalDeclaration :=
+	 Condition DeclarationBlock;
+	 | Condition DeclarationBlock else DeclarationBlock;
+
+ConditionalStatement :=
+	 Condition NoScopeNonEmptyStatement;
+	 | Condition NoScopeNonEmptyStatement else NoScopeNonEmptyStatement;
+
+Condition :=
+	 VersionCondition;
+	 | DebugCondition;
+	 | StaticIfCondition;
+
+VersionCondition :=
+	 version lparen Integer rparen;
+	 | version lparen Identifier rparen;
+	 | version lparen unittest rparen;
+
+VersionSpecification :=
+	 version assign Identifier semicolon;
+	 | version assig= Integer semicolon;
+
+DebugCondition :=
+	 debug;
+	 | debug lparen Integer rparen;
+	 | debug lparen Identifier rparen;
+
+DebugSpecification :=
+	 debug assign Identifier semicolon;
+	 | debug assign Integer semicolon;
+
+StaticIfCondition :=
+	 static if lparen AssignExpression rparen;
+
+StaticAssert :=
+	 static assert lparen AssignExpression rparen semicolon;
+	 | static assert lparen AssignExpression comma AssignExpression rparen semicolon;
+
+TemplateDeclaration :=
+	template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
+	| template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
+
+TemplateIdentifier :=
+	Identifier;
+
+TemplateParameters :=
+	lparen TemplateParameterList rparen;
+
+TemplateParameterList :=
+	TemplateParameter;
+	| TemplateParameter comma;
+	| TemplateParameter comma TemplateParameterList;
+
+TemplateParameter :=
+	TemplateTypeParameter;
+	| TemplateValueParameter;
+	| TemplateAliasParameter;
+	| TemplateTupleParameter;
+	| TemplateThisParameter;
+
+TemplateTupleParameter :=
+	Identifier dotdotdot;
+
+IdentifierOrTemplateInstance :=
+	Identifier;
+	| TemplateInstance;
+
+TemplateInstance :=
+	TemplateIdentifier bang lparen TemplateArgumentList rparen;
+	| TemplateIdentifier bang TemplateSingleArgument;
+
+TemplateArgumentList :=
+	TemplateArgument;
+	| TemplateArgument comma;
+	| TemplateArgument comma TemplateArgumentList;
+
+TemplateArgument :=
+	Type;
+	| AssignExpression;
+	| Symbol;
+
+Symbol :=
+	SymbolTail;
+	| dot SymbolTail;
+
+SymbolTail :=
+	Identifier;
+	| Identifier dot SymbolTail;
+	| TemplateInstance;
+	| TemplateInstance dot SymbolTail;
+
+TemplateSingleArgument :=
+	Identifier;
+	| BasicTypeX;
+	| CharacterLiteral;
+	| StringLiteral;
+	| IntegerLiteral;
+	| FloatLiteral;
+	| true;
+	| false;
+	| null;
+	| __FILE__;
+	| __LINE__;
+
+TemplateTypeParameter :=
+	Identifier;
+	| Identifier TemplateTypeParameterSpecialization;
+	| Identifier TemplateTypeParameterDefault;
+	| Identifier TemplateTypeParameterSpecialization TemplateTypeParameterDefault;
+
+TemplateTypeParameterSpecialization :=
+	colon Type;
+
+TemplateTypeParameterDefault :=
+	assign Type;
+
+TemplateValueParameter :=
+	TemplateValueDeclaration;
+	| TemplateValueDeclaration TemplateValueParameterSpecialization;
+	| TemplateValueDeclaration TemplateValueParameterDefault;
+	| TemplateValueDeclaration TemplateValueParameterSpecialization TemplateValueParameterDefault;
+
+// without storage classes
+TemplateValueDeclaration :=
+	ParameterDeclarator;
+
+TemplateValueParameterSpecialization :=
+	colon ConditionalExpression;
+
+// already part of conditionalexpression
+TemplateValueParameterDefault :=
+	assign __FILE__;
+	| assign __LINE__;
+
+TemplateAliasParameter:
+	alias Type Identifier TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
+	| alias Identifier TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
+	| alias Identifier TemplateAliasParameterSpecialization;
+	| alias Identifier TemplateAliasParameterDefault;
+	| alias Identifier;
+	| alias Type Identifier TemplateAliasParameterDefault;
+	| alias Type Identifier TemplateAliasParameterSpecialization;
+	| alias Type Identifier;
+
+TemplateAliasParameterSpecialization :=
+	colon Type;
+
+TemplateAliasParameterDefault :=
+	assign TypeOrExpression;
+
+ClassTemplateDeclaration :=
+	class Identifier lparen TemplateParameterList rparen Constraint BaseClassList ClassBody;
+	| class Identifier lparen TemplateParameterList rparen BaseClassList ClassBody;
+	| class Identifier lparen TemplateParameterList rparen Constraint ClassBody;
+	| class Identifier lparen TemplateParameterList rparen ClassBody;
+
+StructTemplateDeclaration :=
+	struct Identifier lparen TemplateParameterList rparen Constraint StructBody;
+	| struct Identifier lparen TemplateParameterList rparen StructBody;
+
+UnionTemplateDeclaration :=
+	union Identifier lparen TemplateParameterList rparen Constraint StructBody;
+	| union Identifier lparen TemplateParameterList rparen StructBody;
+
+InterfaceTemplateDeclaration :=
+	interface Identifier lparen TemplateParameterList rparen Constraint BaseInterfaceList InterfaceBody;
+	| interface Identifier lparen TemplateParameterList rparen Constraint InterfaceBody;
+	| interface Identifier lparen TemplateParameterList rparen InterfaceBody;
+	| interface Identifier lparen TemplateParameterList rparen BaseInterfaceList InterfaceBody;
+
+TemplateMixinDeclaration :=
+	mixin template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
+	| mixin template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
+
+Constraint :=
+	if lparen ConstraintExpression rparen;
+
+ConstraintExpression :=
+	Expression;
+
+TemplateMixin :=
+	mixin GlobalIdentifierList MixinIdentifier semicolon;
+	| mixin GlobalIdentifierList semicolon;
+	| mixin Typeof dot IdentifierList MixinIdentifier semicolon;
+	| mixin Typeof dot IdentifierList semicolon;
+
+Unittest:
+	unittest BlockStatement;
+
+AsmInstruction:
+	string
