@@ -63,7 +63,10 @@
 "^^=" {: return Token(this.getLoc(), termxorxorassign); :}
 "__thread" {: return Token(this.getLoc(), termthread); :}
 "__traits" {: return Token(this.getLoc(), termtraits); :}
+"abstract" {: return Token(this.getLoc(), termabstract); :}
 "alias" {: return Token(this.getLoc(), termassert); :}
+"align" {: return Token(this.getLoc(), termalign); :}
+"asm" {: return Token(this.getLoc(), termasm); :}
 "assert" {: return Token(this.getLoc(), termassert); :}
 "auto" {: return Token(this.getLoc(), termauto); :}
 "body" {: return Token(this.getLoc(), termbody); :}
@@ -71,6 +74,7 @@
 "break" {: return Token(this.getLoc(), termbreak); :}
 "byte" {: return Token(this.getLoc(), termbyte); :}
 "case" {: return Token(this.getLoc(), termcase); :}
+"cast" {: return Token(this.getLoc(), termcast); :}
 "catch" {: return Token(this.getLoc(), termcatch); :}
 "__gshared" {: return Token(this.getLoc(), termgshared); :}
 "cdouble" {: return Token(this.getLoc(), termcdouble); :}
@@ -87,6 +91,7 @@
 "do" {: return Token(this.getLoc(), termdo); :}
 "double" {: return Token(this.getLoc(), termdouble); :}
 "enum" {: return Token(this.getLoc(), termenum); :}
+"else" {: return Token(this.getLoc(), termelse); :}
 "export" {: return Token(this.getLoc(), termexport); :}
 "extern" {: return Token(this.getLoc(), termextern); :}
 "false" {: return Token(this.getLoc(), termfalse); :}
@@ -103,6 +108,7 @@
 "if" {: return Token(this.getLoc(), termif); :}
 "ifloat" {: return Token(this.getLoc(), termifloat); :}
 "import" {: return Token(this.getLoc(), termimport); :}
+"immutable" {: return Token(this.getLoc(), termimmutable); :}
 "in" {: return Token(this.getLoc(), termin); :}
 "inout" {: return Token(this.getLoc(), terminout); :}
 "int" {: return Token(this.getLoc(), termint); :}
@@ -111,9 +117,11 @@
 "ireal" {: return Token(this.getLoc(), termireal); :}
 "is" {: return Token(this.getLoc(), termis); :}
 "long" {: return Token(this.getLoc(), termlong); :}
+"lazy" {: return Token(this.getLoc(), termlazy); :}
 "mixin" {: return Token(this.getLoc(), termmixin); :}
 "module" {: return Token(this.getLoc(), termmodule); :}
 "new" {: return Token(this.getLoc(), termnew); :}
+"nothrow" {: return Token(this.getLoc(), termnothrow); :}
 "null" {: return Token(this.getLoc(), termnull); :}
 "out" {: return Token(this.getLoc(), termout); :}
 "override" {: return Token(this.getLoc(), termoverride); :}
@@ -124,6 +132,7 @@
 "real" {: return Token(this.getLoc(), termreal); :}
 "ref" {: return Token(this.getLoc(), termref); :}
 "return" {: return Token(this.getLoc(), termreturn); :}
+"pure" {: return Token(this.getLoc(), termpure); :}
 "scope" {: return Token(this.getLoc(), termscope); :}
 "semicolon" {: return Token(this.getLoc(), termshort); :}
 "short" {: return Token(this.getLoc(), termshort); :}
@@ -149,6 +158,7 @@
 "volatile" {: return Token(this.getLoc(), termvolatile); :}
 "wchar" {: return Token(this.getLoc(), termwchar); :}
 "while" {: return Token(this.getLoc(), termwhile); :}
+"with" {: return Token(this.getLoc(), termwith); :}
 "{" {: return Token(this.getLoc(), termlcurly); :}
 "|" {: return Token(this.getLoc(), termlogicor); :}
 "|=" {: return Token(this.getLoc(), termorassign); :}
