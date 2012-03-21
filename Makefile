@@ -8,8 +8,8 @@ all: build
 run: build
 	./dmcd
 
-parsetable: d2.dlr
-	../dalr/Dalr -i d2.dlr -r src/parsetable.d -rm parsetable
+parsetable: d3.dlr
+	../dalr/Dalr -i d3.dlr -r src/parsetable.d -rm parsetable
 
 build: $(GEN) $(OBJS) Makefile
 	sh IncreBuildId.sh

@@ -34,6 +34,7 @@
 "<<" {: return Token(this.getLoc(), termleftshift); :}
 "<<=" {: return Token(this.getLoc(), termleftshiftassign); :}
 "<=" {: return Token(this.getLoc(), termlessequal); :}
+"=>" {: return Token(this.getLoc(), termarrow); :}
 "<>" {: return Token(this.getLoc(), termsquare); :}
 "<>=" {: return Token(this.getLoc(), termsquareequal); :}
 "=" {: return Token(this.getLoc(), termassign); :}
@@ -159,6 +160,8 @@
 "wchar" {: return Token(this.getLoc(), termwchar); :}
 "while" {: return Token(this.getLoc(), termwhile); :}
 "with" {: return Token(this.getLoc(), termwith); :}
+"__FILE__" {: return Token(this.getLoc(), termfile); :}
+"__LINE__" {: return Token(this.getLoc(), termline); :}
 "{" {: return Token(this.getLoc(), termlcurly); :}
 "|" {: return Token(this.getLoc(), termlogicor); :}
 "|=" {: return Token(this.getLoc(), termorassign); :}
