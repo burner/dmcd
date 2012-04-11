@@ -47,4 +47,6 @@ clean:
 	rm src/lextable.d
 	rm src/parsetable.d
 	rm *.o
+	rm ambiGraph*.dot
+	rm ambiGraph*.png
 	rm dmcd

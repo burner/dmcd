@@ -1,5 +1,11 @@
 S := Module;
 
+%right dot
+%right else
+%left basicTypePrimExpr
+%left idenList
+%left tempInst
+
 Module :=
 	ModuleDeclaration DeclDefs;
 	| DeclDefs;
@@ -117,14 +123,14 @@ AutoDeclaration :=
 	StorageClasses AutoDeclarationX semicolon; 
 	
 AutoDeclarationX := 
-	Identifier assign Initializer;
+	identifier assign Initializer;
 	| AutoDeclarationX comma identifier assign Initializer;
 
 BasicType :=
 	BasicTypeX;
 	| dot IdentifierList;
 	| IdentifierList;
-	| Typeof;
+	| Typeof %prec basicTypePrimExpr;
 	| Typeof dot IdentifierList;
 	| const lparen Type rparen;
 	| immutable lparen Type rparen;
@@ -198,9 +204,9 @@ DeclaratorSuffix :=
 	| TemplateParameterList Parameters;
 
 IdentifierList :=
-	identifier;
+	identifier %prec idenList;
 	| identifier dot IdentifierList;
-	| TemplateInstance;
+	| TemplateInstance %prec tempInst;
 	| TemplateInstance dot IdentifierList;
 
 StorageClasses :=
@@ -1083,7 +1089,7 @@ InterfaceDeclaration :=
 	| InterfaceTemplateDeclaration;
 
 BaseInterfaceList :=
-	colon InterfaceClasses;
+	colon Interfaces;
 
 InterfaceBody :=
 	lcurly DeclDefs rcurly;
