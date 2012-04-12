@@ -1,10 +1,24 @@
 S := Module;
 
-%right dot
-%right else
+%left dot
+%left else
 %left basicTypePrimExpr
 %left idenList
 %left tempInst
+%left cmpAndExpr
+%left plus minus
+%left tilde
+%left star div modulo
+%left or and in
+%left lparen rparen
+%left xorxor
+%left plusplus minusminus
+%left lbrack rbrack
+%left logicalor logicaland
+%left assign plusassign minusassign starassign divassign moduloassign orassign andassign xorassign tildeassign leftshiftassign rightshiftassign unsignedrightshiftassign xorxorassign questionmark
+%left leftshift rightshift unsignedrightshift
+%left equal notequal bangis is greateequal lessequal bangassign bangsquareassign squereassign banggreater banggreaterassign bangless banglessequal bangin bangin
+%left identifier
 
 Module :=
 	ModuleDeclaration DeclDefs;
@@ -454,7 +468,7 @@ XorExpression :=
 	| XorExpression xor AndExpression;
 
 AndExpression :=
-	ShiftExpression;
+	ShiftExpression %prec cmpAndExpr;
 	| AndExpression and ShiftExpression;
 
 CmpExpression :=
