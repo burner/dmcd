@@ -300,6 +300,16 @@ class Parse {
 		println();
 	}
 
+	private string stackToString() const {
+		auto ret = new StringBuffer!(char)("parse stack: ");
+		foreach(it; this.parseStack) {
+			ret.pushBack("%d ", it);
+		}
+		ret.pushBack('\n');
+		return ret.getString();
+	}
+
+
 	private void printTokenStack() const {
 		printf("token stack: ");
 		foreach(it; this.tokenStack) {
@@ -308,10 +318,21 @@ class Parse {
 		println();
 	}
 
+	private string tokenStackToString() const {
+		auto ret = new StringBuffer!(char)("token stack: ");
+		foreach(it; this.tokenStack) {
+			ret.pushBack("%s ", it.toStringShort());
+		}
+		ret.pushBack('\n');
+		return ret.getString();
+	}
+
 	private string reportError(const Token input) const {
 		StringBuffer!(char) ret = new StringBuffer!(char)(1023);
-		ret.pushBack("%?1!1s in state %?1!1d on input %?1!1s this is parse %d", 
+		ret.pushBack("%?1!1s in state %?1!1d on input %?1!1s this is parse %d\n", 
 			"ERROR", this.parseStack.back(), input.toString(), this.id);
+		ret.pushBack(this.stackToString());
+		ret.pushBack(this.tokenStackToString());
 		return ret.getString();
 	}
 
@@ -324,6 +345,7 @@ class Parse {
 		
 		//action = this.getAction(input)[actIdx]; 
 		//log("%s", action.toString());
+		this.printStack();
 		if(action.getTyp() == TableType.Accept) {
 			//log("%s %s", action.toString(), input.toString());
 			this.parseStack.popBack(rules[action.getNumber()].length-1);
