@@ -30,7 +30,7 @@ void main(string[] args) {
 	sw.start();
 	Parser p = new Parser(new Lexer(file, lpMulti, 10));
 
-	p.parse();
+	bool succ = p.parse();
 	printfln("lexing and parsing took %f seconds", sw.stop());
-	p.getAST().toGraph("test1.dot");
+	p.getAst().toGraph("test1.dot");
 }

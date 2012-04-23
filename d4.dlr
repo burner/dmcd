@@ -1,30 +1,3 @@
-%right dot
-%right else
-%right basicTypePrimExpr
-%left basTypeDeclSuff
-%left blockInitStructInit
-%left declTmpParm
-%left idenList
-%left tempInst
-%left cmpAndExpr
-%left noScopeFuncBody
-%left parmTempValPar
-%left argListFrstExpr
-%right dotdotdot
-%right plusplus minusminus 
-%right star
-%right div modulo
-%right plus minus tilde
-%right leftshift rightshift unsignedrightshift
-%right equal notequal is bangis less greater lessequal greaterequal
-%right and xor or logicaland logicalor
-%right questionmark
-%right assign plusassign minusassign starassign divassign moduloassign leftshiftassign rightshiftassign andassign xorassign orassign tildeassign unsignedrightshiftassign xorxorassign
-%right comma
-%right lbrack rbrack lparen rparen
-%left semicolon
-
-
 S := Module;
 
 Module :=
@@ -151,7 +124,7 @@ BasicType :=
 	BasicTypeX;
 	| dot IdentifierList;
 	| IdentifierList;
-	| Typeof %prec basicTypePrimExpr;
+	| Typeof;
 	| Typeof dot IdentifierList;
 	| const lparen Type rparen;
 	| immutable lparen Type rparen;
@@ -184,10 +157,10 @@ BasicTypeX :=
 
 BasicType2 :=
 	star;
-	| lbrack rbrack %prec basTypeDeclSuff;
-	| lbrack AssignExpression rbrack %prec basTypeDeclSuff;
+	| lbrack rbrack ;
+	| lbrack AssignExpression rbrack ;
 	| lbrack AssignExpression dotdot AssignExpression rbrack;
-	| lbrack Type rbrack %prec basTypeDeclSuff;
+	| lbrack Type rbrack ;
 	| delegate Parameters FunctionAttributes;
 	| function Parameters FunctionAttributes;
 	| delegate Parameters;
@@ -202,7 +175,7 @@ Declarator :=
 	| BasicType2 identifier DeclaratorSuffixes;
 	| BasicType2 lparen Declarator rparen;
 	| BasicType2 lparen Declarator rparen DeclaratorSuffixes;
-	| identifier %prec declTmpParm;
+	| identifier ;
 	| identifier DeclaratorSuffixes;
 	| lparen Declarator rparen;
 	| lparen Declarator rparen DeclaratorSuffixes;
@@ -225,9 +198,9 @@ DeclaratorSuffix :=
 	| TemplateParameterList Parameters;
 
 IdentifierList :=
-	identifier %prec idenList;
+	identifier ;
 	| identifier dot IdentifierList;
-	| TemplateInstance %prec tempInst;
+	| TemplateInstance ;
 	| TemplateInstance dot IdentifierList;
 
 StorageClasses :=
@@ -288,7 +261,7 @@ Parameter :=
 	| InOut BasicType Declarator dotdotdot;
 	| InOut BasicType Declarator assign DefaultInitializerExpression;
 	| InOut Type InOut Type dotdotdot;
-	| BasicType Declarator %prec parmTempValPar;
+	| BasicType Declarator ;
 	| BasicType Declarator dotdotdot;
 	| BasicType Declarator assign DefaultInitializerExpression;
 	| Type InOut Type dotdotdot;
@@ -415,7 +388,7 @@ LinkageType :=
 
 AlignAttribute :=
 	align;
-	| align lparen Integer rparen;
+	| align lparen IntegerLiteral rparen;
 
 ProtectionAttribute :=
 	export;
@@ -475,7 +448,7 @@ XorExpression :=
 	| XorExpression xor AndExpression;
 
 AndExpression :=
-	ShiftExpression %prec cmpAndExpr;
+	ShiftExpression ;
 	| AndExpression and ShiftExpression;
 
 CmpExpression :=
@@ -568,7 +541,7 @@ AllocatorArguments :=
 	| lparen rparen;
 
 ArgumentList :=
-	AssignExpression %prec argListFrstExpr;
+	AssignExpression ;
 	| AssignExpression comma;
 	| AssignExpression comma ArgumentList;
 
@@ -623,7 +596,7 @@ PrimaryExpression :=
 	| null;
 	| true;
 	| false;
-	| dollar;
+	| dollarsym;
 	| file;
 	| line;
 	| IntegerLiteral;
@@ -800,7 +773,7 @@ LabeledStatement :=
 	identifier colon NoScopeStatement;
 
 BlockStatement :=
-	lcurly rcurly %prec blockInitStructInit;
+	lcurly rcurly ;
 	| lcurly StatementList rcurly;
 
 StatementList :=
@@ -1143,7 +1116,7 @@ EnumMember :=
 	 | Type identifier assign AssignExpression;
 
 FunctionBody :=
-	 BlockStatement %prec noScopeFuncBody;
+	 BlockStatement ;
 	 | BodyStatement;
 	 | InStatement BodyStatement;
 	 | OutStatement BodyStatement;

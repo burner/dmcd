@@ -5,103 +5,291 @@ import hurt.container.deque;
 import hurt.io.stdio;
 import hurt.util.pair;
 import hurt.util.slog;
+import hurt.util.util;
 import hurt.string.formatter;
+import hurt.string.stringbuffer;
 
 import ast;
 import lexer;
+import lextable;
 import parsetable;
 import token;
 
-class Parser {
-	private Lexer lexer;
-	private Deque!(Token) tokenBuffer;
+class Parse {
+	private int id;
+	private long tokenBufIdx;
+	private Parser parser;
 	private Deque!(int) parseStack;
 	private Deque!(Token) tokenStack;
 	private AST ast;
+	private Token input;
 
-	public this(Lexer lexer) {
-		this.lexer = lexer;	
-		this.tokenBuffer = new Deque!(Token)(64);
+	this(Parser parser, int id) {
+		this.parser = parser;
+		this.id = id;
 		this.parseStack = new Deque!(int)(128);
 		this.tokenStack = new Deque!(Token)(128);
-		this.ast = new AST();
-	} 
+		// we start at state (zero null none 0)
+		this.parseStack.pushBack(0);
 
-	AST getAST() {
+		this.ast = new AST();
+		this.tokenBufIdx = 0;
+		this.input = this.getToken();
+	}
+
+	this(Parser parser, Parse toCopy, int id) {
+		this.parser = parser;
+		this.parseStack = new Deque!(int)(toCopy.parseStack);
+		this.tokenStack = new Deque!(Token)(toCopy.tokenStack);
+		this.tokenBufIdx = toCopy.tokenBufIdx;
+		this.ast = new AST(toCopy.ast);
+		assert(this.ast == toCopy.ast);
+
+		this.tokenBufIdx = toCopy.tokenBufIdx;
+		this.input = toCopy.input;
+		this.id = id;
+	}
+
+	package int getId() const {
+		return this.id;
+	}
+
+	public bool copyEqualButDistinged(Parse p) @trusted {
+		if(p is this) {
+			log();
+			return false;
+		}
+		
+		if(this.ast != p.ast) {
+			log();
+			return false;
+		}
+
+		if(this.parseStack is p.parseStack || this.parseStack != p.parseStack) {
+			log();
+			return false;
+		}
+
+		if(this.tokenStack is p.tokenStack || this.tokenStack != p.tokenStack) {
+			log();
+			return false;
+		}
+
+		return this.input == p.input;
+	}
+
+	public override bool opEquals(Object o) @trusted {
+		Parse p = cast(Parse)o;
+
+		if(this.tokenBufIdx != p.tokenBufIdx) {
+			return false;
+		}
+
+		// no need to compare every element if the size is not equal
+		if(this.parseStack.getSize() != p.parseStack.getSize()) {
+			return false;
+		}
+
+		// compare the parseStack from the back to the front
+		// because the difference should be at the back
+		for(auto it = this.parseStack.cEnd(), jt = p.parseStack.cEnd(); 
+				it.isValid() && jt.isValid(); it--, jt--) {
+			if(*it != *jt) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	package const(Token) getCurrentInput() const {
+		return this.input;
+	}
+
+	package int getTos() const {
+		return this.parseStack[this.parseStack.getSize()-1];
+	}
+
+	package AST getAst() {
 		return this.ast;
 	}
 
-	/** do not call this direct unless you want whitespace token
-	 */
-	private Token getNextToken() { 
-		if(this.tokenBuffer.isEmpty()) {
-			this.lexer.getToken(this.tokenBuffer);
-		} 
-		assert(!this.tokenBuffer.isEmpty());
-
-		return this.tokenBuffer.popFront();
-	}
-
 	private Token getToken() {
-		Token t = this.getNextToken();
-		while(t.getTyp() == -99) {
-			t = this.getNextToken();
-		}
-		return t;
+		return this.parser.increToNextToken(this.tokenBufIdx++);
 	}
 
-	private TableItem getAction(const Token input) const {
-		auto retError = Pair!(int,TableItem)(-42, 
-			TableItem(TableType.Error, 0));
+	private Token buildTreeWithLoc(immutable int retType, immutable(int[]) 
+			tokens, size_t rule, Location loc) {
+		/*log("%s", idToString(retType));
+		foreach(it; tokens) {
+			printf("%d ", it);
+		}
+		println();
+		this.printTokenStack();
+		*/
+
+		assert(tokens !is null);
+		assert(tokens.length > 0);
+
+		// insert all the token that are not yet placed in the ast
+		foreach(idx, it; tokens) {
+			 if(!this.tokenStack[it].isPlacedInAst()) {
+			 	/*log("rules.length %d, rule %d it %d", rules.length, rule,
+					it);
+				log("rules[rule].length %d", rules[rule].length);
+				log("negIdx(rules[rule], it) %d", negIdx(rules[rule], it));
+				*/
+				size_t npos = this.ast.insert(
+					this.tokenStack[it], // the token
+					rules[rule][negIdx(rules[rule], it)]);
+				//log("%s", this.tokenStack[it].toString());
+				this.tokenStack[it] = Token(this.tokenStack[it], npos);
+				assert(this.tokenStack[it].getTreeIdx() == npos);
+				//log("%s", this.tokenStack[it].toString());
+			 }
+		}
+
+		Token ret = Token(loc, retType);
+		size_t pos = this.ast.insert(ret, retType);
+
+		foreach(idx, it; tokens) {
+			Token tmp = this.tokenStack[it];
+			//log("%s", tmp.toString());
+			this.ast.append(tmp.getTreeIdx());
+		}
+		//log("pos %d %s", pos, this.ast.singleNodeToString(pos));
+		//Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), retType, 
+			//pos);
+		//log("%s", ret.toString());
+		return Token(ret, pos);
+	}
+
+	private Token buildTree(immutable int retType, immutable(int[]) tokens, 
+			size_t rule, immutable int startPosIdx = 0) {
+		/*log("%s, %d", idToString(retType), startPosIdx);
+		foreach(it; tokens) {
+			printf("%d ", it);
+		}
+		println();
+		this.printTokenStack();
+		*/
+		assert(tokens !is null);
+		assert(tokens.length > 0);
+		//log("%s %d", this.tokenStack[tokens[startPosIdx]].toString(), 
+		//	tokens[startPosIdx]);
+
+		// insert all the token that are not yet placed in the ast
+		foreach(idx, it; tokens) {
+			if(idx == startPosIdx) { // ignore the head of the tree
+				continue;
+			 }
+			 if(!this.tokenStack[it].isPlacedInAst()) {
+			 	/*log("rules.length %d, rule %d it %d", rules.length, rule,
+					it);
+				log("rules[rule].length %d", rules[rule].length);
+				log("negIdx(rules[rule], it) %d", negIdx(rules[rule], it));
+				*/
+				size_t npos = this.ast.insert(
+					this.tokenStack[it], // the token
+					rules[rule][negIdx(rules[rule], it)]);
+				//log("%s", this.tokenStack[it].toString());
+				this.tokenStack[it] = Token(this.tokenStack[it], npos);
+				//log("%s", this.tokenStack[it].toString());
+			 }
+		}
+
+		size_t pos = this.ast.insert(this.tokenStack[tokens[startPosIdx]],
+			retType);
+
+		foreach(idx, it; tokens) {
+			if(idx == startPosIdx) { // ignore the head of the tree
+				continue;
+			}
+
+			Token tmp = this.tokenStack[it];
+			//log("%s", tmp.toString());
+			this.ast.append(tmp.getTreeIdx());
+		}
+		//log("pos %d %s", pos, this.ast.singleNodeToString(pos));
+		Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), 
+			retType, pos);
+		//log("%s", ret.toString());
+		return ret;
+	}
+
+	public immutable(TableItem[]) getAction() const {
+		immutable(Pair!(int,immutable(immutable(TableItem)[]))) retError = 
+			Pair!(int,immutable(immutable(TableItem)[]))(int.min, 
+			[TableItem(TableType.Error, 0)]);
 
 		//log("%d %d", this.parseStack.back(), input.getTyp());
 
-		auto toSearch = Pair!(int,TableItem)(input.getTyp(), TableItem(false));
-		auto row = parseTable[this.parseStack.back()];
+		immutable(Pair!(int,immutable(immutable(TableItem)[]))) toSearch = 
+			Pair!(int,immutable(immutable(TableItem)[]))(
+			this.input.getTyp(), [TableItem(false)]);
+
+		immutable(immutable(Pair!(int,immutable(TableItem[])))[]) row
+			= parseTable[this.parseStack.back()];
+
 		bool found;
 		size_t foundIdx;
 
-		auto ret = binarySearch!(Pair!(int,TableItem))
+		auto ret = binarySearch!(TitP)
 			(row, toSearch, retError, row.length, found, foundIdx,
-			function(Pair!(int,TableItem) a, Pair!(int,TableItem) b) {
+			function(immutable(Pair!(int,immutable(TableItem[]))) a, 
+					immutable(Pair!(int,immutable(TableItem[]))) b) {
 				return a.first > b.first;
 			}, 
-			function(Pair!(int,TableItem) a, Pair!(int,TableItem) b) {
+			function(immutable(Pair!(int,immutable(TableItem[]))) a, 
+					immutable(Pair!(int,immutable(TableItem[]))) b) {
 				return a.first == b.first; });
 
 		return ret.second;
 	}
 
 	private short getGoto(const int input) const {
-		auto retError = Pair!(int,TableItem)(int.min, 
-			TableItem(TableType.Error, 0));
+		immutable(Pair!(int,immutable(immutable(TableItem)[]))) retError = 
+			Pair!(int,immutable(immutable(TableItem)[]))(int.min, 
+			[TableItem(TableType.Error, 0)]);
 
-		auto toSearch = Pair!(int,TableItem)(input, TableItem(false));
+		immutable(Pair!(int,immutable(immutable(TableItem)[]))) toSearch = 
+			Pair!(int,immutable(immutable(TableItem)[]))(
+			input, [TableItem(false)]);
+
 		auto row = gotoTable[this.parseStack.back()];
 		bool found;
 		size_t foundIdx;
 
-		auto ret = binarySearch!(Pair!(int,TableItem))
+		auto ret = binarySearch!((TitP))
 			(row, toSearch, retError, row.length, found, foundIdx,
-			function(Pair!(int,TableItem) a, Pair!(int,TableItem) b) {
+			function(immutable(Pair!(int,immutable(TableItem[]))) a, 
+					immutable(Pair!(int,immutable(TableItem[]))) b) {
 				return a.first > b.first;
 			}, 
-			function(Pair!(int,TableItem) a, Pair!(int,TableItem) b) {
+			function(immutable(Pair!(int,immutable(TableItem[]))) a, 
+					immutable(Pair!(int,immutable(TableItem[]))) b) {
 				return a.first == b.first; });
 
-		return ret.second.getNumber();
+
+		assert(ret.second.length == 1);
+		return ret.second[0].getNumber();
 	}
 
 	private void runAction(short actionNum) {
 		Token ret;
+		//log("actionNum %d", actionNum);
 		switch(actionNum) {
 			mixin(actionString);
 			default:
 				assert(false, format("no action for %d defined", actionNum));
 		}
+		//log("%d", this.id);
 		//log("%s", ret.toString());
 		this.tokenStack.popBack(rules[actionNum].length-1);
 		this.tokenStack.pushBack(ret);
+		//this.printTokenStack();
+		//log("%s", this.ast.toString());
+
 	}
 
 	private void printStack() const {
@@ -115,421 +303,230 @@ class Parser {
 	private void printTokenStack() const {
 		printf("token stack: ");
 		foreach(it; this.tokenStack) {
-			printf("%s ", it.toStringShort());
+			printf("%s:%d ", it.toStringShort(), it.getTreeIdx());
 		}
 		println();
 	}
 
-	private void reportError(const Token input) const {
-		printfln("%?1!1s in state %?1!1d on input %?1!1s", "ERROR", 
-			this.parseStack.back(), input.toString());
-		this.printStack();
+	private string reportError(const Token input) const {
+		StringBuffer!(char) ret = new StringBuffer!(char)(1023);
+		ret.pushBack("%?1!1s in state %?1!1d on input %?1!1s this is parse %d", 
+			"ERROR", this.parseStack.back(), input.toString(), this.id);
+		return ret.getString();
 	}
 
-	public void parse() {
-		// we start at state (zero null none 0)
-		this.parseStack.pushBack(0);
-
-		TableItem action;
-		Token input = this.getToken();
+	public Pair!(int,string) step(immutable(TableItem[]) actionTable, 
+			size_t actIdx) {
+		TableItem action = actionTable[actIdx];
+		//Token input = this.getToken();
 		//this.tokenStack.pushBack(input);
 		//log("%s", input.toString());
 		
-		while(true) { 
-			this.printStack();
-			this.printTokenStack();
-			//println(this.ast.toString());
-			action = this.getAction(input); 
-			log(false, "input %d state %d %s", input.getTyp(), 
-				this.parseStack.back(), action.toString());
-			if(action.getTyp() == TableType.Accept) {
-				//log("%s %s", action.toString(), input.toString());
-				this.parseStack.popBack(rules[action.getNumber()].length-1);
-				this.runAction(action.getNumber());
-				break;
-			} else if(action.getTyp() == TableType.Error) {
-				//log();
-				this.reportError(input);
-				assert(false, "ERROR");
-			} else if(action.getTyp() == TableType.Shift) {
-				log("%s", input.toString());
-				//log();
-				this.parseStack.pushBack(action.getNumber());
-				this.tokenStack.pushBack(input);
-				input = this.getToken();
-			} else if(action.getTyp() == TableType.Reduce) {
-				log();
-				// do action
-				// pop RHS of Production
-				this.parseStack.popBack(rules[action.getNumber()].length-1);
-				this.parseStack.pushBack(
-					this.getGoto(rules[action.getNumber()][0]));
+		//action = this.getAction(input)[actIdx]; 
+		//log("%s", action.toString());
+		if(action.getTyp() == TableType.Accept) {
+			//log("%s %s", action.toString(), input.toString());
+			this.parseStack.popBack(rules[action.getNumber()].length-1);
+			this.runAction(action.getNumber());
+			return Pair!(int,string)(1,"");
+		} else if(action.getTyp() == TableType.Error) {
+			//log();
+			return Pair!(int,string)(-1,this.reportError(input));
+		} else if(action.getTyp() == TableType.Shift) {
+			//log("%s", input.toString());
+			//log();
+			this.parseStack.pushBack(action.getNumber());
+			this.tokenStack.pushBack(input);
+			input = this.getToken();
+		} else if(action.getTyp() == TableType.Reduce) {
+			/*log("%d %d %d", this.id, rules[action.getNumber()].length-1, 
+				this.parseStack.getSize());*/
+			// do action
+			// pop RHS of Production
+			this.parseStack.popBack(rules[action.getNumber()].length-1);
+			this.parseStack.pushBack(
+				this.getGoto(rules[action.getNumber()][0]));
 
-				// tmp token stack stuff
-				this.runAction(action.getNumber());
+			// tmp token stack stuff
+			this.runAction(action.getNumber());
+		}
+		//printfln("id %d ast %s", this.id, this.ast.toStringGraph());
+		return Pair!(int,string)(0,"");
+	}
+}
+
+class Parser {
+	private Lexer lexer;
+	private Deque!(Token) tokenBuffer;
+	private Deque!(Token) tokenStore;
+	private Deque!(Parse) parses;
+	private Deque!(Parse) newParses;
+	private Deque!(Parse) acceptingParses;
+	private Deque!(int) toRemove;
+	private Deque!(Pair!(int,string)) parseError;
+	private int nextId;
+	private bool lastTokenFound;
+
+	public this(Lexer lexer) {
+		this.lexer = lexer;	
+		this.tokenBuffer = new Deque!(Token)(64);
+		this.tokenStore = new Deque!(Token);
+		assert(this.tokenStore.isEmpty());
+		assert(this.tokenStore.getSize() == 0, 
+			format("%d", this.tokenStore.getSize()));
+		this.parses = new Deque!(Parse)(16);
+		this.nextId = 0;
+		this.parses.pushBack(new Parse(this,this.nextId++));
+		this.newParses = new Deque!(Parse)(16);
+		this.acceptingParses = new Deque!(Parse)(16);
+		this.toRemove = new Deque!(int)(16);
+		this.parseError = new Deque!(Pair!(int,string))(16);
+		this.lastTokenFound = false;
+	} 
+
+	public AST getAst() {
+		assert(!this.acceptingParses.isEmpty());
+		return this.acceptingParses.front().getAst();
+	}
+
+	/** do not call this direct unless you want whitespace token
+	 */
+	private Token getNextToken() { 
+		if(this.tokenBuffer.isEmpty()) {
+			this.lexer.getToken(this.tokenBuffer);
+		} 
+		if(this.tokenBuffer.isEmpty()) {
+			return Token(termdollar);
+		} else {
+			return this.tokenBuffer.popFront();
+		}
+	}
+
+	private Token getToken() {
+		Token t = this.getNextToken();
+		if(t.getTyp() == termdollar) {
+			this.lastTokenFound = true;
+		}
+		while(t.getTyp() == -99) {
+			if(t.getTyp() == termdollar) {
+				this.lastTokenFound = true;
+			}
+			t = this.getNextToken();
+		}
+		return t;
+	}
+
+	package Token increToNextToken(long idx) {
+		//log("%d %d", idx, this.tokenStore.getSize());
+		if(idx + 1 >= this.tokenStore.getSize()) {
+			//log("lastTokenFound %b", this.lastTokenFound);
+			if(this.lastTokenFound) {
+				return Token(termdollar);
+			}
+			this.tokenStore.pushBack(this.getToken());
+		}
+		//log("%u", this.tokenStore.getSize());
+
+		return this.tokenStore[idx++];
+	}
+
+	private int merge(Parse a, Parse b) {
+		log("a ast = %s", a.getAst().toStringGraph());
+		log("b ast = %s", b.getAst().toStringGraph());
+		return a.getId();
+	}
+
+	private void mergeRun(Deque!(Parse) parse) {
+		// early exit if only one parse is left
+		if(parse.getSize() <= 1) {
+			return;
+		}
+		// remove all accepting parses or merged away parses
+		// call merge function for all parse that are equal
+		for(size_t i = 0; i < parse.getSize() - 1; i++) {
+			if(this.toRemove.contains(parse[i].getId())) {
+				continue;
+			}
+			for(size_t j = i+1; j < parse.getSize(); j++) {
+				if(this.toRemove.contains(parse[j].getId())) {
+					continue;
+				}
+
+				// for every tow parse that are equal call the merge 
+				// function
+				if(parse[i] == parse[j]) {
+					this.toRemove.pushBack(
+						this.merge(parse[i], parse[j]) 
+					);
+				}
 			}
 		}
-		log();
-		this.printStack();
-		this.printTokenStack();
-		//log("%s", this.ast.toString());
 	}
 
-	private Token isExprAstA() {
-		Token typNT = this.tokenStack[-2];
-		Token iNi = this.tokenStack[-4];
-		size_t pos = this.ast.insert(iNi, termIsExpression);
-		this.ast.append(typNT.getTreeIdx());
-		return Token(iNi.getLoc(), termIsExpression, pos);
-	}
+	public bool parse() {
+		while(!this.parses.isEmpty()) {
+			// for every parse
+			for(size_t i = 0; i < this.parses.getSize(); i++) {
+				// get all actions
+				immutable(TableItem[]) actions = this.parses[i].getAction();
+				// if there are more than one action we found a conflict
+				if(actions.length > 1) {
+					/*log("fork at id %d, tos %d, input %s, number of actions %d",
+						this.parses[i].getId(), this.parses[i].getTos(),
+						this.parses[i].getCurrentInput().toString(), 
+						actions.length);
+					*/
+					for(size_t j = 1; j < actions.length; j++) {
+						Parse tmp = new Parse(this, this.parses[i], 
+							this.nextId++);
+						assert(tmp.copyEqualButDistinged(this.parses[i]));
+						auto rslt = tmp.step(actions, j);
+						if(rslt.first == 1) {
+							this.acceptingParses.pushBack(this.parses[i]);
+							this.toRemove.pushBack(this.parses[i].getId);
+						} else if(rslt.first == -1) {
+							this.toRemove.pushBack(this.parses[i].getId);
+							this.parseError.pushBack(rslt);
+						} else {
+							this.newParses.pushBack(tmp);
+						}
+					}
+				}
 
-	private Token isExprAstB() {
-		Token typSpe = this.tokenStack[-2];
-		Token op = this.tokenStack[-3];
-		Token typNT = this.tokenStack[-4];
-		Token iNi = this.tokenStack[-6];
-		size_t pos = this.ast.insert(iNi, termIsExpression);
-		this.ast.append(typNT.getTreeIdx());
-		this.ast.append(op.getTreeIdx());
-		this.ast.append(typSpe.getTreeIdx());
-		return Token(iNi.getLoc(), termIsExpression, pos);
-	}
+				// after all one action is left
+				auto rslt = this.parses[i].step(actions, 0);
+				if(rslt.first == 1) {
+					this.acceptingParses.pushBack(this.parses[i]);
+					this.toRemove.pushBack(this.parses[i].getId);
+				} else if(rslt.first == -1) {
+					this.toRemove.pushBack(this.parses[i].getId);
+					this.parseError.pushBack(rslt);
+				} 
+			}
+			// copy all new parses
+			while(!this.newParses.isEmpty()) {
+				this.parses.pushBack(this.newParses.popBack());
+			}
 
-	private Token isExprAstC() {
-		Token iden = this.tokenStack[-2];
-		Token typNT = this.tokenStack[-3];
-		Token iNi = this.tokenStack[-5];
-		size_t pos = this.ast.insert(iNi, termIsExpression);
-		this.ast.append(typNT.getTreeIdx());
-		this.ast.append(iden.getTreeIdx());
-		return Token(iNi.getLoc(), termIsExpression, pos);
-	}
+			this.mergeRun(this.parses);
 
-	private Token isExprAstD() {
-		Token typSpe = this.tokenStack[-2];
-		Token op = this.tokenStack[-3];
-		Token iden = this.tokenStack[-4];
-		Token typNT = this.tokenStack[-5];
-		Token iNi = this.tokenStack[-7];
-		size_t pos = this.ast.insert(iNi, termIsExpression);
-		this.ast.append(typNT.getTreeIdx());
-		this.ast.append(iden.getTreeIdx());
-		this.ast.append(op.getTreeIdx());
-		this.ast.append(typSpe.getTreeIdx());
-		return Token(iNi.getLoc(), termIsExpression, pos);
-	}
+			this.parses.removeFalse(delegate(Parse a) {
+				return this.toRemove.containsNot(a.getId()); });
 
-	private Token isExprAstE() {
-		Token tmpParList = this.tokenStack[-2];
-		Token typSpe = this.tokenStack[-4];
-		Token op = this.tokenStack[-5];
-		Token iden = this.tokenStack[-6];
-		Token typNT = this.tokenStack[-7];
-		Token iNi = this.tokenStack[-9];
-		size_t pos = this.ast.insert(iNi, termIsExpression);
-		this.ast.append(tmpParList.getTreeIdx());
-		this.ast.append(typSpe.getTreeIdx());
-		this.ast.append(op.getTreeIdx());
-		this.ast.append(iden.getTreeIdx());
-		this.ast.append(typNT.getTreeIdx());
-		return Token(iNi.getLoc(), termIsExpression, pos);
-	}
+			//log("%d", this.toRemove.getSize());
+			this.toRemove.clean();
+			if(this.parses.isEmpty() && this.acceptingParses.isEmpty()) {
+				foreach(it; this.parseError) {
+					printfln("%s", it.second);
+				}
+			}
+			this.parseError.clean();
+			//log("%d", this.toRemove.getSize());
+		}
 
-	private Token typOfAst() {
-		Token exp = this.tokenStack[-2];
-		size_t pos = this.ast.insert(termTypeof);
-		this.ast.append(exp.getTreeIdx());
-		return Token(this.tokenStack[-4].getLoc(), termTypeof, pos);
-	}
-
-	private Token typNTAst() {
-		Token baTy = this.tokenStack[-2];
-		Token de2 = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termTypeNT);
-		this.ast.append(baTy.getTreeIdx());
-		this.ast.append(de2.getTreeIdx());
-		return Token(baTy.getLoc(), termTypeNT, pos);
-	}
-
-	private Token basTypAst() {
-		Token idLst = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termBasicType);
-		this.ast.append(idLst.getTreeIdx());
-		return Token(this.tokenStack[-2].getLoc(), termBasicType, pos);
-	}
-	
-	private Token dec2aAst() {
-		Token baTy2 = this.tokenStack[-2];
-		Token de2 = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termDeclarator2);
-		this.ast.append(baTy2.getTreeIdx());
-		this.ast.append(de2.getTreeIdx());
-		return Token(baTy2.getLoc(), termDeclarator2, pos);
-	}
-
-	private Token dec2bAst() {
-		Token deSufOp = this.tokenStack[-1];
-		Token de2 = this.tokenStack[-3];
-		size_t pos = this.ast.insert(termDeclarator2);
-		this.ast.append(de2.getTreeIdx());
-		this.ast.append(deSufOp.getTreeIdx());
-		return Token(de2.getLoc(), termDeclarator2, pos);
-	}
-
-	private Token dec2cAst() {
-		Token de2 = this.tokenStack[-2];
-		//Token deSuOp = this.tokenStack[-1]; TODO check this
-		size_t pos = this.ast.insert(termDeclarator2);
-		this.ast.append(de2.getTreeIdx());
-		//this.ast.append(deSuOp.getTreeIdx());
-		return Token(de2.getLoc(), termDeclarator2, pos);
-	}
-
-	private Token basTyp2a() {
-		Token typNT = this.tokenStack[-2];
-		size_t pos = this.ast.insert(termBasicType2);
-		this.ast.append(typNT.getTreeIdx());
-		return Token(typNT.getLoc(), termBasicType2, pos);
-	}
-	
-	private Token basTyp2b() {
-		Token assiExp2 = this.tokenStack[-2];
-		Token assiExp1 = this.tokenStack[-4];
-		size_t pos = this.ast.insert(termBasicType2);
-		this.ast.append(assiExp1.getTreeIdx());
-		this.ast.append(assiExp2.getTreeIdx());
-		return Token(assiExp1.getLoc(), termBasicType2, pos);
-	}
-	
-	private Token idLstAst() {
-		Token idLst = this.tokenStack[-3];
-		Token id = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termIdentifierList);
-		this.ast.append(idLst.getTreeIdx());
-		this.ast.append(id.getTreeIdx());
-		return Token(idLst.getLoc(), termIdentifierList, pos);
-	}
-
-	private Token decSufOpaAst() {
-		Token decSufOp = this.tokenStack[-2];
-		Token decSuf = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termDeclaratorSuffixesOpt);
-		this.ast.append(decSufOp.getTreeIdx());
-		this.ast.append(decSuf.getTreeIdx());
-		return Token(decSufOp.getLoc(), termDeclaratorSuffixesOpt, pos);
-	}
-
-	private Token decSufOpbAst() {
-		Token decSuf = this.tokenStack[-1];
-		size_t pos = this.ast.insert(termDeclaratorSuffixesOpt);
-		this.ast.append(decSuf.getTreeIdx());
-		return Token(decSuf.getLoc(), termDeclaratorSuffixesOpt, pos);
-	}
-
-	private Token basTypNoIdLsta() {
-		Token idLst = this.tokenStack[-1];
-		Token typOf = this.tokenStack[-2];
-		size_t pos = this.ast.insert(termBasicTypeNoIdList);
-		this.ast.append(idLst.getTreeIdx());
-		this.ast.append(typOf.getTreeIdx());
-		return Token(idLst.getLoc(), termBasicTypeNoIdList, pos);
-	}
-
-	private Token basTypNoIdLstb() {
-		Token typeNT = this.tokenStack[-2];
-		Token typeCon = this.tokenStack[-4];
-		size_t pos = this.ast.insert(termBasicTypeNoIdList);
-		this.ast.append(typeCon.getTreeIdx());
-		this.ast.append(typeNT.getTreeIdx());
-		return Token(typeCon.getLoc(), termBasicTypeNoIdList, pos);
-	}
-
-	private Token tmpInsAst() {
-		Token tmpArgLstOpt = this.tokenStack[-2];
-		Token identi = this.tokenStack[-5];
-		size_t pos = this.ast.insert(termTemplateInstance);
-		this.ast.append(identi.getTreeIdx());
-		this.ast.append(tmpArgLstOpt.getTreeIdx());
-		return Token(identi.getLoc(), termTemplateInstance, pos);
-	}
-
-	private Token tmpArgLstAst() {
-		Token tmpArg = this.tokenStack[-1];
-		Token tmpArgLst = this.tokenStack[-3];
-		size_t pos = this.ast.insert(termTemplateArgumentList);
-		this.ast.append(tmpArgLst.getTreeIdx());
-		this.ast.append(tmpArg.getTreeIdx());
-		return Token(tmpArgLst.getLoc(), termTemplateArgumentList, pos);
-	}
-
-	private Token impExprAst() {
-		Token assiExpr = this.tokenStack[-2];
-		Token importToken = this.tokenStack[-4];
-		size_t pos = this.ast.insert(importToken, termMixinExpression);
-		this.ast.append(assiExpr.getTreeIdx());
-		return Token(importToken.getLoc(), termImportExpression, pos);
-	}
-
-	private Token mixExprAst() {
-		Token assiExpr = this.tokenStack[-2];
-		Token mixinToken = this.tokenStack[-4];
-		size_t pos = this.ast.insert(mixinToken, termMixinExpression);
-		this.ast.append(assiExpr.getTreeIdx());
-		return Token(mixinToken.getLoc(), termMixinExpression, pos);
-	}
-
-	private Token asseExprAst1() {
-		Token assiExpr = this.tokenStack[-2];
-		Token asse = this.tokenStack[-4];
-		size_t pos = this.ast.insert(asse, termAssertExpression);
-		this.ast.append(assiExpr.getTreeIdx());
-		return Token(asse.getLoc(), termAssertExpression, pos);
-	}
-
-	private Token asseExprAst2() {
-		Token assiExpr2 = this.tokenStack[-2];
-		Token assiExpr1 = this.tokenStack[-4];
-		Token asse = this.tokenStack[-6];
-		size_t pos = this.ast.insert(asse, termAssertExpression);
-		this.ast.append(assiExpr1.getTreeIdx());
-		this.ast.append(assiExpr2.getTreeIdx());
-		return Token(asse.getLoc(), termAssertExpression, pos);
-	}
-
-	private Token exprExprAst() {
-		Token assExpr = this.tokenStack[-1];
-		Token comma = this.tokenStack[-2];
-		Token expr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(termExpression);
-		this.ast.append(assExpr.getTreeIdx());
-		this.ast.append(expr.getTreeIdx());
-		return Token(expr.getLoc(), termExpression, pos);
-	}
-
-	private Token assiExprAst() {
-		Token assiExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token conExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termAssignExpression);
-		this.ast.append(conExpr.getTreeIdx());
-		this.ast.append(assiExpr.getTreeIdx());
-		return Token(conExpr.getLoc(), termAssignExpression, pos);
-	}
-
-	private Token condExprAst() {
-		Token condExp = this.tokenStack[-1];
-		Token colon = this.tokenStack[-2];
-		Token expr = this.tokenStack[-3];
-		Token quest = this.tokenStack[-4];
-		Token orOrExp = this.tokenStack[-5];
-		size_t pos = this.ast.insert(termConditionalExpression);
-		this.ast.append(orOrExp.getTreeIdx());
-		this.ast.append(expr.getTreeIdx());
-		this.ast.append(condExp.getTreeIdx());
-		return Token(orOrExp.getLoc(), termConditionalExpression, pos);
-	}
-
-	private Token orOrExprAst() {
-		Token andAndExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token orOrExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termXorExpression);
-		this.ast.append(orOrExpr.getTreeIdx());
-		this.ast.append(andAndExpr.getTreeIdx());
-		return Token(orOrExpr.getLoc(), termXorExpression, pos);
-	}
-
-	private Token andAndExprAst() {
-		Token orExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token andAndExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termXorExpression);
-		this.ast.append(andAndExpr.getTreeIdx());
-		this.ast.append(orExpr.getTreeIdx());
-		return Token(andAndExpr.getLoc(), termXorExpression, pos);
-	}
-
-	private Token orExprAst() {
-		Token xorExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token orExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termXorExpression);
-		this.ast.append(orExpr.getTreeIdx());
-		this.ast.append(xorExpr.getTreeIdx());
-		return Token(orExpr.getLoc(), termXorExpression, pos);
-	}
-
-	private Token xorExprAst() {
-		Token andExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token xorExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termXorExpression);
-		this.ast.append(xorExpr.getTreeIdx());
-		this.ast.append(andExpr.getTreeIdx());
-		return Token(andExpr.getLoc(), termXorExpression, pos);
-	}
-
-	private Token andExprAst() {
-		Token cmpExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token andExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termAndExpression);
-		this.ast.append(andExpr.getTreeIdx());
-		this.ast.append(cmpExpr.getTreeIdx());
-		return Token(andExpr.getLoc(), termAndExpression, pos);
-	}
-
-	private Token cmpExprAst() {
-		Token shiftExpr2 = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token shiftExpr1 = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termCmpExpression);
-		this.ast.append(shiftExpr1.getTreeIdx());
-		this.ast.append(shiftExpr2.getTreeIdx());
-		return Token(shiftExpr1.getLoc(), termCmpExpression, pos);
-	}
-
-	private Token shiExprAst() {
-		Token addExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token shiftExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termShiftExpression);
-		this.ast.append(shiftExpr.getTreeIdx());
-		this.ast.append(addExpr.getTreeIdx());
-		return Token(shiftExpr.getLoc(), termShiftExpression, pos);
-	}
-
-	private Token addExprAst() {
-		Token mulExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token addExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termAddExpression);
-		this.ast.append(mulExpr.getTreeIdx());
-		this.ast.append(addExpr.getTreeIdx());
-		return Token(mulExpr.getLoc(), termAddExpression, pos);
-	}
-
-	private Token mulExprAst() {
-		Token unExpr = this.tokenStack[-1];
-		Token op = this.tokenStack[-2];
-		Token mulExpr = this.tokenStack[-3];
-		size_t pos = this.ast.insert(op, termMulExpression);
-		this.ast.append(unExpr.getTreeIdx());
-		this.ast.append(mulExpr.getTreeIdx());
-		return Token(mulExpr.getLoc(), termMulExpression, pos);
-	}
-
-	private Token unExprAst() {
-		Token op = this.tokenStack[-2];
-		Token unExpr = this.tokenStack[-1];
-		size_t pos = this.ast.insert(op, termUnaryExpression);
-		this.ast.append(unExpr.getTreeIdx());
-		return Token(op.getLoc(), termUnaryExpression, pos);
-	}
-
-	private Token posExprAst() {
-		Token t = this.tokenStack.back();
-		size_t pos = this.ast.insert(t, termPostfixExpression);
-		return Token(t.getLoc(), termPostfixExpression, pos);
+		// this is necessary because their might be more than one accepting 
+		// parse
+		this.mergeRun(this.acceptingParses);
+		return !this.acceptingParses.isEmpty();
 	}
 }
