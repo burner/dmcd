@@ -23,7 +23,7 @@ PackageName :=
 
 DeclDefs :=
 	DeclDef;
-	| DeclDef DeclDefs;
+	| DeclDefs DeclDef;
 
 DeclDef :=
 	AttributeSpecifier;

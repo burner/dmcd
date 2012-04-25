@@ -16,7 +16,7 @@ build: $(GEN) $(OBJS) Makefile
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
 src/parsetable.d: d4.dlr Makefile
-	../dalr/Dalr -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -g ambiGraph -k true
+	../dalr/Dalr -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -g ambiGraph -k true -z d4rulegraph.dot
 
 src/lextable.d: d4.dlr d.dex Makefile
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable
