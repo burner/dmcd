@@ -32,5 +32,7 @@ void main(string[] args) {
 
 	bool succ = p.parse();
 	printfln("lexing and parsing took %f seconds", sw.stop());
-	p.getAst().toGraph("test1.dot");
+	if(succ) {
+		p.getAst().toGraph("test1.dot");
+	}
 }
