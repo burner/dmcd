@@ -120,13 +120,6 @@ class Parse {
 
 	private Token buildTreeWithLoc(immutable int retType, immutable(int[]) 
 			tokens, size_t rule, Location loc) {
-		/*log("%s", idToString(retType));
-		foreach(it; tokens) {
-			printf("%d ", it);
-		}
-		println();
-		this.printTokenStack();
-		*/
 
 		assert(tokens !is null);
 		assert(tokens.length > 0);
@@ -134,18 +127,11 @@ class Parse {
 		// insert all the token that are not yet placed in the ast
 		foreach(idx, it; tokens) {
 			 if(!this.tokenStack[it].isPlacedInAst()) {
-			 	/*log("rules.length %d, rule %d it %d", rules.length, rule,
-					it);
-				log("rules[rule].length %d", rules[rule].length);
-				log("negIdx(rules[rule], it) %d", negIdx(rules[rule], it));
-				*/
 				size_t npos = this.ast.insert(
 					this.tokenStack[it], // the token
 					rules[rule][negIdx(rules[rule], it)]);
-				//log("%s", this.tokenStack[it].toString());
 				this.tokenStack[it] = Token(this.tokenStack[it], npos);
 				assert(this.tokenStack[it].getTreeIdx() == npos);
-				//log("%s", this.tokenStack[it].toString());
 			 }
 		}
 
@@ -154,29 +140,15 @@ class Parse {
 
 		foreach(idx, it; tokens) {
 			Token tmp = this.tokenStack[it];
-			//log("%s", tmp.toString());
 			this.ast.append(tmp.getTreeIdx());
 		}
-		//log("pos %d %s", pos, this.ast.singleNodeToString(pos));
-		//Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), retType, 
-			//pos);
-		//log("%s", ret.toString());
 		return Token(ret, pos);
 	}
 
 	private Token buildTree(immutable int retType, immutable(int[]) tokens, 
 			size_t rule, immutable int startPosIdx = 0) {
-		/*log("%s, %d", idToString(retType), startPosIdx);
-		foreach(it; tokens) {
-			printf("%d ", it);
-		}
-		println();
-		this.printTokenStack();
-		*/
 		assert(tokens !is null);
 		assert(tokens.length > 0);
-		//log("%s %d", this.tokenStack[tokens[startPosIdx]].toString(), 
-		//	tokens[startPosIdx]);
 
 		// insert all the token that are not yet placed in the ast
 		foreach(idx, it; tokens) {
@@ -184,17 +156,10 @@ class Parse {
 				continue;
 			 }
 			 if(!this.tokenStack[it].isPlacedInAst()) {
-			 	/*log("rules.length %d, rule %d it %d", rules.length, rule,
-					it);
-				log("rules[rule].length %d", rules[rule].length);
-				log("negIdx(rules[rule], it) %d", negIdx(rules[rule], it));
-				*/
 				size_t npos = this.ast.insert(
 					this.tokenStack[it], // the token
 					rules[rule][negIdx(rules[rule], it)]);
-				//log("%s", this.tokenStack[it].toString());
 				this.tokenStack[it] = Token(this.tokenStack[it], npos);
-				//log("%s", this.tokenStack[it].toString());
 			 }
 		}
 
@@ -207,13 +172,10 @@ class Parse {
 			}
 
 			Token tmp = this.tokenStack[it];
-			//log("%s", tmp.toString());
 			this.ast.append(tmp.getTreeIdx());
 		}
-		//log("pos %d %s", pos, this.ast.singleNodeToString(pos));
 		Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), 
 			retType, pos);
-		//log("%s", ret.toString());
 		return ret;
 	}
 
@@ -222,11 +184,11 @@ class Parse {
 			Pair!(int,immutable(immutable(TableItem)[]))(int.min, 
 			[TableItem(TableType.Error, 0)]);
 
-		//log("%d %d", this.parseStack.back(), input.getTyp());
-
 		immutable(Pair!(int,immutable(immutable(TableItem)[]))) toSearch = 
 			Pair!(int,immutable(immutable(TableItem)[]))(
 			this.input.getTyp(), [TableItem(false)]);
+
+		log("%s", this.input.toString());
 
 		immutable(immutable(Pair!(int,immutable(TableItem[])))[]) row
 			= parseTable[this.parseStack.back()];

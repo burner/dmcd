@@ -16,7 +16,7 @@ ModuleName :=
 
 Packages :=
 	PackageName;
-	| Packages dot PackageName;
+	| PackageName dot Packages;
 
 PackageName :=
 	identifier;
@@ -57,7 +57,7 @@ ImportDeclaration :=
 ImportList :=
 	Import;
 	| ImportBindings;
-	| Import comma ImportList;
+	| ImportList comma Import;
 
 Import :=
 	ModuleFullyQualifiedName;
@@ -68,7 +68,7 @@ ImportBindings :=
 
 ImportBindList :=
 	ImportBind;
-	| ImportBind comma ImportBindList;
+	| ImportBindList comma ImportBind;
 
 ImportBind :=
 	identifier;
@@ -205,7 +205,7 @@ IdentifierList :=
 
 StorageClasses :=
 	StorageClass;
-	| StorageClass StorageClasses;
+	| StorageClasses StorageClass;
 
 StorageClass :=
 	abstract;
