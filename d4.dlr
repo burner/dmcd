@@ -353,8 +353,8 @@ Attribute :=
 	| LinkageAttribute;
 	| Pragma;
 	| ProtectionAttribute;
-	| __gshared;
-	| __thread;
+	| gshared;
+	| thread;
 	| abstract;
 	| auto;
 	| const;
@@ -696,7 +696,7 @@ TypeSpecialization :=
 	| union;
 
 TraitsExpression :=
-	__traits lparen TraitsKeyword comma TraitsArguments rparen;
+	traits lparen TraitsKeyword comma TraitsArguments rparen;
 
 TraitsKeyword :=
 	identifier;

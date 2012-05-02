@@ -18,8 +18,8 @@ build: $(GEN) $(OBJS) Makefile
 src/parsetable.d: d4.dlr Makefile
 	../dalr/Dalr -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -e true
 
-src/lextable.d: d4.dlr d.dex Makefile
-	../dex/fsm -i d.dex -n src/lextable.d -nm lextable
+src/lextable.d: d.dlr d.dex Makefile
+	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot
 
 parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d\
 src/token.d Makefile
