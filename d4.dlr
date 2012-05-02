@@ -388,7 +388,7 @@ LinkageType :=
 
 AlignAttribute :=
 	align;
-	| align lparen IntegerLiteral rparen;
+	| align lparen integer rparen;
 
 ProtectionAttribute :=
 	export;
@@ -599,10 +599,10 @@ PrimaryExpression :=
 	| dollarsym;
 	| file;
 	| line;
-	| IntegerLiteral;
-	| FloatLiteral;
-	| CharacterLiteral;
-	| StringLiterals;
+	| integer;
+	| floatliteral;
+	| charliteral;
+	| stringliteral;
 	| ArrayLiteral;
 	| AssocArrayLiteral;
 	| Lambda;
@@ -1147,22 +1147,22 @@ Condition :=
 	 | StaticIfCondition;
 
 VersionCondition :=
-	 version lparen Integer rparen;
+	 version lparen integer rparen;
 	 | version lparen identifier rparen;
 	 | version lparen unittest rparen;
 
 VersionSpecification :=
 	 version assign identifier semicolon;
-	 | version assign Integer semicolon;
+	 | version assign integer semicolon;
 
 DebugCondition :=
 	 debug;
-	 | debug lparen Integer rparen;
+	 | debug lparen integer rparen;
 	 | debug lparen identifier rparen;
 
 DebugSpecification :=
 	 debug assign identifier semicolon;
-	 | debug assign Integer semicolon;
+	 | debug assign integer semicolon;
 
 StaticIfCondition :=
 	 static if lparen AssignExpression rparen;
@@ -1227,10 +1227,10 @@ SymbolTail :=
 TemplateSingleArgument :=
 	identifier;
 	| BasicTypeX;
-	| CharacterLiteral;
-	| StringLiteral;
-	| IntegerLiteral;
-	| FloatLiteral;
+	| charliteral;
+	| stringliteral;
+	| integer;
+	| floatliteral;
 	| true;
 	| false;
 	| null;

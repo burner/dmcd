@@ -1,0 +1,30 @@
+S := Module;
+
+Module := module IdentifierList semicolon;
+	| module IdentifierList semicolon DeclDefs;
+
+IdentifierList := IdentifierList dot identifier;
+	| identifier;
+
+DeclDefs := DeclDefs DeclDef;
+	| DeclDef;
+
+DeclDef := ImportDeclaration;
+	
+ImportDeclaration := import ImportList semicolon; 
+	| static import ImportList semicolon ; 
+
+ImportList := Import ;
+	| ImportBindings ;
+	| Import comma ImportList ;
+
+Import := IdentifierList ;
+	| identifier assign IdentifierList ;
+
+ImportBindings := Import colon ImportBindList ;
+
+ImportBindList := ImportBind ;
+	| ImportBind comma ImportBindList ;
+
+ImportBind := identifier ;
+	| identifier assign identifier ;
