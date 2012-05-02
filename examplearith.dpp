@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 module hello.world.gggg ; 
 
 import zzz.uuu.iii;
 import ttt.kkk.lll;
-=======
-module args;
-
-import bar;
->>>>>>> d12803ca54243b5c0d1692d6bc11f4c5aef4c945
