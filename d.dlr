@@ -1,7 +1,19 @@
-S := IdentifierList;
+S := Module;
+
+Module := module IdentifierList semicolon;
+	| module IdentifierList semicolon DeclDefs;
+	| DeclDefs;
+
+DeclDefs := DeclDef;
+	| DeclDef DeclDefs;
+
+DeclDef := ImportDeclaration;
+
+ImportDeclaration := import IdentifierList semicolon;
 
 IdentifierList := identifier dot IdentifierList; 
 	{: ret = buildTree(termIdentifierList, [-3, -1], actionNum); :}
 
 	| identifier; 
 		{: ret = buildTree(termIdentifierList, [-1], actionNum); :}
+
