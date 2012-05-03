@@ -9,14 +9,14 @@ run: build
 	./dmcd
 
 parsetable: d5.dlr
-	../dalr/Dalr -g ambiGraph -i d5.dlr -r src/parsetable.d -rm parsetable -glr true -e true
+	../dalr/Dalr -g ambiGraph -i d5.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree
 
 build: $(GEN) $(OBJS) Makefile
 	sh IncreBuildId.sh
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
-src/parsetable.d: d4.dlr Makefile
-	../dalr/Dalr -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -e true
+src/parsetable.d: d5.dlr Makefile
+	../dalr/Dalr -g ambiGraph -i d5.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree
 
 src/lextable.d: d.dlr d.dex Makefile
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot

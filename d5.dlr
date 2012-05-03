@@ -1,3 +1,7 @@
+%left andShiftExpr
+%right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
+%right dot
+
 S := Module;
 
 Module := module IdentifierList semicolon;
@@ -9,10 +13,42 @@ IdentifierList := IdentifierList dot identifier;
 DeclDefs := DeclDefs DeclDef;
 	| DeclDef;
 
-DeclDef := ImportDeclaration;
+DeclDef := Attribute colon DeclDefImpl;
+	| Attribute lcurly rcurly;
+	| Attribute lcurly DeclDefImpl rcurly;
+	| DeclDefImpl;
+
+Attribute := extern lparen identifier rparen;
+	| align;
+	| align lparen integer rparen;
+	| deprecated;
+	| ProtectionAttribute;
+	| static;
+	| extern;
+	| final;
+	| synchronized;
+	| override;
+	| abstract;
+	| const;
+	| auto;
+	| scope;
+	| gshared;
+	| shared;
+	| immutable;
+	| inout;
+	| disable;
+
+ProtectionAttribute := private;
+	| package;
+	| protected;
+	| public;
+	| export;
+
+DeclDefImpl := ImportDeclaration;
+	| EnumDeclaration;
+	| Declaration;
 	
 ImportDeclaration := import ImportList semicolon; 
-	| static import ImportList semicolon ; 
 
 ImportList := Import ;
 	| ImportBindings ;
@@ -28,3 +64,300 @@ ImportBindList := ImportBind ;
 
 ImportBind := identifier ;
 	| identifier assign identifier ;
+
+EnumDeclaration := enum identifier EnumBody;
+	| enum EnumBody;
+	| enum identifier colon Type EnumBody;
+	| enum colon Type EnumBody;
+
+EnumBody := semicolon ;
+	| lcurly EnumMembers rcurly;
+
+EnumMembers := EnumMember ;
+	| EnumMembers comma EnumMember;
+
+EnumMember := identifier;
+	| identifier assign AssignExpression;
+	| Type identifier assign AssignExpression;
+
+Type := BasicType;
+
+BasicType :=
+	BasicTypeX;
+	| IdentifierList;
+	| TypeofType;
+	| const lparen Type rparen;
+	| immutable lparen Type rparen;
+	| shared lparen Type rparen;
+	| inout lparen Type rparen;
+
+BasicTypeX := bool;
+	| byte;
+	| cdouble;
+	| cfloat;
+	| char;
+	| creal;
+	| dchar;
+	| double;
+	| float;
+	| idouble;
+	| ifloat;
+	| int;
+	| ireal;
+	| long;
+	| real;
+	| short;
+	| ubyte;
+	| uint;
+	| ulong;
+	| ushort;
+	| void;
+	| wchar;
+
+Expression := AssignExpression;
+	| AssignExpression comma AssignExpression;
+
+AssignExpression :=
+	ConditionalExpression;
+	| AssignExpression assign ConditionalExpression;
+	| AssignExpression plusassign ConditionalExpression;
+	| AssignExpression minusassign ConditionalExpression;
+	| AssignExpression starassign ConditionalExpression;
+	| AssignExpression divassign ConditionalExpression;
+	| AssignExpression moduloassign ConditionalExpression;
+	| AssignExpression andassign ConditionalExpression;
+	| AssignExpression orassign ConditionalExpression;
+	| AssignExpression xorassign ConditionalExpression;
+	| AssignExpression tildeassign ConditionalExpression;
+	| AssignExpression leftshiftassign ConditionalExpression;
+	| AssignExpression rightshiftassign ConditionalExpression;
+	| AssignExpression unsignedrightshiftassign ConditionalExpression;
+	| AssignExpression xorxorassign ConditionalExpression;
+
+ConditionalExpression :=
+	OrOrExpression;
+	| OrOrExpression questionmark Expression colon ConditionalExpression;
+
+OrOrExpression :=
+	AndAndExpression;
+	| OrOrExpression logicalor AndAndExpression;
+
+AndAndExpression :=
+	OrExpression;
+	| AndAndExpression logicaland OrExpression;
+	| CmpExpression;
+	| AndAndExpression logicaland CmpExpression;
+
+OrExpression :=
+	XorExpression;
+	| OrExpression or XorExpression;
+
+XorExpression :=
+	AndExpression;
+	| XorExpression xor AndExpression;
+
+AndExpression :=
+	ShiftExpression %prec andShiftExpr;
+	| AndExpression and ShiftExpression;
+
+CmpExpression :=
+	ShiftExpression;
+	| EqualExpression;
+	| IdentityExpression;
+	| RelExpression;
+	| InExpression;
+
+EqualExpression :=
+	ShiftExpression equal ShiftExpression;
+	| ShiftExpression notequal ShiftExpression;
+
+IdentityExpression :=
+	ShiftExpression is ShiftExpression;
+	| ShiftExpression bangis ShiftExpression;
+
+RelExpression :=
+	ShiftExpression less ShiftExpression;
+	| ShiftExpression lessequal ShiftExpression;
+	| ShiftExpression greater ShiftExpression;
+	| ShiftExpression greaterequal ShiftExpression;
+	| ShiftExpression bangsquareassign ShiftExpression;
+	| ShiftExpression bangsquare ShiftExpression;
+	| ShiftExpression square ShiftExpression;
+	| ShiftExpression squareassign ShiftExpression;
+	| ShiftExpression banggreater ShiftExpression;
+	| ShiftExpression banggreaterassign ShiftExpression;
+	| ShiftExpression bangless ShiftExpression;
+	| ShiftExpression banglessequal ShiftExpression;
+
+InExpression :=
+	ShiftExpression in ShiftExpression;
+	| ShiftExpression bangin ShiftExpression;
+
+ShiftExpression :=
+	AddExpression;
+	| ShiftExpression leftshift AddExpression;
+	| ShiftExpression rightshift AddExpression;
+	| ShiftExpression unsignedrightshift AddExpression;
+
+AddExpression :=
+	MulExpression;
+	| AddExpression plus MulExpression;
+	| AddExpression minus MulExpression;
+	| CatExpression;
+
+CatExpression :=
+	AddExpression tilde MulExpression;
+
+MulExpression :=
+	PowExpression;
+	| MulExpression star PowExpression;
+	| MulExpression div PowExpression;
+	| MulExpression modulo PowExpression;
+
+PowExpression :=
+	PostfixExpression;
+	| PostfixExpression xorxor UnaryExpression;
+
+UnaryExpression :=
+	and UnaryExpression;
+	| increment UnaryExpression;
+	| decrement UnaryExpression;
+	| star UnaryExpression;
+	| minus UnaryExpression;
+	| plus UnaryExpression;
+	| bang UnaryExpression;
+	| tilde UnaryExpression;
+	| CastExpression;
+
+CastExpression :=
+	cast lparen Type rparen UnaryExpression;
+	| cast lapren CastQual rparen UnaryExpression;
+	| cast lparen rparen UnaryExpression;
+
+CastQual :=
+	const;
+	| const shared;
+	| shared const;
+	| inout;
+	| inout shared;
+	| shared inout;
+	| immutable;
+	| shared;
+
+PostfixExpression :=
+	PrimaryExpression;
+	| PostfixExpression dot IdentifierOrTemplateInstance;
+	| PostfixExpression dot NewExpression;
+	| PostfixExpression plusplus;
+	| PostfixExpression minusminus;
+	| PostfixExpression lparen rparen;
+	| PostfixExpression lparen ArgumentList rparen;
+	| IndexExpression;
+	| SliceExpression;
+
+IndexExpression :=
+	PostfixExpression lbrack ArgumentList rbrack;
+
+SliceExpression :=
+	PostfixExpression lbrack rbrack;
+	| PostfixExpression lbrack AssignExpression dotdot AssignExpression rbrack;
+
+PrimaryExpression :=
+	identifier;
+	| TemplateInstance;
+	| this;
+	| super;
+	| null;
+	| true;
+	| false;
+	| dollarsym;
+	| file;
+	| line;
+	| integer;
+	| floatliteral;
+	| charliteral;
+	| stringliteral;
+	| ArrayLiteral;
+	| AssocArrayLiteral;
+	| Lambda;
+	| FunctionLiteral;
+	| AssertExpression;
+	| MixinExpression;
+	| import lparen AssignExpression rparen;
+	| BasicType dot identifier;
+	| Typeof;
+	| TypeidExpression;
+	| IsExpression;
+	| lparen Expression rparen;
+	| TraitsExpression;
+
+Declaration :=
+	AliasDeclaration;
+	| AliasThisDeclaration;
+	| Decl;
+
+AliasDeclaration :=
+	alias BasicType Declarator;
+	
+AliasThisDeclaration := 
+	alias identifier this;
+
+Decl :=
+	StorageClasses Decl;
+	| BasicType Declarators semicolon;
+	| BasicType Declarator FunctionBody;
+	| AutoDeclaration;
+
+Declarators :=
+	DeclaratorInitializer;
+	| DeclaratorInitializer comma DeclaratorIdentifierList;
+
+DeclaratorInitializer :=
+	Declarator;
+	| Declarator assgin Initializer;
+
+DeclaratorIdentifierList :=
+	DeclaratorIdentifier;
+	| DeclaratorIdentifier comma DeclaratorIdentifierList;
+
+DeclaratorIdentifier :=
+	identifier;
+	| identifier assgin Initializer;
+
+StorageClasses :=
+	StorageClass;
+	| StorageClass StorageClasses;
+
+StorageClass :=
+	abstract;
+	| auto;
+	| const;
+	| deprecated;
+	| extern;
+	| final;
+	| immutable;
+	| inout;
+	| shared;
+	| nothrow;
+	| override;
+	| pure;
+	| ref;
+	| scope;
+	| static;
+	| synchronized;
+	| gshared;
+	| thread;
+
+ArgumentList :=
+	AssignExpression ;
+	| AssignExpression comma;
+	| AssignExpression comma ArgumentList;
+
+Typeof :=
+	typeof lparen Expression rparen;
+	| typeof lparen return rparen;
+
+TypeofType :=
+	typeof lparen Expression rparen;
+	| typeof lparen return rparen;
+

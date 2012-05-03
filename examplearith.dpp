@@ -1,9 +1,31 @@
-module hello.world.gggg ; 
+module hello.world.gggg; 
 
-<<<<<<< HEAD
-import bar;
-import gars.hhh;
-=======
-import zzz.uuu.iii;
-import ttt.kkk.lll;
->>>>>>> 2ca2423e1b38a3f2dad92ac87146bbede6aa7783
+static import bar;
+
+import std.stdio : rename, foo = iii;
+
+enum ENUM {
+	integer,
+	foobar,
+	argsbar
+}
+
+enum ENUM {
+	integer,
+	foobar,
+	argsbar
+}
+
+import std.stdio : rename, foo = iii;
+
+enum ENUM {
+	integer,
+	foobar,
+	argsbar
+}
+
+enum ENUM {
+	integer,
+	foobar,
+	argsbar = assign
+}

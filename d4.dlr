@@ -527,8 +527,7 @@ UnaryExpression :=
 ComplementExpression :=
 	tilde UnaryExpression;
 
-NewExpression :=
-	 new AllocatorArguments Type lbrack AssignExpression rbrack;
+NewExpression := new AllocatorArguments Type lbrack AssignExpression rbrack;
 	| new Type lbrack AssignExpression rbrack;
 	| new AllocatorArguments Type lparen ArgumentList lparen;
 	| new Type lparen ArgumentList lparen;
@@ -556,7 +555,7 @@ DeleteExpression :=
 CastExpression :=
 	cast lparen Type rparen UnaryExpression;
 	| cast lapren CastQual rparen UnaryExpression;
-	| cast lparen rpaten UnaryExpression;
+	| cast lparen rparen UnaryExpression;
 
 CastQual :=
 	const;
