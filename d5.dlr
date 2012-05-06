@@ -1,3 +1,13 @@
+%{
+	BasicType := Typeof;
+	PrimaryExpression := Typeof;
+}%
+
+%{
+	IdentifierList := identifier;
+	PrimaryExpression := identifier;
+}%
+
 %left andShiftExpr
 %right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
 %right dot
@@ -13,30 +23,38 @@ IdentifierList := IdentifierList dot identifier;
 DeclDefs := DeclDefs DeclDef;
 	| DeclDef;
 
-DeclDef := Attribute colon DeclDefImpl;
-	| Attribute lcurly rcurly;
-	| Attribute lcurly DeclDefImpl rcurly;
-	| DeclDefImpl;
-
-Attribute := extern lparen identifier rparen;
-	| align;
-	| align lparen integer rparen;
-	| deprecated;
+Attribute := AlignAttribute;
+	| LinkageAttribute;
+	| Pragma;
 	| ProtectionAttribute;
-	| static;
+	| gshared;
+	| thread;
+	| abstract;
+	| auto;
+	| const;
+	| deprecated;
+	| disable;
 	| extern;
 	| final;
-	| synchronized;
-	| override;
-	| abstract;
-	| const;
-	| auto;
-	| scope;
-	| gshared;
-	| shared;
 	| immutable;
 	| inout;
-	| disable;
+	| override;
+	| property;
+	| ref;
+	| safe;
+	| scope;
+	| shared;
+	| static;
+	| synchronized;
+	| system;
+	| trusted;
+
+LinkageAttribute :=
+	extern lparen identifier rparen;
+
+AlignAttribute :=
+	align;
+	| align lparen integer rparen;
 
 ProtectionAttribute := private;
 	| package;
@@ -44,11 +62,25 @@ ProtectionAttribute := private;
 	| public;
 	| export;
 
-DeclDefImpl := ImportDeclaration;
+DeclDef := ImportDeclaration;
+	| AttributeSpecifier;
 	| EnumDeclaration;
 	| Declaration;
+
+Pragma :=
+	pragma lparen identifier rparen;
+	| pragma lparen identifier comma ArgumentList rparen;
+
+
+AttributeSpecifier := Attribute colon; 
+	| Attribute lcurly rcurly;
+	| Attribute lcurly DeclDefs rcurly;
+	| Attribute DeclDef;
 	
 ImportDeclaration := import ImportList semicolon; 
+	| static import ImportList semicolon;
+	| ProtectionAttribute import ImportList semicolon;
+	| ProtectionAttribute static import ImportList semicolon;
 
 ImportList := Import ;
 	| ImportBindings ;
@@ -85,7 +117,7 @@ Type := BasicType;
 BasicType :=
 	BasicTypeX;
 	| IdentifierList;
-	| TypeofType;
+	| Typeof;
 	| const lparen Type rparen;
 	| immutable lparen Type rparen;
 	| shared lparen Type rparen;
@@ -291,6 +323,13 @@ PrimaryExpression :=
 	| lparen Expression rparen;
 	| TraitsExpression;
 
+AssertExpression :=
+	assert lparen AssignExpression rparen;
+	| assert lparen AssignExpression comma AssignExpression rparen;
+
+MixinExpression :=
+	mixin lparen AssignExpression rparen;
+
 Declaration :=
 	AliasDeclaration;
 	| AliasThisDeclaration;
@@ -357,7 +396,32 @@ Typeof :=
 	typeof lparen Expression rparen;
 	| typeof lparen return rparen;
 
-TypeofType :=
-	typeof lparen Expression rparen;
-	| typeof lparen return rparen;
+TypeidExpression :=
+	typeid lparen Type rparen;
+	| typeid lparen Expression rparen;
+
+IsExpression :=
+	is lparen Type rparen;
+	| is lparen Type colon TypeSpecialization rparen;
+	| is lparen Type equal TypeSpecialization rparen;
+	| is lparen Type identifier rparen;
+	| is lparen Type identifier colon TypeSpecialization rparen;
+	| is lparen Type identifier equal TypeSpecialization rparen;
+	| is lparen Type identifier equal TypeSpecialization comma TemplateParameterList rparen;
+
+TypeSpecialization :=
+	Type;
+	| class;
+	| const;
+	| delegate;
+	| enum;
+	| function;
+	| immutable;
+	| inout;
+	| interface;
+	| return;
+	| shared;
+	| struct;
+	| super;
+	| union;
 

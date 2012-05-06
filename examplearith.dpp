@@ -1,31 +1,8 @@
 module hello.world.gggg; 
 
-static import bar;
+import std.stdio, std.algo;
+import std.stdio : writefln, foo = writef;
 
-import std.stdio : rename, foo = iii;
-
-enum ENUM {
-	integer,
-	foobar,
-	argsbar
-}
-
-enum ENUM {
-	integer,
-	foobar,
-	argsbar
-}
-
-import std.stdio : rename, foo = iii;
-
-enum ENUM {
-	integer,
-	foobar,
-	argsbar
-}
-
-enum ENUM {
-	integer,
-	foobar,
-	argsbar = assign
+enum Foo {
+	a
 }

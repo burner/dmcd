@@ -1,29 +1,54 @@
+%{
+	BasicType2 := lbrack AssignExpression rbrack;
+	DeclaratorSuffix := lbrack AssignExpression rback;
+}%
+
+%{
+	Declarator := identifier;
+	TemplateTypeParameter := identifier;
+}%
+
+%left andShiftExpr
+%right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
+%right dot
+
 S := Module;
 
 Module :=
-	ModuleDeclaration DeclDefs;
+	ModuleDeclaration;
+	| ModuleDeclaration DeclDefs; 
+		{: ret = buildTreeWithLoc(termModule, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| DeclDefs;
 
 ModuleDeclaration :=
-	module ModuleFullyQualifiedName semicolon;
+	module ModuleFullyQualifiedName semicolon; 
+		{: ret = buildTreeWithLoc(termModuleDeclaration, [-2], actionNum,
+		this.tokenStack[-3].getLoc()); :}
 
 ModuleFullyQualifiedName :=
 	ModuleName;
-	| Packages dot ModuleName;
+	| Packages dot ModuleName; 
+		{: ret = buildTreeWithLoc(termModuleDeclaration, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 ModuleName :=
 	identifier;
 
 Packages :=
 	PackageName;
-	| PackageName dot Packages;
+	| Packages dot PackageName; 
+		{: ret = buildTreeWithLoc(termPackages, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 PackageName :=
 	identifier;
 
 DeclDefs :=
 	DeclDef;
-	| DeclDefs DeclDef;
+	| DeclDefs DeclDef; 
+		{: ret = buildTreeWithLoc(termDeclDefs, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 DeclDef :=
 	AttributeSpecifier;
@@ -51,34 +76,54 @@ DeclDef :=
 	| semicolon;
 
 ImportDeclaration :=
-	import ImportList semicolon;
-	| static ImportList semicolon;
+	import ImportList semicolon; 
+		{: ret = buildTreeWithLoc(termImportDeclaration, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
+
+	| static import ImportList semicolon; 
+		{: ret = buildTreeWithLoc(termImportDeclaration, [-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 ImportList :=
-	Import;
-	| ImportBindings;
-	| ImportList comma Import;
+	Import; {: ret = buildTreeWithLoc(termImportList, [-1], actionNum,
+		this.tokenStack[-1].getLoc()); :}
+	| ImportBindings; {: ret = buildTreeWithLoc(termImportList, [-1], 
+		actionNum, this.tokenStack[-1].getLoc()); :}
+	| ImportList comma Import; 
+		{: ret = buildTreeWithLoc(termImportList, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 Import :=
-	ModuleFullyQualifiedName;
-	| ModuleAliasIdentifier assign ModuleFullyQualifiedName;
+	IdentifierList; {: ret = buildTreeWithLoc(termImport,[-1], actionNum,
+		this.tokenStack[-1].getLoc()); :}
+	| ModuleAliasIdentifier assign IdentifierList; 
+		{: ret = buildTreeWithLoc(termImport, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 ImportBindings :=
-	Import colon ImportBindList;
+	Import colon ImportBindList; 
+		{: ret = buildTreeWithLoc(termImportBindings, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 ImportBindList :=
 	ImportBind;
-	| ImportBindList comma ImportBind;
+	| ImportBindList comma ImportBind; 
+		{: ret = buildTreeWithLoc(termImportBindList, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 ImportBind :=
 	identifier;
-	| identifier assign identifier;
+	| identifier assign identifier; 
+		{: ret = buildTreeWithLoc(termImportBind, [-3,-1], actionNum,
+			this.tokenStack[-2].getLoc()); :}
 
 ModuleAliasIdentifier :=
 	identifier;
 
 MixinDeclaration :=
-	mixin lparen AssignExpression rparen semicolon;
+	mixin lparen AssignExpression rparen semicolon; 
+		{: ret = buildTreeWithLoc(termMixinDeclaration, [-3], actionNum,
+			this.tokenStack[-5].getLoc()); :}
 
 Declaration :=
 	AliasDeclaration;
@@ -86,10 +131,14 @@ Declaration :=
 	| Decl;
 
 AliasDeclaration :=
-	alias BasicType Declarator;
+	alias BasicType Declarator; 
+		{: ret = buildTreeWithLoc(termAliasDeclaration, [-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	
 AliasThisDeclaration := 
 	alias identifier this;
+		{: ret = buildTreeWithLoc(termAliasThisDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 Decl :=
 	StorageClasses Decl;
@@ -99,7 +148,7 @@ Decl :=
 
 Declarators :=
 	DeclaratorInitializer;
-	| DeclaratorInitializer comma DeclaratorIdentifierList;
+	| DeclaratorIdentifierList comma DeclaratorIdentifier;
 
 DeclaratorInitializer :=
 	Declarator;
@@ -107,7 +156,7 @@ DeclaratorInitializer :=
 
 DeclaratorIdentifierList :=
 	DeclaratorIdentifier;
-	| DeclaratorIdentifier comma DeclaratorIdentifierList;
+	| DeclaratorIdentifierList comma DeclaratorIdentifier;
 
 DeclaratorIdentifier :=
 	identifier;
@@ -168,7 +217,7 @@ BasicType2 :=
 
 BasicTypes2 :=
 	BasicType2;
-	| BasicType2 BasicTypes2;
+	| BasicTypes2 BasicType2;
 
 Declarator :=
 	BasicType2 identifier;
@@ -182,7 +231,7 @@ Declarator :=
 
 DeclaratorSuffixes :=
 	DeclaratorSuffix;
-	| DeclaratorSuffix DeclaratorSuffixes;
+	| DeclaratorSuffixes DeclaratorSuffix;
 
 DeclaratorSuffix :=
 	lbrack rbrack;
@@ -199,9 +248,13 @@ DeclaratorSuffix :=
 
 IdentifierList :=
 	identifier ;
-	| identifier dot IdentifierList;
+	| IdentifierList dot identifier; 
+		{: ret = buildTreeWithLoc(termIdentifierList, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| TemplateInstance ;
-	| TemplateInstance dot IdentifierList;
+	| TemplateInstance dot IdentifierList; 
+		{: ret = buildTreeWithLoc(termTemplateInstance, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 StorageClasses :=
 	StorageClass;
@@ -1088,31 +1141,43 @@ InterfaceBody :=
 	lcurly DeclDefs rcurly;
 	| lcurly rcurly;
 
-EnumDeclaration :=
-	enum EnumBody;
+EnumDeclaration := enum EnumBody; 
+		{: ret = buildTreeWithLoc(termEnumDeclaration, [-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| enum EnumTag EnumBody;
+		{: ret = buildTreeWithLoc(termEnumDeclaration, [-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| enum EnumTag colon EnumBaseType EnumBody;
+		{: ret = buildTreeWithLoc(termEnumDeclaration, [-4,-2,-1], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 	| enum colon EnumBaseType EnumBody;
+		{: ret = buildTreeWithLoc(termEnumDeclaration, [-2,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 EnumTag :=
-	identifier;
+	identifier; 
 
 EnumBaseType :=
 	Type;
 
 EnumBody :=
 	semicolon;
-	| lcurly EnumMembers rcurly;
+	| lcurly EnumMembers rcurly; {: ret = this.tokenStack[-2]; :}
 
 EnumMembers :=
 	EnumMember;
-	| EnumMember comma;
-	| EnumMember comma EnumMembers;
+	| EnumMembers comma EnumMember; {: ret = buildTreeWithLoc(termEnumMembers,
+		[-3,-1], actionNum, this.tokenStack[-3].getLoc()); :}
 
 EnumMember :=
 	 identifier;
-	 | identifier assign AssignExpression;
+	 | identifier assign AssignExpression; 
+	 	{: ret = buildTreeWithLoc(termEnumMember, [-3,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
+
 	 | Type identifier assign AssignExpression;
+	 	{: ret = buildTreeWithLoc(termEnumMember, [-4,-3,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 FunctionBody :=
 	 BlockStatement ;
