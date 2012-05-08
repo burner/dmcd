@@ -174,8 +174,10 @@ class Parse {
 			Token tmp = this.tokenStack[it];
 			this.ast.append(tmp.getTreeIdx());
 		}
-		Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), 
-			retType, pos);
+		/*Token ret = Token(this.tokenStack[tokens[startPosIdx]].getLoc(), 
+			retType, pos);*/
+		Token tmp = this.tokenStack[tokens[startPosIdx]];
+		Token ret = Token(tmp, pos);
 		return ret;
 	}
 

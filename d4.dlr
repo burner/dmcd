@@ -140,27 +140,37 @@ AliasThisDeclaration :=
 		{: ret = buildTreeWithLoc(termAliasThisDeclaration, [-2,-1], 
 			actionNum, this.tokenStack[-3].getLoc()); :}
 
-Decl :=
-	StorageClasses Decl;
-	| BasicType Declarators semicolon;
-	| BasicType Declarator FunctionBody;
+Decl := StorageClasses Decl; {: ret = buildTreeWithLoc(termDecl, [-2,-1], actionNum, 
+		this.tokenStack[-2].getLoc()); :}
+	| BasicType Declarators semicolon; {: ret = buildTreeWithLoc(termDecl, [-3,-2], 
+		actionNum, this.tokenStack[-3].getLoc()); :}
+	| BasicType Declarator FunctionBody; {: ret = buildTreeWithLoc(termDecl, [-3,-2,-1], 
+		actionNum, this.tokenStack[-3].getLoc()); :}
 	| AutoDeclaration;
 
 Declarators :=
 	DeclaratorInitializer;
-	| DeclaratorIdentifierList comma DeclaratorIdentifier;
+	| DeclaratorIdentifierList comma DeclaratorIdentifier; 
+		{: ret = buildTreeWithLoc(termDeclarators, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 DeclaratorInitializer :=
 	Declarator;
 	| Declarator assgin Initializer;
+		{: ret = buildTreeWithLoc(termDeclaratorInitializer, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 DeclaratorIdentifierList :=
 	DeclaratorIdentifier;
 	| DeclaratorIdentifierList comma DeclaratorIdentifier;
+		{: ret = buildTreeWithLoc(termDeclaratorIdentifierList, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 DeclaratorIdentifier :=
 	identifier;
 	| identifier assgin Initializer;
+		{: ret = buildTreeWithLoc(termDeclaratorIdentifier, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 AutoDeclaration := 
 	StorageClasses AutoDeclarationX semicolon; 

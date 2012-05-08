@@ -6,3 +6,5 @@ import std.stdio : writefln, foo = writef;
 enum Foo {
 	a
 }
+
+immutable bool boolean, warheit;
