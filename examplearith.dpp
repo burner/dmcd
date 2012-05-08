@@ -8,3 +8,7 @@ enum Foo {
 }
 
 immutable bool boolean, warheit;
+
+int func(int a, int b) {
+	return a;
+}

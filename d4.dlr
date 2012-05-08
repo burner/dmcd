@@ -174,21 +174,38 @@ DeclaratorIdentifier :=
 
 AutoDeclaration := 
 	StorageClasses AutoDeclarationX semicolon; 
+		{: ret = buildTreeWithLoc(termAutoDeclaration, [-3,-2], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	
-AutoDeclarationX := 
-	identifier assign Initializer;
+AutoDeclarationX := identifier assign Initializer;
+		{: ret = buildTreeWithLoc(termAutoDeclarationX, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| AutoDeclarationX comma identifier assign Initializer;
+		{: ret = buildTreeWithLoc(termAutoDeclarationX, [-5,-3,-2,-1], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 
 BasicType :=
 	BasicTypeX;
-	| dot IdentifierList;
+	| dot IdentifierList; 
+		{: ret = buildTreeWithLoc(termBasicType, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| IdentifierList;
 	| Typeof;
 	| Typeof dot IdentifierList;
+		{: ret = buildTreeWithLoc(termBasicType, [-3,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| const lparen Type rparen;
+		{: ret = buildTreeWithLoc(termBasicType, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| immutable lparen Type rparen;
+		{: ret = buildTreeWithLoc(termBasicType, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| shared lparen Type rparen;
+		{: ret = buildTreeWithLoc(termBasicType, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| inout lparen Type rparen;
+		{: ret = buildTreeWithLoc(termBasicType, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 BasicTypeX :=
 	bool;
@@ -217,44 +234,98 @@ BasicTypeX :=
 BasicType2 :=
 	star;
 	| lbrack rbrack ;
+		{: ret = buildTreeWithLoc(termBasicType2, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| lbrack AssignExpression rbrack ;
+		{: ret = buildTreeWithLoc(termBasicType2, [-3,-1], actionNum, 
+			this.tokenStack[-1].getLoc()); :}
 	| lbrack AssignExpression dotdot AssignExpression rbrack;
+		{: ret = buildTreeWithLoc(termBasicType2, [-4,-3,-2], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 	| lbrack Type rbrack ;
+		{: ret = buildTreeWithLoc(termBasicType2, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| delegate Parameters FunctionAttributes;
+		{: ret = buildTreeWithLoc(termBasicType2, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| function Parameters FunctionAttributes;
+		{: ret = buildTreeWithLoc(termBasicType2, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| delegate Parameters;
+		{: ret = buildTreeWithLoc(termBasicType2, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| function Parameters;
+		{: ret = buildTreeWithLoc(termBasicType2, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 BasicTypes2 :=
 	BasicType2;
 	| BasicTypes2 BasicType2;
+		{: ret = buildTreeWithLoc(termBasicTypes2, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 Declarator :=
 	BasicType2 identifier;
+		{: ret = buildTreeWithLoc(termDeclarator, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| BasicType2 identifier DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| BasicType2 lparen Declarator rparen;
+		{: ret = buildTreeWithLoc(termDeclarator, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| BasicType2 lparen Declarator rparen DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator, [-5,-3,-1], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 	| identifier ;
 	| identifier DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| lparen Declarator rparen;
+		{: ret = buildTreeWithLoc(termDeclarator, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| lparen Declarator rparen DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator, [-3,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 DeclaratorSuffixes :=
 	DeclaratorSuffix;
 	| DeclaratorSuffixes DeclaratorSuffix;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffixes, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 DeclaratorSuffix :=
 	lbrack rbrack;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| lbrack AssignExpression rbrack;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| lbrack Type rbrack;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| Parameters;
 	| Parameters Constraint;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| Parameters MemberFunctionAttributes Constraint;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| Parameters MemberFunctionAttributes;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| TemplateParameterList Parameters Constraint;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| TemplateParameterList Parameters MemberFunctionAttributes;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| TemplateParameterList Parameters MemberFunctionAttributes Constraint;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| TemplateParameterList Parameters;
+		{: ret = buildTreeWithLoc(termDeclaratorSuffix, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 IdentifierList :=
 	identifier ;
@@ -269,6 +340,8 @@ IdentifierList :=
 StorageClasses :=
 	StorageClass;
 	| StorageClasses StorageClass;
+		{: ret = buildTreeWithLoc(termStorageClasses, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 StorageClass :=
 	abstract;
@@ -300,38 +373,74 @@ Property :=
 Type :=
 	BasicType;
 	| BasicType Declarator2;
+		{: ret = buildTreeWithLoc(termType, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 Declarator2 :=
 	BasicType2 DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator2, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| BasicType2;
 	| DeclaratorSuffixes;
 	| BasicType2 lparen Declarator2 rparen DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator2, [-5,-3,-1], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 	| lparen Declarator2 rparen DeclaratorSuffixes;
+		{: ret = buildTreeWithLoc(termDeclarator2, [-3,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| BasicType2 lparen Declarator2 rparen;
+		{: ret = buildTreeWithLoc(termDeclarator2, [-4,-2], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| lparen Declarator2 rparen;
+		{: ret = buildTreeWithLoc(termDeclarator2, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 
 Parameters :=
 	lparen ParameterList rparen;
+		{: ret = buildTreeWithLoc(termParameters, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| lparen rparen;
+		{: ret = buildTreeWithLoc(termParameters, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 ParameterList :=
 	Parameter;
-	| Parameter comma ParameterList;
+	| ParameterList comma Parameter;
+		{: ret = buildTreeWithLoc(termParameterList, [-3,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| dotdotdot;
 
 Parameter :=
 	InOut BasicType Declarator;
+		{: ret = buildTreeWithLoc(termParameter, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| InOut BasicType Declarator dotdotdot;
+		{: ret = buildTreeWithLoc(termParameter, [-4,-3,-2,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| InOut BasicType Declarator assign DefaultInitializerExpression;
+		{: ret = buildTreeWithLoc(termParameter, [-5,-4,-3,-2,-1], actionNum, 
+			this.tokenStack[-5].getLoc()); :}
 	| InOut Type InOut Type dotdotdot;
+		{: ret = buildTreeWithLoc(termParameter, [-4,-3,-2,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| BasicType Declarator ;
+		{: ret = buildTreeWithLoc(termParameter, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| BasicType Declarator dotdotdot;
+		{: ret = buildTreeWithLoc(termParameter, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| BasicType Declarator assign DefaultInitializerExpression;
+		{: ret = buildTreeWithLoc(termParameter, [-4,-3,-2,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 	| Type InOut Type dotdotdot;
+		{: ret = buildTreeWithLoc(termParameter, [-4,-3,-2,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 InOut :=
 	InOutX;
 	| InOut InOutX;
+		{: ret = buildTreeWithLoc(termInOut, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 InOutX :=
 	in;
@@ -343,6 +452,8 @@ InOutX :=
 FunctionAttributes :=
 	FunctionAttribute;
 	| FunctionAttribute FunctionAttributes;
+		{: ret = buildTreeWithLoc(termFunctionAttributes, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 FunctionAttribute :=
 	nothrow;
@@ -352,6 +463,8 @@ FunctionAttribute :=
 MemberFunctionAttributes :=
 	MemberFunctionAttribute;
 	| MemberFunctionAttribute MemberFunctionAttributes;
+		{: ret = buildTreeWithLoc(termMemberFunctionAttributes, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 MemberFunctionAttribute :=
 	const;
@@ -360,8 +473,9 @@ MemberFunctionAttribute :=
 	| shared;
 	| FunctionAttribute;
 
-DefaultInitializerExpression :=
-	assign AssignExpression;
+DefaultInitializerExpression := assign AssignExpression;
+		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| file;
 	| line;
 
@@ -377,32 +491,52 @@ NonVoidInitializer :=
 ArrayInitializer :=
 	lbrack rbrack;
 	| lbrack ArrayMemberInitializations rbrack;
+		{: ret = buildTreeWithLoc(termArrayInitializer, [-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ArrayMemberInitializations :=
 	ArrayMemberInitialization;
 	| ArrayMemberInitialization comma;
+		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ArrayMemberInitialization comma ArrayMemberInitializations;
+		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ArrayMemberInitialization :=
 	NonVoidInitializer;
 	| AssignExpression colon NonVoidInitializer;
+		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StructInitializer :=
 	lcurly rcurly;
 	| lcurly StructMemberInitializers rcurly;
+		{: ret = buildTreeWithLoc(termStructInitializer, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 StructMemberInitializers :=
 	StructMemberInitializer;
 	| StructMemberInitializer comma;
+		{: ret = buildTreeWithLoc(termStructMemberInitializers, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| StructMemberInitializer comma StructMemberInitializers;
+		{: ret = buildTreeWithLoc(termStructMemberInitializers, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StructMemberInitializer :=
 	NonVoidInitializer;
 	| identifier colon NonVoidInitializer;
+		{: ret = buildTreeWithLoc(termStructMemberInitializer, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 Typeof :=
 	typeof lparen Expression rparen;
+		{: ret = buildTreeWithLoc(termTypeof, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| typeof lparen return rparen;
+		{: ret = buildTreeWithLoc(termTypeof, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 VoidInitializer :=
 	void;
@@ -410,6 +544,8 @@ VoidInitializer :=
 AttributeSpecifier :=
 	Attribute colon;
 	| Attribute DeclarationBlock;
+		{: ret = buildTreeWithLoc(termAttributeSpecifier, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 Attribute :=
 	AlignAttribute;
@@ -441,17 +577,22 @@ Attribute :=
 DeclarationBlock :=
 	DeclDef;
 	| lcurly DeclDefs rcurly;
+		{: ret = buildTreeWithLoc(termDeclarationBlock, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| lcurly rcurly;
+		{: ret = buildTreeWithLoc(termDeclarationBlock, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 LinkageAttribute :=
-	extern lparen LinkageType rparen;
-
-LinkageType :=
-	identifier;
+	extern lparen identifier rparen;
+		{: ret = buildTreeWithLoc(termLinkageAttribute, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 AlignAttribute :=
 	align;
 	| align lparen integer rparen;
+		{: ret = buildTreeWithLoc(termAlignAttribute, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ProtectionAttribute :=
 	export;
@@ -462,6 +603,8 @@ ProtectionAttribute :=
 
 Pragma :=
 	pragma lparen identifier rparen;
+		{: ret = buildTreeWithLoc(termPragma, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| pragma lparen identifier comma ArgumentList rparen;
 
 Expression :=
