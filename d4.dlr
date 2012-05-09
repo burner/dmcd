@@ -2129,10 +2129,10 @@ InterfaceTemplateDeclaration :=
 
 TemplateMixinDeclaration :=
 	mixin template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
-	 	{: ret = buildTreeWithLoc(termMixinTemplateDeclaration, 
+	 	{: ret = buildTreeWithLoc(termTemplateMixinDeclaration,
 			[-8,-6,-4,-2], actionNum, this.tokenStack[-10].getLoc()); :}
 	| mixin template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
-	 	{: ret = buildTreeWithLoc(termMixinTemplateDeclaration, 
+	 	{: ret = buildTreeWithLoc(termTemplateMixinDeclaration, 
 			[-7,-5,-2], actionNum, this.tokenStack[-9].getLoc()); :}
 
 Constraint :=
@@ -2158,7 +2158,7 @@ TemplateMixin :=
 			actionNum, this.tokenStack[-8].getLoc()); :}
 UnitTest :=
 	unittest BlockStatement;
-	 	{: ret = buildTreeWithLoc(termUnittest, [-2,-1], 
+	 	{: ret = buildTreeWithLoc(termUnitTest, [-2,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AsmInstruction :=
