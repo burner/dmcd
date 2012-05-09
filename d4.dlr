@@ -8,9 +8,8 @@
 	TemplateTypeParameter := identifier;
 }%
 
-%left andShiftExpr
-%right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
-%right dot
+//%right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
+//%right dot
 
 S := Module;
 
@@ -221,6 +220,7 @@ BasicTypeX :=
 	| wchar;
 	| dchar;
 	| float;
+	| size_t;
 	| double;
 	| real;
 	| ifloat;
@@ -1237,7 +1237,7 @@ BlockStatement :=
 
 StatementList :=
 	Statement;
-	| Statement StatementList;
+	| StatementList Statement;
 		{: ret = buildTreeWithLoc(termStatementList, [-2,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 

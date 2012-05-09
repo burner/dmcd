@@ -1,14 +1,22 @@
 module hello.world.gggg; 
 
-import std.stdio, std.algo;
-import std.stdio : writefln, foo = writef;
-
-enum Foo {
-	a
+int func(int a, int b) {
+	return a + b;
 }
 
-immutable bool boolean, warheit;
+private class Gen(T) {
+	public:
+		this(T foo) {
+			this.foo = foo;
+		}
 
-int func(int a, int b) {
-	return a;
+		T get() const {
+			return this.foo;
+		}
+	
+	private T foo;
+}
+
+void main() {
+	Gen!(int) g = new Gen!(int)();
 }

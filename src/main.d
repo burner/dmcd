@@ -24,7 +24,7 @@ void main(string[] args) {
 
 	size_t numToken = 10;
 	arg.setOption("-t", "--token", "the number of token lexed in one run of" ~
-		" lexer. Default is 10" , numToken);
+		" lexer. Default is 10" , numToken, true);
 
 	StopWatch sw;
 	sw.start();

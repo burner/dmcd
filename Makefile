@@ -9,7 +9,7 @@ run: build
 	./dmcd
 
 parsetable: d4.dlr
-	../dalr/Dalr -g ambiGraph -i d5.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree
+	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -k true
 
 build: $(GEN) $(OBJS) Makefile
 	sh IncreBuildId.sh
