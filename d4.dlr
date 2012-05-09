@@ -1089,22 +1089,44 @@ AssertExpression :=
 
 MixinExpression :=
 	mixin lparen AssignExpression rparen;
+		{: ret = buildTreeWithLoc(termMixinExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ImportExpression :=
 	import lparen AssignExpression rparen;
+		{: ret = buildTreeWithLoc(termImportExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 TypeidExpression :=
 	typeid lparen Type rparen;
+		{: ret = buildTreeWithLoc(termTypeidExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| typeid lparen Expression rparen;
+		{: ret = buildTreeWithLoc(termTypeidExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 IsExpression :=
 	is lparen Type rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| is lparen Type colon TypeSpecialization rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-4,-3,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| is lparen Type equal TypeSpecialization rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-4,-3,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| is lparen Type identifier rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-3,-2], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| is lparen Type identifier colon TypeSpecialization rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-5,-4,-3,-2], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| is lparen Type identifier equal TypeSpecialization rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-5,-4,-3,-2], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| is lparen Type identifier equal TypeSpecialization comma TemplateParameterList rparen;
+		{: ret = buildTreeWithLoc(termIsExpression, [-6,-5,-4,-3,-2], 
+			actionNum, this.tokenStack[-8].getLoc()); :}
 
 TypeSpecialization :=
 	Type;
@@ -1124,6 +1146,8 @@ TypeSpecialization :=
 
 TraitsExpression :=
 	traits lparen TraitsKeyword comma TraitsArguments rparen;
+		{: ret = buildTreeWithLoc(termTraitsExpression, [-4,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 TraitsKeyword :=
 	identifier;
@@ -1131,6 +1155,8 @@ TraitsKeyword :=
 TraitsArguments :=
 	TraitsArgument;
 	| TraitsArgument comma TraitsArguments;
+		{: ret = buildTreeWithLoc(termTraitsArguments, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 TraitsArgument :=
 	AssignExpression;
@@ -1146,7 +1172,7 @@ NoScopeNonEmptyStatement :=
     | BlockStatement;
 
 NoScopeStatement :=
-    semicolon;;
+    semicolon;
     | NonEmptyStatement;
     | BlockStatement;
 
@@ -1198,30 +1224,50 @@ ScopeBlockStatement :=
 
 LabeledStatement :=
 	identifier colon NoScopeStatement;
+		{: ret = buildTreeWithLoc(termLabeledStatement, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 BlockStatement :=
 	lcurly rcurly ;
+		{: ret = buildTreeWithLoc(termBlockStatement, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| lcurly StatementList rcurly;
+		{: ret = buildTreeWithLoc(termBlockStatement, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 StatementList :=
 	Statement;
 	| Statement StatementList;
+		{: ret = buildTreeWithLoc(termStatementList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ExpressionStatement :=
 	Expression semicolon;
+		{: ret = buildTreeWithLoc(termExpressionStatement, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 DeclarationStatement :=
 	Declaration;
 
 IfStatement :=
 	if lparen IfCondition rparen ThenStatement;
+		{: ret = buildTreeWithLoc(termIfStatement, [-4,-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| if lparen IfCondition rparen ThenStatement else ElseStatement;
+		{: ret = buildTreeWithLoc(termIfStatement, [-5,-3,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 
 IfCondition :=
 	Expression;
 	| auto identifier assign Expression;
+		{: ret = buildTreeWithLoc(termIfCondition, [-4,-3,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| BasicType BasicTypes2 Declarator assign Expression;
+		{: ret = buildTreeWithLoc(termIfCondition, [-5,-4,-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| BasicType Declarator assign Expression;
+		{: ret = buildTreeWithLoc(termIfCondition, [-4,-3,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ThenStatement :=
 	ScopeStatement;
@@ -1231,15 +1277,27 @@ ElseStatement :=
 
 WhileStatement :=
 	while lparen Expression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termWhileStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 DoStatement :=
 	do ScopeStatement while lparen Expression rparen semicolon;
+		{: ret = buildTreeWithLoc(termDoStatement, [-6,-3], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 
 ForStatement :=
     for lparen Initialize Test semicolon Increment rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termForStatement, [-6,-5,-3,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
     | for lparen Initialize Test semicolon rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termForStatement, [-5,-4,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
     | for lparen Initialize semicolon Increment rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termForStatement, [-5,-3,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
     | for lparen Initialize semicolon rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termForStatement, [-4,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 Initialize :=
 	semicolon;
@@ -1255,6 +1313,8 @@ Increment :=
 
 ForeachStatement :=
 	Foreach lparen ForeachTypeList semicolon Aggregate rparen NoScopeNonEmptyStatement;
+		{: ret = buildTreeWithLoc(termForeachStatement, [-5,-3,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 
 Foreach :=
 	foreach;
@@ -1263,11 +1323,19 @@ Foreach :=
 ForeachTypeList :=
 	ForeachType;
 	| ForeachType comma ForeachTypeList;
+		{: ret = buildTreeWithLoc(termForeachTypeList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ForeachType :=
 	ref Type identifier;
+		{: ret = buildTreeWithLoc(termForeachTypeList, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| ref identifier;
+		{: ret = buildTreeWithLoc(termForeachTypeList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| Type identifier;
+		{: ret = buildTreeWithLoc(termForeachTypeList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| identifier;
 
 Aggregate :=
@@ -1275,12 +1343,18 @@ Aggregate :=
 
 SwitchStatement :=
 	switch lparen Expression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termSwitchStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 CaseStatement :=
 	case ArgumentList colon ScopeStatementList;
+		{: ret = buildTreeWithLoc(termCaseStatement, [-3,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 CaseRangeStatement :=
 	case FirstExp colon dotdot case LastExp colon ScopeStatementList;
+		{: ret = buildTreeWithLoc(termCaseRangeStatement, [-7,-3,-1], 
+			actionNum, this.tokenStack[-8].getLoc()); :}
 
 FirstExp :=
 	AssignExpression;
@@ -1290,6 +1364,8 @@ LastExp :=
 
 DefaultStatement :=
 	default colon Statement;
+		{: ret = buildTreeWithLoc(termDefaultStatement, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ScopeStatementList :=
     StatementListNoCaseNoDefault;
@@ -1297,6 +1373,8 @@ ScopeStatementList :=
 StatementListNoCaseNoDefault :=
     StatementNoCaseNoDefault;
     | StatementNoCaseNoDefault StatementListNoCaseNoDefault;
+		{: ret = buildTreeWithLoc(termStatementListNoCaseNoDefault, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StatementNoCaseNoDefault :=
     semicolon;
@@ -1305,80 +1383,150 @@ StatementNoCaseNoDefault :=
 
 FinalSwitchStatement :=
 	final switch lparen Expression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termFinalSwitchStatement, [-3,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 ContinueStatement :=
 	continue semicolon;
+		{: ret = buildTreeWithLoc(termFinalSwitchStatement, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| continue identifier semicolon;
+		{: ret = buildTreeWithLoc(termFinalSwitchStatement, [-3,-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 BreakStatement :=
 	break semicolon;
+		{: ret = buildTreeWithLoc(termBreakStatement, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| break identifier semicolon;
+		{: ret = buildTreeWithLoc(termBreakStatement, [-3,-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ReturnStatement :=
 	return semicolon;
+		{: ret = buildTreeWithLoc(termReturnStatement, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| return Expression semicolon;
+		{: ret = buildTreeWithLoc(termReturnStatement, [-3,-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 GotoStatement :=
 	goto identifier semicolon;
+		{: ret = buildTreeWithLoc(termGotoStatement, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| goto default semicolon;
+		{: ret = buildTreeWithLoc(termGotoStatement, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| goto case semicolon;
+		{: ret = buildTreeWithLoc(termGotoStatement, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| goto case Expression semicolon;
+		{: ret = buildTreeWithLoc(termGotoStatement, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 WithStatement :=
 	with lparen Expression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termWithStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| with lparen Symbol rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termWithStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| with lparen TemplateInstance rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termWithStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 SynchronizedStatement :=
 	synchronized ScopeStatement;
+		{: ret = buildTreeWithLoc(termSynchronizedStatement, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| synchronized lparen Expression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termSynchronizedStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 TryStatement :=
 	try ScopeStatement Catches;
+		{: ret = buildTreeWithLoc(termTryStatement, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| try ScopeStatement Catches FinallyStatement;
+		{: ret = buildTreeWithLoc(termTryStatement, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| try ScopeStatement FinallyStatement;
+		{: ret = buildTreeWithLoc(termTryStatement, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 Catches :=
 	LastCatch;
 	| Catch;
 	| Catch Catches;
+		{: ret = buildTreeWithLoc(termCatches, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 LastCatch :=
 	catch NoScopeNonEmptyStatement;
+		{: ret = buildTreeWithLoc(termLastCatch, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 Catch :=
 	catch lparen CatchParameter rparen NoScopeNonEmptyStatement;
+		{: ret = buildTreeWithLoc(termCatch, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 CatchParameter :=
 	BasicType identifier;
+		{: ret = buildTreeWithLoc(termCatchParameter, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 FinallyStatement :=
 	finally NoScopeNonEmptyStatement;
+		{: ret = buildTreeWithLoc(termFinallyStatement, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ThrowStatement :=
 	throw Expression semicolon;
+		{: ret = buildTreeWithLoc(termThrowStatement, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ScopeGuardStatement :=
 	scope lparen exit rparen NonEmptyOrScopeBlockStatement;
+		{: ret = buildTreeWithLoc(termScopeGuardStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| scope lparen success rparen NonEmptyOrScopeBlockStatement;
+		{: ret = buildTreeWithLoc(termScopeGuardStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| scope lparen failure rparen NonEmptyOrScopeBlockStatement;
+		{: ret = buildTreeWithLoc(termScopeGuardStatement, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 AsmStatement :=
 	asm lcurly rcurly;
+		{: ret = buildTreeWithLoc(termAsmStatement, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| asm lcurly AsmInstructionList rcurly;
+		{: ret = buildTreeWithLoc(termAsmStatement, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 AsmInstructionList :=
 	AsmInstruction semicolon;
-	| AsmInstruction semicolon AsmInstructionList;
+		{: ret = buildTreeWithLoc(termAsmInstructionList, [-2], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| AsmInstructionList semicolon AsmInstruction;
+		{: ret = buildTreeWithLoc(termAsmInstructionList, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 PragmaStatement :=
 	Pragma NoScopeStatement;
+		{: ret = buildTreeWithLoc(termPragmaStatement, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 MixinStatement :=
 	mixin lparen AssignExpression rparen semicolon;
+		{: ret = buildTreeWithLoc(termMixinStatement, [-3], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 ForeachRangeStatement :=
 	Foreach lparen ForeachType semicolon LwrExpression dotdot UprExpression rparen ScopeStatement;
+		{: ret = buildTreeWithLoc(termForeachRangeStatement, [-7,-5,-3,-1], 
+			actionNum, this.tokenStack[-9].getLoc()); :}
 
 LwrExpression :=
 	Expression;
@@ -1388,19 +1536,33 @@ UprExpression :=
 
 AggregateDeclaration :=
 	struct identifier StructBody;
+		{: ret = buildTreeWithLoc(termAggregateDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| union identifier StructBody;
+		{: ret = buildTreeWithLoc(termAggregateDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| struct identifier semicolon;
+		{: ret = buildTreeWithLoc(termAggregateDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| union identifier semicolon;
+		{: ret = buildTreeWithLoc(termAggregateDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| StructTemplateDeclaration;
 	| UnionTemplateDeclaration;
 
 StructBody :=
 	lcurly StructBodyDeclarations rcurly;
+		{: ret = buildTreeWithLoc(termStructBody, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| lcurly rcurly;
+		{: ret = buildTreeWithLoc(termStructBody, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StructBodyDeclarations :=
 	StructBodyDeclaration;
 	| StructBodyDeclaration StructBodyDeclarations;
+		{: ret = buildTreeWithLoc(termStructBodyDeclarations, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StructBodyDeclaration :=
 	DeclDef;
@@ -1417,15 +1579,25 @@ StructDeallocator :=
 
 StructPostblit :=
 	this lparen this rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termStructPostblit, [-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 ClassDeclaration :=
 	class identifier BaseClassList ClassBody;
+		{: ret = buildTreeWithLoc(termClassDeclaration, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| class identifier ClassBody;
+		{: ret = buildTreeWithLoc(termClassDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| ClassTemplateDeclaration;
 
 BaseClassList :=
 	colon SuperClass;
+		{: ret = buildTreeWithLoc(termBaseClassList, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| colon SuperClass comma Interfaces;
+		{: ret = buildTreeWithLoc(termBaseClassList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| Interfaces;
 
 SuperClass :=
@@ -1434,6 +1606,8 @@ SuperClass :=
 Interfaces :=
 	Interface;
 	| Interface comma Interfaces;
+		{: ret = buildTreeWithLoc(termInterfaces, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 Interface :=
 	identifier;
@@ -1441,10 +1615,14 @@ Interface :=
 ClassBody :=
 	lcurly rcurly;
 	| lcurly ClassBodyDeclarations rcurly;
+		{: ret = buildTreeWithLoc(termInterfaces, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ClassBodyDeclarations :=
 	ClassBodyDeclaration;
 	| ClassBodyDeclaration ClassBodyDeclarations;
+		{: ret = buildTreeWithLoc(termClassBodyDeclarations, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ClassBodyDeclaration :=
 	DeclDef;
@@ -1454,67 +1632,127 @@ ClassBodyDeclaration :=
 
 Constructor :=
 	this Parameters FunctionBody;
+		{: ret = buildTreeWithLoc(termConstructor, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| TemplatedConstructor;
 
 TemplatedConstructor :=
     this lparen TemplateParameterList rparen Parameters Constraint FunctionBody;
+		{: ret = buildTreeWithLoc(termTemplatedConstructor, [-5,-3,-2,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
     | this lparen TemplateParameterList rparen Parameters FunctionBody;
+		{: ret = buildTreeWithLoc(termTemplatedConstructor, [-4,-2,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 Destructor :=
 	tilde this lparen rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termDestructor, [-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 StaticConstructor :=
 	static this lparen rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termStaticConstructor, [-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 StaticDestructor :=
 	static tilde this lparen rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termStaticDestructor, [-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 SharedStaticConstructor :=
 	shared static this lparen rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termSharedStaticConstructor, [-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 SharedStaticDestructor :=
 	shared static tilde this lparen rparen FunctionBody;
+		{: ret = buildTreeWithLoc(termSharedStaticDestructor, [-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 
 Invariant :=
 	invariant lparen rparen BlockStatement;
+		{: ret = buildTreeWithLoc(termInvariant, [-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ClassAllocator :=
 	new Parameters FunctionBody;
+		{: ret = buildTreeWithLoc(termClassAllocator, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ClassDeallocator :=
 	delete Parameters FunctionBody;
+		{: ret = buildTreeWithLoc(termClassDeallocator, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 AliasThis :=
 	alias identifier this semicolon;
+		{: ret = buildTreeWithLoc(termAliasThis, [-3], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 NewAnonClassExpression :=
 	new AllocatorArguments class ClassArguments Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-5,-3,-2,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| new AllocatorArguments class ClassArguments SuperClass ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-5,-3,-2,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| new AllocatorArguments class ClassArguments SuperClass Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, 
+			[-6,-4,-3,-2,-1], actionNum, this.tokenStack[-7].getLoc()); :}
 	| new AllocatorArguments class Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-4,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new AllocatorArguments class SuperClass ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-4,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new AllocatorArguments class SuperClass Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-5,-3,-2,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| new class ClassArguments Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-3,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new class ClassArguments SuperClass ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-3,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new class ClassArguments SuperClass Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-4,-3,-2,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	| new class ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| new class SuperClass Interfaces ClassBody;
+		{: ret = buildTreeWithLoc(termNewAnonClassExpression, [-3,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 ClassArguments :=
 	lparen ArgumentList rparen;
+		{: ret = buildTreeWithLoc(termClassArguments, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| lparen rparen;
+		{: ret = buildTreeWithLoc(termClassArguments, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 InterfaceDeclaration :=
 	interface identifier BaseInterfaceList InterfaceBody;
+		{: ret = buildTreeWithLoc(termInterfaceDeclaration, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| interface identifier InterfaceBody;
+		{: ret = buildTreeWithLoc(termInterfaceDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| InterfaceTemplateDeclaration;
 
 BaseInterfaceList :=
 	colon Interfaces;
+		{: ret = buildTreeWithLoc(termBaseInterfaceList, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 InterfaceBody :=
 	lcurly DeclDefs rcurly;
+		{: ret = buildTreeWithLoc(termInterfaceBody, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| lcurly rcurly;
+		{: ret = buildTreeWithLoc(termInterfaceBody, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 EnumDeclaration := enum EnumBody; 
 		{: ret = buildTreeWithLoc(termEnumDeclaration, [-1], actionNum, 
@@ -1537,12 +1775,15 @@ EnumBaseType :=
 
 EnumBody :=
 	semicolon;
-	| lcurly EnumMembers rcurly; {: ret = this.tokenStack[-2]; :}
+	| lcurly EnumMembers rcurly; 
+		{: ret = buildTreeWithLoc(termEnumBody, [-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 
 EnumMembers :=
 	EnumMember;
-	| EnumMembers comma EnumMember; {: ret = buildTreeWithLoc(termEnumMembers,
-		[-3,-1], actionNum, this.tokenStack[-3].getLoc()); :}
+	| EnumMembers comma EnumMember; 
+		{: ret = buildTreeWithLoc(termEnumMembers, [-3,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 
 EnumMember :=
 	 identifier;
@@ -1558,27 +1799,51 @@ FunctionBody :=
 	 BlockStatement ;
 	 | BodyStatement;
 	 | InStatement BodyStatement;
+	 	{: ret = buildTreeWithLoc(termFunctionBody, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	 | OutStatement BodyStatement;
+	 	{: ret = buildTreeWithLoc(termFunctionBody, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	 | InStatement OutStatement BodyStatement;
+	 	{: ret = buildTreeWithLoc(termFunctionBody, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	 | OutStatement InStatement BodyStatement;
+	 	{: ret = buildTreeWithLoc(termFunctionBody, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 
 InStatement :=
 	 in BlockStatement;
+	 	{: ret = buildTreeWithLoc(termInStatement, [-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 OutStatement :=
 	 out BlockStatement;
+	 	{: ret = buildTreeWithLoc(termOutStatement, [-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	 | out lparen identifier rparen BlockStatement;
+	 	{: ret = buildTreeWithLoc(termOutStatement, [-3,-1], actionNum, 
+			this.tokenStack[-4].getLoc()); :}
 
 BodyStatement :=
 	 body BlockStatement;
+	 	{: ret = buildTreeWithLoc(termBodyStatement, [-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 
 ConditionalDeclaration :=
 	 Condition DeclarationBlock;
+	 	{: ret = buildTreeWithLoc(termConditionalDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	 | Condition DeclarationBlock else DeclarationBlock;
+	 	{: ret = buildTreeWithLoc(termConditionalDeclaration, [-4,-3,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ConditionalStatement :=
 	 Condition NoScopeNonEmptyStatement;
+	 	{: ret = buildTreeWithLoc(termConditionalDeclaration, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	 | Condition NoScopeNonEmptyStatement else NoScopeNonEmptyStatement;
+	 	{: ret = buildTreeWithLoc(termConditionalDeclaration, [-5,-4,-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 Condition :=
 	 VersionCondition;
@@ -1587,32 +1852,60 @@ Condition :=
 
 VersionCondition :=
 	 version lparen integer rparen;
+	 	{: ret = buildTreeWithLoc(termVersionCondition, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	 | version lparen identifier rparen;
+	 	{: ret = buildTreeWithLoc(termVersionCondition, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	 | version lparen unittest rparen;
+	 	{: ret = buildTreeWithLoc(termVersionCondition, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 VersionSpecification :=
 	 version assign identifier semicolon;
+	 	{: ret = buildTreeWithLoc(termVersionSpecification, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	 | version assign integer semicolon;
+	 	{: ret = buildTreeWithLoc(termVersionSpecification, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 DebugCondition :=
 	 debug;
 	 | debug lparen integer rparen;
+	 	{: ret = buildTreeWithLoc(termDebugCondition, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	 | debug lparen identifier rparen;
+	 	{: ret = buildTreeWithLoc(termDebugCondition, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 DebugSpecification :=
 	 debug assign identifier semicolon;
+	 	{: ret = buildTreeWithLoc(termDebugSpecification, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	 | debug assign integer semicolon;
+	 	{: ret = buildTreeWithLoc(termDebugSpecification, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 StaticIfCondition :=
 	 static if lparen AssignExpression rparen;
+	 	{: ret = buildTreeWithLoc(termStaticIfCondition, [-2], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 StaticAssert :=
 	 static assert lparen AssignExpression rparen semicolon;
+	 	{: ret = buildTreeWithLoc(termStaticAssert, [-3], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 	 | static assert lparen AssignExpression comma AssignExpression rparen semicolon;
+	 	{: ret = buildTreeWithLoc(termStaticAssert, [-5,-3], 
+			actionNum, this.tokenStack[-8].getLoc()); :}
 
 TemplateDeclaration :=
 	template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
+	 	{: ret = buildTreeWithLoc(termTemplateDeclaration, [-8,-6,-4,-2], 
+			actionNum, this.tokenStack[-9].getLoc()); :}
 	| template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
+	 	{: ret = buildTreeWithLoc(termTemplateDeclaration, [-7,-5,-2], 
+			actionNum, this.tokenStack[-8].getLoc()); :}
 
 TemplateIdentifier :=
 	identifier;
@@ -1620,7 +1913,11 @@ TemplateIdentifier :=
 TemplateParameterList :=
 	TemplateParameter;
 	| TemplateParameter comma;
+	 	{: ret = buildTreeWithLoc(termTemplateParameterList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| TemplateParameter comma TemplateParameterList;
+	 	{: ret = buildTreeWithLoc(termTemplateParameterList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateParameter :=
 	TemplateTypeParameter;
@@ -1631,6 +1928,8 @@ TemplateParameter :=
 
 TemplateTupleParameter :=
 	identifier dotdotdot;
+	 	{: ret = buildTreeWithLoc(termTemplateTupleParameter, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 IdentifierOrTemplateInstance :=
 	identifier;
@@ -1638,15 +1937,25 @@ IdentifierOrTemplateInstance :=
 
 TemplateInstance :=
 	TemplateIdentifier bang lparen TemplateArgumentList rparen;
+	 	{: ret = buildTreeWithLoc(termTemplateInstance, [-5,-2], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| TemplateIdentifier bang TemplateSingleArgument;
+	 	{: ret = buildTreeWithLoc(termTemplateInstance, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 TemplateThisParameter :=
     this TemplateTypeParameter;
+	 	{: ret = buildTreeWithLoc(termTemplateThisParameter, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateArgumentList :=
 	TemplateArgument;
 	| TemplateArgument comma;
+	 	{: ret = buildTreeWithLoc(termTemplateArgumentList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| TemplateArgument comma TemplateArgumentList;
+	 	{: ret = buildTreeWithLoc(termTemplateArgumentList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateArgument :=
 	Type;
@@ -1656,12 +1965,18 @@ TemplateArgument :=
 Symbol :=
 	SymbolTail;
 	| dot SymbolTail;
+	 	{: ret = buildTreeWithLoc(termSymbol, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 SymbolTail :=
 	identifier;
-	| identifier dot SymbolTail;
+	| SymbolTail dot identifier;
+	 	{: ret = buildTreeWithLoc(termSymbolTail, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| TemplateInstance;
-	| TemplateInstance dot SymbolTail;
+	| SymbolTail dot TemplateInstance;
+	 	{: ret = buildTreeWithLoc(termSymbolTail, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateSingleArgument :=
 	identifier;
@@ -1679,85 +1994,172 @@ TemplateSingleArgument :=
 TemplateTypeParameter :=
 	identifier;
 	| identifier TemplateTypeParameterSpecialization;
+	 	{: ret = buildTreeWithLoc(termTemplateTypeParameter, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| identifier TemplateTypeParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateTypeParameter, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| identifier TemplateTypeParameterSpecialization TemplateTypeParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateTypeParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 TemplateTypeParameterSpecialization :=
 	colon Type;
+	 	{: ret = buildTreeWithLoc(termTemplateTypeParameterSpecialization, 
+			[-2,-1], actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateTypeParameterDefault :=
 	assign Type;
+	 	{: ret = buildTreeWithLoc(termTemplateTypeParameterDefault, 
+			[-2,-1], actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateValueParameter :=
     BasicType Declarator;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameter, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
     | BasicType Declarator TemplateValueParameterSpecialization;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
     | BasicType Declarator TemplateValueParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
     | BasicType Declarator TemplateValueParameterSpecialization TemplateValueParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameter, [-4,-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 TemplateValueParameterSpecialization :=
     colon ConditionalExpression;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameterSpecialization, 
+			[-2,-1], actionNum, this.tokenStack[-2].getLoc()); :}
 
 // already part of conditionalexpression
 TemplateValueParameterDefault :=
 	assign file;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameterDefault, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| assign line;
+	 	{: ret = buildTreeWithLoc(termTemplateValueParameterDefault, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateAliasParameter :=
 	alias BasicType Declarator TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-4,-3,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| alias identifier TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias identifier TemplateAliasParameterSpecialization;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias identifier TemplateAliasParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias identifier;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias BasicType Declarator TemplateAliasParameterDefault;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias BasicType Declarator TemplateAliasParameterSpecialization;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias BasicType Declarator;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 TemplateAliasParameterSpecialization :=
 	colon Type;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameterSpecialization, [-1]
+			, actionNum, this.tokenStack[-2].getLoc()); :}
 	| colon ConditionalExpression;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameterSpecialization, [-1]
+			, actionNum, this.tokenStack[-2].getLoc()); :}
 
 TemplateAliasParameterDefault :=
 	assign Type;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameterDefault, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| assign ConditionalExpression;
+	 	{: ret = buildTreeWithLoc(termTemplateAliasParameterDefault, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ClassTemplateDeclaration :=
 	class identifier lparen TemplateParameterList rparen Constraint BaseClassList ClassBody;
+	 	{: ret = buildTreeWithLoc(termClassTemplateDeclaration, 
+			[-7,-5,-3,-2,-1], actionNum, this.tokenStack[-8].getLoc()); :}
 	| class identifier lparen TemplateParameterList rparen BaseClassList ClassBody;
+	 	{: ret = buildTreeWithLoc(termClassTemplateDeclaration, [-6,-4,-2,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| class identifier lparen TemplateParameterList rparen Constraint ClassBody;
+	 	{: ret = buildTreeWithLoc(termClassTemplateDeclaration, [-6,-4,-2,-1], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| class identifier lparen TemplateParameterList rparen ClassBody;
+	 	{: ret = buildTreeWithLoc(termClassTemplateDeclaration, [-5,-3,-1], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 StructTemplateDeclaration :=
 	struct identifier lparen TemplateParameterList rparen Constraint StructBody;
+	 	{: ret = buildTreeWithLoc(termStructTemplateDeclaration, [-6,-4,-2,-1],
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| struct identifier lparen TemplateParameterList rparen StructBody;
+	 	{: ret = buildTreeWithLoc(termStructTemplateDeclaration, [-5,-3,-1],
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 UnionTemplateDeclaration :=
 	union identifier lparen TemplateParameterList rparen Constraint StructBody;
+	 	{: ret = buildTreeWithLoc(termUnionTemplateDeclaration, [-6,-4,-2,-1],
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| union identifier lparen TemplateParameterList rparen StructBody;
+	 	{: ret = buildTreeWithLoc(termUnionTemplateDeclaration, [-5,-3,-1],
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 InterfaceTemplateDeclaration :=
 	interface identifier lparen TemplateParameterList rparen Constraint BaseInterfaceList InterfaceBody;
+	 	{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
+			[-7,-5,-3,-2,-1], actionNum, this.tokenStack[-8].getLoc()); :}
 	| interface identifier lparen TemplateParameterList rparen Constraint InterfaceBody;
+	 	{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
+			[-6,-4,-2,-1], actionNum, this.tokenStack[-7].getLoc()); :}
 	| interface identifier lparen TemplateParameterList rparen InterfaceBody;
+	 	{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
+			[-5,-3,-1], actionNum, this.tokenStack[-7].getLoc()); :}
 	| interface identifier lparen TemplateParameterList rparen BaseInterfaceList InterfaceBody;
+	 	{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
+			[-6,-4,-2,-1], actionNum, this.tokenStack[-7].getLoc()); :}
 
 TemplateMixinDeclaration :=
 	mixin template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
+	 	{: ret = buildTreeWithLoc(termMixinTemplateDeclaration, 
+			[-8,-6,-4,-2], actionNum, this.tokenStack[-10].getLoc()); :}
 	| mixin template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
+	 	{: ret = buildTreeWithLoc(termMixinTemplateDeclaration, 
+			[-7,-5,-2], actionNum, this.tokenStack[-9].getLoc()); :}
 
 Constraint :=
 	if lparen ConstraintExpression rparen;
+	 	{: ret = buildTreeWithLoc(termConstraint, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 ConstraintExpression :=
 	Expression;
 
 TemplateMixin :=
 	mixin TemplateIdentifier semicolon;
+	 	{: ret = buildTreeWithLoc(termTemplateMixin, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| mixin TemplateIdentifier identifer semicolon;
+	 	{: ret = buildTreeWithLoc(termTemplateMixin, [-3], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| mixin TemplateIdentifier bang lparen TemplateArgumentList rparen semicolon;
+	 	{: ret = buildTreeWithLoc(termTemplateMixin, [-6,-3], 
+			actionNum, this.tokenStack[-7].getLoc()); :}
 	| mixin TemplateIdentifier bang lparen TemplateArgumentList rparen semicolon identifier;
-
+	 	{: ret = buildTreeWithLoc(termTemplateMixin, [-7,-4,-1], 
+			actionNum, this.tokenStack[-8].getLoc()); :}
 UnitTest :=
 	unittest BlockStatement;
+	 	{: ret = buildTreeWithLoc(termUnittest, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AsmInstruction :=
 	stringliteral;
