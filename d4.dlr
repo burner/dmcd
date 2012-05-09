@@ -29,8 +29,8 @@ ModuleDeclaration :=
 ModuleFullyQualifiedName :=
 	ModuleName;
 	| Packages dot ModuleName; 
-		{: ret = buildTreeWithLoc(termModuleDeclaration, [-3,-1], actionNum, 
-			this.tokenStack[-2].getLoc()); :}
+		{: ret = buildTreeWithLoc(termModuleFullyQualifiedName, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ModuleName :=
 	identifier;
@@ -854,69 +854,130 @@ ComplementExpression := tilde UnaryExpression;
 		{: ret = buildTreeWithLoc(termComplementExpression, [-2,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
-NewExpression := new AllocatorArguments Type lbrack AssignExpression rbrack;
+NewExpression := 
+	new AllocatorArguments Type lbrack AssignExpression rbrack;
+		{: ret = buildTreeWithLoc(termNewExpression, [-5,-4,-2], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new Type lbrack AssignExpression rbrack;
+		{: ret = buildTreeWithLoc(termNewExpression, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| new AllocatorArguments Type lparen ArgumentList lparen;
+		{: ret = buildTreeWithLoc(termNewExpression, [-5,-4,-2], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| new Type lparen ArgumentList lparen;
+		{: ret = buildTreeWithLoc(termNewExpression, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| new AllocatorArguments Type;
+		{: ret = buildTreeWithLoc(termNewExpression, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| new Type;
+		{: ret = buildTreeWithLoc(termNewExpression, [-1], 
+			actionNum, this.tokenStack[-1].getLoc()); :}
 	| NewAnonClassExpression;
 
 AllocatorArguments :=
 	lparen ArgumentList rparen;
+		{: ret = buildTreeWithLoc(termAllocatorArguments, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| lparen rparen;
 
 ArgumentList :=
 	AssignExpression ;
 	| AssignExpression comma;
+		{: ret = buildTreeWithLoc(termArgumentList, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| AssignExpression comma ArgumentList;
+		{: ret = buildTreeWithLoc(termArgumentList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ClassArguments :=
 	class lparen ArgumentList rparen;
+		{: ret = buildTreeWithLoc(termClassArguments, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| class lparen rparen;
+		{: ret = buildTreeWithLoc(termClassArguments, [-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| class;
 
 DeleteExpression :=
 	delete UnaryExpression;
+		{: ret = buildTreeWithLoc(termDeleteExpression, [-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 CastExpression :=
 	cast lparen Type rparen UnaryExpression;
+		{: ret = buildTreeWithLoc(termCastExpression, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| cast lapren CastQual rparen UnaryExpression;
+		{: ret = buildTreeWithLoc(termCastExpression, [-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| cast lparen rparen UnaryExpression;
+		{: ret = buildTreeWithLoc(termCastExpression, [-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 CastQual :=
 	const;
 	| const shared;
+		{: ret = buildTreeWithLoc(termCastQual, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| shared const;
+		{: ret = buildTreeWithLoc(termCastQual, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| inout;
 	| inout shared;
+		{: ret = buildTreeWithLoc(termCastQual, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| shared inout;
+		{: ret = buildTreeWithLoc(termCastQual, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| immutable;
 	| shared;
 
 PostfixExpression :=
 	PrimaryExpression;
-	| PostfixExpression dot IdentifierOrTemplateInstance;
-	| PostfixExpression dot NewExpression;
-	| PostfixExpression plusplus;
-	| PostfixExpression minusminus;
-	| PostfixExpression lparen rparen;
-	| PostfixExpression lparen ArgumentList rparen;
 	| IndexExpression;
 	| SliceExpression;
+	| PostfixExpression dot IdentifierOrTemplateInstance;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| PostfixExpression dot NewExpression;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| PostfixExpression plusplus;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| PostfixExpression minusminus;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| PostfixExpression lparen rparen;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
+	| PostfixExpression lparen ArgumentList rparen;
+		{: ret = buildTreeWithLoc(termPostfixExpression, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 IndexExpression :=
 	PostfixExpression lbrack ArgumentList rbrack;
+		{: ret = buildTreeWithLoc(termIndexExpression, [-4,-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 SliceExpression :=
 	PostfixExpression lbrack rbrack;
+		{: ret = buildTreeWithLoc(termSliceExpression, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| PostfixExpression lbrack AssignExpression dotdot AssignExpression rbrack;
+		{: ret = buildTreeWithLoc(termSliceExpression, [-6,-4,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 PrimaryExpression :=
 	identifier;
 	| dot identifier;
+		{: ret = buildTreeWithLoc(termPrimaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| TemplateInstance;
 	| dot TemplateInstance;
+		{: ret = buildTreeWithLoc(termPrimaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| this;
 	| super;
 	| null;
@@ -937,28 +998,44 @@ PrimaryExpression :=
 	| MixinExpression;
 	| ImportExpression;
 	| BasicType dot identifier;
+		{: ret = buildTreeWithLoc(termPrimaryExpression, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| Typeof;
 	| TypeidExpression;
 	| IsExpression;
 	| lparen Expression rparen;
+		{: ret = buildTreeWithLoc(termPrimaryExpression, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| TraitsExpression;
 
 Lambda :=
 	identifier arrow AssignExpression;
+		{: ret = buildTreeWithLoc(termLambda, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| ParameterAttributes arrow AssignExpression;
+		{: ret = buildTreeWithLoc(termLambda, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 ArrayLiteral :=
 	lbrack ArgumentList rbrack;
+		{: ret = buildTreeWithLoc(termArrayLiteral, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 AssocArrayLiteral :=
 	lbrack KeyValuePairs rbrack;
+		{: ret = buildTreeWithLoc(termAssocArrayLiteral, [-2], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 KeyValuePairs :=
 	KeyValuePair;
 	| KeyValuePair comma KeyValuePairs;
+		{: ret = buildTreeWithLoc(termKeyValuePairs, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 KeyValuePair :=
 	KeyExpression colon ValueExpression;
+		{: ret = buildTreeWithLoc(termKeyValuePair, [-3,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 KeyExpression :=
 	AssignExpression;
@@ -968,23 +1045,47 @@ ValueExpression :=
 
 FunctionLiteral :=
 	function Type ParameterAttributes FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-4,-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| function ParameterAttributes FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| function Type FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| function FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| delegate Type ParameterAttributes FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-4,-3,-2,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| delegate ParameterAttributes FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| delegate Type FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-3,-2,-1], 
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| delegate FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ParameterAttributes FunctionBody;
+		{: ret = buildTreeWithLoc(termFunctionLiteral, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| FunctionBody;
 
 ParameterAttributes :=
 	Parameters;
 	| Parameters FunctionAttributes;
+		{: ret = buildTreeWithLoc(termParameterAttributes, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AssertExpression :=
 	assert lparen AssignExpression rparen;
+		{: ret = buildTreeWithLoc(termAssertExpression, [-2], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 	| assert lparen AssignExpression comma AssignExpression rparen;
+		{: ret = buildTreeWithLoc(termAssertExpression, [-4,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 MixinExpression :=
 	mixin lparen AssignExpression rparen;
