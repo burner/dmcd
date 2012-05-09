@@ -85,17 +85,14 @@ ImportDeclaration :=
 			this.tokenStack[-4].getLoc()); :}
 
 ImportList :=
-	Import; {: ret = buildTreeWithLoc(termImportList, [-1], actionNum,
-		this.tokenStack[-1].getLoc()); :}
-	| ImportBindings; {: ret = buildTreeWithLoc(termImportList, [-1], 
-		actionNum, this.tokenStack[-1].getLoc()); :}
+	Import; 
+	| ImportBindings; 
 	| ImportList comma Import; 
 		{: ret = buildTreeWithLoc(termImportList, [-3,-1], actionNum,
 			this.tokenStack[-2].getLoc()); :}
 
 Import :=
-	IdentifierList; {: ret = buildTreeWithLoc(termImport,[-1], actionNum,
-		this.tokenStack[-1].getLoc()); :}
+	IdentifierList; 
 	| ModuleAliasIdentifier assign IdentifierList; 
 		{: ret = buildTreeWithLoc(termImport, [-3,-1], actionNum,
 			this.tokenStack[-2].getLoc()); :}
@@ -140,12 +137,15 @@ AliasThisDeclaration :=
 		{: ret = buildTreeWithLoc(termAliasThisDeclaration, [-2,-1], 
 			actionNum, this.tokenStack[-3].getLoc()); :}
 
-Decl := StorageClasses Decl; {: ret = buildTreeWithLoc(termDecl, [-2,-1], actionNum, 
-		this.tokenStack[-2].getLoc()); :}
-	| BasicType Declarators semicolon; {: ret = buildTreeWithLoc(termDecl, [-3,-2], 
-		actionNum, this.tokenStack[-3].getLoc()); :}
-	| BasicType Declarator FunctionBody; {: ret = buildTreeWithLoc(termDecl, [-3,-2,-1], 
-		actionNum, this.tokenStack[-3].getLoc()); :}
+Decl := StorageClasses Decl; 
+		{: ret = buildTreeWithLoc(termDecl, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
+	| BasicType Declarators semicolon; 
+		{: ret = buildTreeWithLoc(termDecl, [-3,-2], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
+	| BasicType Declarator FunctionBody; 
+		{: ret = buildTreeWithLoc(termDecl, [-3,-2,-1], actionNum, 
+			this.tokenStack[-3].getLoc()); :}
 	| AutoDeclaration;
 
 Declarators :=
@@ -157,20 +157,20 @@ Declarators :=
 DeclaratorInitializer :=
 	Declarator;
 	| Declarator assgin Initializer;
-		{: ret = buildTreeWithLoc(termDeclaratorInitializer, [-3,-1], actionNum, 
-			this.tokenStack[-2].getLoc()); :}
+		{: ret = buildTreeWithLoc(termDeclaratorInitializer, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 DeclaratorIdentifierList :=
 	DeclaratorIdentifier;
 	| DeclaratorIdentifierList comma DeclaratorIdentifier;
-		{: ret = buildTreeWithLoc(termDeclaratorIdentifierList, [-3,-1], actionNum, 
-			this.tokenStack[-2].getLoc()); :}
+		{: ret = buildTreeWithLoc(termDeclaratorIdentifierList, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 DeclaratorIdentifier :=
 	identifier;
 	| identifier assgin Initializer;
-		{: ret = buildTreeWithLoc(termDeclaratorIdentifier, [-3,-1], actionNum, 
-			this.tokenStack[-2].getLoc()); :}
+		{: ret = buildTreeWithLoc(termDeclaratorIdentifier, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AutoDeclaration := 
 	StorageClasses AutoDeclarationX semicolon; 
@@ -181,8 +181,8 @@ AutoDeclarationX := identifier assign Initializer;
 		{: ret = buildTreeWithLoc(termAutoDeclarationX, [-3,-1], actionNum, 
 			this.tokenStack[-2].getLoc()); :}
 	| AutoDeclarationX comma identifier assign Initializer;
-		{: ret = buildTreeWithLoc(termAutoDeclarationX, [-5,-3,-2,-1], actionNum, 
-			this.tokenStack[-5].getLoc()); :}
+		{: ret = buildTreeWithLoc(termAutoDeclarationX, [-5,-3,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 BasicType :=
 	BasicTypeX;
@@ -490,6 +490,8 @@ NonVoidInitializer :=
 
 ArrayInitializer :=
 	lbrack rbrack;
+		{: ret = buildTreeWithLoc(termArrayInitializer, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| lbrack ArrayMemberInitializations rbrack;
 		{: ret = buildTreeWithLoc(termArrayInitializer, [-1], 
 			actionNum, this.tokenStack[-3].getLoc()); :}
@@ -497,16 +499,16 @@ ArrayInitializer :=
 ArrayMemberInitializations :=
 	ArrayMemberInitialization;
 	| ArrayMemberInitialization comma;
-		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-2], 
-			actionNum, this.tokenStack[-2].getLoc()); :}
+		{: ret = buildTreeWithLoc(termArrayMemberInitializations, [-2], 
+			actionNum, this.tokenStack[-1].getLoc()); :}
 	| ArrayMemberInitialization comma ArrayMemberInitializations;
-		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-3,-1], 
+		{: ret = buildTreeWithLoc(termArrayMemberInitializations, [-3,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ArrayMemberInitialization :=
 	NonVoidInitializer;
 	| AssignExpression colon NonVoidInitializer;
-		{: ret = buildTreeWithLoc(termDefaultInitializerExpression, [-3,-1], 
+		{: ret = buildTreeWithLoc(termArrayMemberInitialization, [-3,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
 StructInitializer :=
@@ -603,9 +605,11 @@ ProtectionAttribute :=
 
 Pragma :=
 	pragma lparen identifier rparen;
-		{: ret = buildTreeWithLoc(termPragma, [-4,-2], 
+		{: ret = buildTreeWithLoc(termPragma, [-2], 
 			actionNum, this.tokenStack[-4].getLoc()); :}
 	| pragma lparen identifier comma ArgumentList rparen;
+		{: ret = buildTreeWithLoc(termPragma, [-4,-2], 
+			actionNum, this.tokenStack[-6].getLoc()); :}
 
 Expression :=
 	CommaExpression;
@@ -613,49 +617,93 @@ Expression :=
 CommaExpression :=
 	AssignExpression;
 	| AssignExpression comma CommaExpression;
+		{: ret = buildTreeWithLoc(termCommaExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AssignExpression :=
 	ConditionalExpression;
 	| ConditionalExpression assign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression plusassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression minusassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression starassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression divassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression moduloassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression andassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression orassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression xorassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression tildeassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression leftshiftassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression rightshiftassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression unsignedrightshiftassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ConditionalExpression xorxorassign AssignExpression;
+		{: ret = buildTreeWithLoc(termAssignExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ConditionalExpression :=
 	OrOrExpression;
 	| OrOrExpression questionmark Expression colon ConditionalExpression;
+		{: ret = buildTreeWithLoc(termConditionalExpression, [-5,-3,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 
 OrOrExpression :=
 	AndAndExpression;
 	| OrOrExpression logicalor AndAndExpression;
+		{: ret = buildTreeWithLoc(termOrOrExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AndAndExpression :=
 	OrExpression;
 	| AndAndExpression logicaland OrExpression;
+		{: ret = buildTreeWithLoc(termAndAndExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| CmpExpression;
 	| AndAndExpression logicaland CmpExpression;
+		{: ret = buildTreeWithLoc(termAndAndExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 OrExpression :=
 	XorExpression;
 	| OrExpression or XorExpression;
+		{: ret = buildTreeWithLoc(termOrExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 XorExpression :=
 	AndExpression;
 	| XorExpression xor AndExpression;
+		{: ret = buildTreeWithLoc(termXorExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AndExpression :=
 	ShiftExpression ;
 	| AndExpression and ShiftExpression;
+		{: ret = buildTreeWithLoc(termAndExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 CmpExpression :=
 	ShiftExpression;
@@ -666,72 +714,145 @@ CmpExpression :=
 
 EqualExpression :=
 	ShiftExpression equal ShiftExpression;
+		{: ret = buildTreeWithLoc(termEqualExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression notequal ShiftExpression;
+		{: ret = buildTreeWithLoc(termEqualExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 IdentityExpression :=
 	ShiftExpression is ShiftExpression;
+		{: ret = buildTreeWithLoc(termIdentityExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression bangis ShiftExpression;
+		{: ret = buildTreeWithLoc(termIdentityExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 RelExpression :=
 	ShiftExpression less ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression lessequal ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression greater ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression greaterequal ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression bangsquareassign ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression bangsquare ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression square ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression squareassign ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression banggreater ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression banggreaterassign ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression bangless ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression banglessequal ShiftExpression;
+		{: ret = buildTreeWithLoc(termRelExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 InExpression :=
 	ShiftExpression in ShiftExpression;
+		{: ret = buildTreeWithLoc(termInExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression bangin ShiftExpression;
+		{: ret = buildTreeWithLoc(termInExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 ShiftExpression :=
 	AddExpression;
 	| ShiftExpression leftshift AddExpression;
+		{: ret = buildTreeWithLoc(termShiftExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression rightshift AddExpression;
+		{: ret = buildTreeWithLoc(termShiftExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ShiftExpression unsignedrightshift AddExpression;
+		{: ret = buildTreeWithLoc(termShiftExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 AddExpression :=
 	MulExpression;
-	| AddExpression plus MulExpression;
-	| AddExpression minus MulExpression;
 	| CatExpression;
+	| AddExpression plus MulExpression;
+		{: ret = buildTreeWithLoc(termAddExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
+	| AddExpression minus MulExpression;
+		{: ret = buildTreeWithLoc(termAddExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 CatExpression :=
 	AddExpression tilde MulExpression;
+		{: ret = buildTreeWithLoc(termCatExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 MulExpression :=
 	PowExpression;
 	| MulExpression star PowExpression;
+		{: ret = buildTreeWithLoc(termMulExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| MulExpression div PowExpression;
+		{: ret = buildTreeWithLoc(termMulExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| MulExpression modulo PowExpression;
+		{: ret = buildTreeWithLoc(termMulExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 PowExpression :=
 	PostfixExpression;
 	| PostfixExpression xorxor UnaryExpression;
+		{: ret = buildTreeWithLoc(termPowExpression, [-3,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 UnaryExpression :=
 	and UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| increment UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| decrement UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| star UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| minus UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| plus UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| bang UnaryExpression;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| ComplementExpression;
 	| lparen Type rparen dot identifier;
+		{: ret = buildTreeWithLoc(termUnaryExpression, [-4,-2,-1], 
+			actionNum, this.tokenStack[-5].getLoc()); :}
 	| NewExpression;
 	| DeleteExpression;
 	| CastExpression;
 	| PowExpression;
 
-ComplementExpression :=
-	tilde UnaryExpression;
+ComplementExpression := tilde UnaryExpression;
+		{: ret = buildTreeWithLoc(termComplementExpression, [-2,-1], 
+			actionNum, this.tokenStack[-2].getLoc()); :}
 
 NewExpression := new AllocatorArguments Type lbrack AssignExpression rbrack;
 	| new Type lbrack AssignExpression rbrack;
