@@ -155,7 +155,7 @@ Declarators :=
 
 DeclaratorInitializer :=
 	Declarator;
-	| Declarator assgin Initializer;
+	| Declarator assign Initializer;
 		{: ret = buildTreeWithLoc(termDeclaratorInitializer, [-3,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
@@ -167,7 +167,7 @@ DeclaratorIdentifierList :=
 
 DeclaratorIdentifier :=
 	identifier;
-	| identifier assgin Initializer;
+	| identifier assign Initializer;
 		{: ret = buildTreeWithLoc(termDeclaratorIdentifier, [-3,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
