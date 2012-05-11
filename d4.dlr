@@ -933,8 +933,11 @@ CastQual :=
 	| immutable;
 	| shared;
 
+// not clear if its an PostfixExpression of UnaryExpression
+// Unary would make sense though it's need to new Objects
 PostfixExpression :=
 	PrimaryExpression;
+	| NewExpression;
 	| IndexExpression;
 	| SliceExpression;
 	| PostfixExpression dot IdentifierOrTemplateInstance;
