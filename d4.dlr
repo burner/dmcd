@@ -522,7 +522,7 @@ StructMemberInitializers :=
 	| StructMemberInitializer comma;
 		{: ret = buildTreeWithLoc(termStructMemberInitializers, [-2], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
-	| StructMemberInitializer comma StructMemberInitializers;
+	| StructMemberInitializers comma StructMemberInitializer;
 		{: ret = buildTreeWithLoc(termStructMemberInitializers, [-3,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 
@@ -1154,7 +1154,7 @@ TraitsKeyword :=
 
 TraitsArguments :=
 	TraitsArgument;
-	| TraitsArgument comma TraitsArguments;
+	| TraitsArguments comma TraitsArgument;
 		{: ret = buildTreeWithLoc(termTraitsArguments, [-3,-1], 
 			actionNum, this.tokenStack[-3].getLoc()); :}
 
