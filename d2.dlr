@@ -1,1259 +1,167 @@
-S := Module;
-
-Module :=
-	ModuleDeclaration DeclDefs;
-	| ModuleDeclaration;
-	| DeclDefs;
-
-ModuleDeclaration :=
-	module ModuleFullyQualifiedName semicolon;
-
-ModuleFullyQualifiedName :=
-	ModuleName;
-	| Packages dot ModuleName;
-
-ModuleName :=
-	identifier;
-
-Packages :=
-	PackageName;
-	| Packages dot PackageName;
-
-PackageName :=
-	identifier;
-
-DeclDefs :=
-	DeclDef;
-	| DeclDef DeclDefs;
-
-DeclDef :=
-	AttributeSpecifier;
-	| ImportDeclaration;
-	| EnumDeclaration;
-	| ClassDeclaration;
-	| InterfaceDeclaration;
-	| AggregateDeclaration;
-	| Declaration;
-	| Constructor;
-	| Destructor;
-	| Invariant;
-	| UnitTest;
-	| DebugSpecification;
-	| VersionSpecification;
-	| SharedStaticConstructor;
-	| SharedStaticDestructor;
-	| ConditionalDeclaration;
-	| StaticAssert;
-	| TemplateDeclaration;
-	| TemplateMixinDeclaration;
-	| TemplateMixin;
-	| MixinDeclaration;
-	| ClassAllocator;
-	| ClassDeallocator;
-	| AliasThis;
-	| semicolon;
-
-ImportDeclaration :=
-	import ImportList semicolon;
-
-ImportList :=
-	Import;
-	| ImportBindings;
-	| Import comma ImportList;
-
-Import :=
-	ModuleFullyQualifiedName;
-	| ModuleAliasIdentifier assign ModuleFullyQualifiedName;
-
-ImportBindings :=
-	Import colon ImportBindList;
-
-ImportBindList :=
-	ImportBind;
-	| ImportBind comma ImportBindList;
-
-ImportBind :=
-	identifier;
-	| identifier assign identifier;
-
-ModuleAliasIdentifier :=
-	identifier;
-
-MixinDeclaration :=
-	mixin lparen AssignExpression rparen semicolon;
-
-Declaration :=
-	alias Decl;
-	| typedef Decl;
-	| Decl;
-
-Decl :=
-	StorageClasses Decl;
-	| BasicType BasicTypes2 Declarators semicolon;
-	| BasicType BasicTypes2 Declarator FunctionBody;
-	| BasicType Declarators semicolon;
-	| BasicType Declarator FunctionBody;
-	| AutoDeclaration;
-
-Declarators :=
-	DeclaratorInitializer;
-	| DeclaratorInitializer comma DeclaratorIdentifierList;
-
-DeclaratorInitializer :=
-	Declarator;
-	| Declarator assgin Initializer;
-
-DeclaratorIdentifierList :=
-	DeclaratorIdentifier;
-	| DeclaratorIdentifier comma DeclaratorIdentifierList;
-
-DeclaratorIdentifier :=
-	identifier;
-	| identifier assgin Initializer;
-
-BasicType :=
-	BasicTypeX;
-	| dot IdentifierList;
-	| IdentifierList;
-	| Typeof;
-	| Typeof dot IdentifierList;
-	| const lparen Type rparen;
-	| immutable lparen Type rparen;
-	| shared lparen Type rparen;
-	| inout lparen Type rparen;
-
-BasicTypeX :=
-	bool;
-	| byte;
-	| ubyte;
-	| short;
-	| ushort;
-	| int;
-	| uint;
-	| long;
-	| ulong;
-	| char;
-	| wchar;
-	| dchar;
-	| float;
-	| double;
-	| real;
-	| ifloat;
-	| idouble;
-	| ireal;
-	| cfloat;
-	| cdouble;
-	| creal;
-	| void;
-
-BasicType2 :=
-	star;
-	| lbrack rbrack;
-	| lbrack AssignExpression rbrack;
-	| lbrack AssignExpression dotdot AssignExpression rbrack;
-	| lbrack Type rbrack;
-	| delegate Parameters FunctionAttributes;
-	| function Parameters FunctionAttributes;
-	| delegate Parameters;
-	| function Parameters;
-
-BasicTypes2 :=
-	BasicType2;
-	| BasicType2 BasicTypes2;
-
-// | Identifier;
-Declarator :=
-	identifier DeclaratorSuffixes;
-
-DeclaratorSuffixes :=
-	DeclaratorSuffix;
-	| DeclaratorSuffix DeclaratorSuffixes;
-
-DeclaratorSuffix :=
-	lbrack rbrack;
-	| lbrack AssignExpression rbrack;
-	| lbrack Type rbrack;
-	| Parameters;
-	| Parameters Constraint;
-	| Parameters MemberFunctionAttributes Constraint;
-	| Parameters MemberFunctionAttributes;
-	| TemplateParameterList Parameters Constraint;
-	| TemplateParameterList Parameters MemberFunctionAttributes;
-	| TemplateParameterList Parameters MemberFunctionAttributes Constraint;
-	| TemplateParameterList Parameters;
-
-GlobalIdentifierList :=
-	IdentifierList;
-	| dot IdentifierList;
-
-
-IdentifierList :=
-	identifier;
-	| identifier dot IdentifierList;
-	| TemplateInstance;
-	| TemplateInstance dot IdentifierList;
-
-StorageClasses :=
-	StorageClass;
-	| StorageClass StorageClasses;
-
-StorageClass :=
-	abstract;
-	| auto;
-	| const;
-	| deprecated;
-	| extern;
-	| final;
-	| immutable;
-	| inout;
-	| shared;
-	| nothrow;
-	| override;
-	| pure;
-	| ref;
-	| scope;
-	| static;
-	| synchronized;
-	| gshared;
-	| thread;
-
-Type :=
-	BasicType;
-	| BasicType Declarator2;
-
-Declarator2 :=
-	BasicTypes2 Declarator2;
-	| lparen Declarator2 rparen;
-	| lparen Declarator2 rparen DeclaratorSuffixes;
-
-TypeWithModifier :=
-	Type;
-	| const TypeWithModifier;
-	| immutable TypeWithModifier;
-	| inout TypeWithModifier;
-	| shared TypeWithModifier;
-
-Parameters :=
-	lparen ParameterList rparen;
-	| lparen rparen;
-
-ParameterList :=
-	Parameter;
-	| Parameter comma ParameterList;
-	| Parameter dotdotdot;
-	| dotdotdot;
-
-Parameter :=
-	InOut ParameterDeclarator DefaultInitializerExpression;
-	| InOut ParameterDeclarator;
-	| ParameterDeclarator DefaultInitializerExpression;
-	| ParameterDeclarator;
-
-ParameterDeclarator :=
-	StorageClasses BasicType BasicTypes2 Declarator;
-	| StorageClasses BasicType Declarator;
-	| StorageClasses BasicType BasicTypes2;
-	| StorageClasses BasicType;
-	| BasicType BasicTypes2 Declarator;
-	| BasicType BasicTypes2;
-	| BasicType Declarator;
-	| BasicType;
-
-InOut :=
-	in;
-	| out;
-	| ref;
-	| lazy;
-	| scope;
-
-FunctionAttributes :=
-	FunctionAttribute;
-	| FunctionAttribute FunctionAttributes;
-
-FunctionAttribute :=
-	nothrow;
-	| pure;
-
-MemberFunctionAttributes :=
-	MemberFunctionAttribute;
-	| MemberFunctionAttribute MemberFunctionAttributes;
-
-MemberFunctionAttribute :=
-	const;
-	| immutable;
-	| inout;
-	| shared;
-	| FunctionAttribute;
-
-DefaultInitializerExpression :=
-	assign AssignExpression;
-
-Initializer :=
-	VoidInitializer;
-	| NonVoidInitializer;
-
-NonVoidInitializer :=
-	AssignExpression;
-	| ArrayInitializer;
-	| StructInitializer;
-
-ArrayInitializer :=
-	ArrayLiteral;
-
-StructInitializer :=
-	StructLiteral;
-
-AutoDeclaration :=
-	StorageClasses identifier assign AssignExpression semicolon;
-
-Typeof :=
-	typeof lparen Expression rparen;
-	| typeof lparen return rparen;
-
-VoidInitializer :=
-	void;
-
-AttributeSpecifier :=
-	Attribute colon;
-	| Attribute DeclarationBlock;
-
-Attribute :=
-	LinkageAttribute;
-	| AlignAttribute;
-	| Pragma;
-	| deprecated;
-	| ProtectionAttribute;
-	| static;
-	| final;
-	| override;
-	| abstract;
-	| const;
-	| auto;
-	| scope;
-	| __gshared;
-	| shared;
-	| immutable;
-	| inout;
-	| ref;
-	| extern;
-	| synchronized;
-	| __thread;
-	| disable;
-	| property;
-	| safe;
-	| system;
-	| trusted;
-
-DeclarationBlock :=
-	DeclDef;
-	| lcurly DeclDefs rcurly;
-	| lcurly rcurly;
-
-LinkageAttribute :=
-	extern lparen LinkageType rparen;
-
-LinkageType :=
-	C;
-	| Cplusplus;
-	| D;
-	| Windows;
-	| Pascal;
-	| System;
-
-AlignAttribute :=
-	align;
-	| align lparen Integer rparen;
-
-ProtectionAttribute :=
-	private;
-	| package;
-	| protected;
-	| public;
-	| export;
-
-Pragma :=
-	pragma lparen identifier rparen;
-	| pragma lparen identifier comma TemplateArgumentList rparen;
-
-Expression :=
-	CommaExpression;
-
-CommaExpression :=
-	AssignExpression;
-	| AssignExpression comma CommaExpression;
-
-AssignExpression :=
-	ConditionalExpression;
-	| ConditionalExpression assign AssignExpression;
-	| ConditionalExpression plusassign AssignExpression;
-	| ConditionalExpression minusassign AssignExpression;
-	| ConditionalExpression starassign AssignExpression;
-	| ConditionalExpression divassign AssignExpression;
-	| ConditionalExpression moduloassign AssignExpression;
-	| ConditionalExpression andassign AssignExpression;
-	| ConditionalExpression orassign AssignExpression;
-	| ConditionalExpression xorassign AssignExpression;
-	| ConditionalExpression tildeassign AssignExpression;
-	| ConditionalExpression leftshiftassign AssignExpression;
-	| ConditionalExpression rightshiftassign AssignExpression;
-	| ConditionalExpression unsignedrightshiftassign AssignExpression;
-	| ConditionalExpression xorxorassign AssignExpression;
-
-ConditionalExpression :=
-	OrOrExpression;
-	| OrOrExpression questionmark Expression colon ConditionalExpression;
-
-OrOrExpression :=
-	AndAndExpression;
-	| OrOrExpression logicalor AndAndExpression;
-
-AndAndExpression :=
-	OrExpression;
-	| AndAndExpression logicaland OrExpression;
-	| CmpExpression;
-	| AndAndExpression logicaland CmpExpression;
-
-OrExpression :=
-	XorExpression;
-	| OrExpression or XorExpression;
-
-XorExpression :=
-	AndExpression;
-	| XorExpression xor AndExpression;
-
-AndExpression :=
-	ShiftExpression;
-	| AndExpression and ShiftExpression;
-
-CmpExpression :=
-	ShiftExpression;
-	| EqualExpression;
-	| IdentityExpression;
-	| RelExpression;
-	| InExpression;
-
-EqualExpression :=
-	ShiftExpression equal ShiftExpression;
-	| ShiftExpression notequal ShiftExpression;
-
-IdentityExpression :=
-	ShiftExpression is ShiftExpression;
-	| ShiftExpression bangis ShiftExpression;
-
-RelExpression :=
-	ShiftExpression less ShiftExpression;
-	| ShiftExpression lessequal ShiftExpression;
-	| ShiftExpression greater ShiftExpression;
-	| ShiftExpression greaterequal ShiftExpression;
-	| ShiftExpression bangsquareassign ShiftExpression;
-	| ShiftExpression bangsquare ShiftExpression;
-	| ShiftExpression square ShiftExpression;
-	| ShiftExpression squareassign ShiftExpression;
-	| ShiftExpression banggreater ShiftExpression;
-	| ShiftExpression banggreaterassign ShiftExpression;
-	| ShiftExpression bangless ShiftExpression;
-	| ShiftExpression banglessequal ShiftExpression;
-
-InExpression :=
-	ShiftExpression in ShiftExpression;
-	| ShiftExpression bangin ShiftExpression;
-
-ShiftExpression :=
-	AddExpression;
-	| ShiftExpression leftshift AddExpression;
-	| ShiftExpression rightshift AddExpression;
-	| ShiftExpression unsignedrightshift AddExpression;
-
-AddExpression :=
-	MulExpression;
-	| AddExpression plus MulExpression;
-	| AddExpression minus MulExpression;
-	| CatExpression;
-
-CatExpression :=
-	AddExpression tilde MulExpression;
-
-MulExpression :=
-	PowExpression;
-	| MulExpression star PowExpression;
-	| MulExpression div PowExpression;
-	| MulExpression modulo PowExpression;
-
-PowExpression :=
-	UnaryExpression;
-	| UnaryExpression xorxor PowExpression;
-
-UnaryExpression :=
-	PostfixExpression;
-	| and UnaryExpression;
-	| plusplus UnaryExpression;
-	| minusminus UnaryExpression;
-	| star UnaryExpression;
-	| minus UnaryExpression;
-	| plus UnaryExpression;
-	| bang UnaryExpression;
-	| tilde UnaryExpression;
-	| NewExpression;
-	| DeleteExpression;
-	| CastExpression;
-
-NewExpression :=
-	NewArguments Type lbrack AssignExpression rbrack;
-	| NewArguments Type rparen ArgumentList lparen;
-	| NewArguments Type;
-	| NewArguments ClassArguments BaseClassList lcurly DeclDefs rcurly;
-	| NewArguments ClassArguments BaseClassList lcurly rcurly;
-	| NewArguments ClassArguments lcurly DeclDefs rcurly;
-	| NewArguments ClassArguments lcurly rcurly;
-
-NewArguments :=
-	new lparen ArgumentList rparen;
-	| new lparen rparen;
-	| new;
-
-ClassArguments :=
-	class lparen ArgumentList rparen;
-	| class lparen rparen;
-	| class;
-
-ArgumentList :=
-	AssignExpression;
-	| AssignExpression comma;
-	| AssignExpression comma ArgumentList;
-
-Arguments :=
-	lparen rparen;
-	| lparen ArgumentList rparen;
-
-DeleteExpression :=
-	delete UnaryExpression;
-
-CastExpression :=
-	cast lparen TypeWithModifier rparen UnaryExpression;
-	| cast lparen rparen UnaryExpression;
-	| cast lparen const rparen UnaryExpression;
-	| cast lparen const shared rparen UnaryExpression;
-	| cast lparen immutable rparen UnaryExpression;
-	| cast lparen inout rparen UnaryExpression;
-	| cast lparen inout shared rparen UnaryExpression;
-	| cast lparen shared rparen UnaryExpression;
-	| cast lparen shared const rparen UnaryExpression;
-	| cast lparen shared inout rparen UnaryExpression;
-
-PostfixExpression :=
-	PrimaryExpression;
-	| PostfixExpression dot IdentifierOrTemplateInstance;
-	| PostfixExpression dot NewExpression;
-	| PostfixExpression plusplus;
-	| PostfixExpression minusminus;
-	| PostfixExpression lparen rparen;
-	| PostfixExpression lparen ArgumentList rparen;
-	| IndexExpression;
-	| SliceExpression;
-
-IndexExpression :=
-	PostfixExpression lbrack ArgumentList rbrack;
-
-SliceExpression :=
-	PostfixExpression lbrack rbrack;
-	| PostfixExpression lbrack AssignExpression dotdot AssignExpression rbrack;
-
-PrimaryExpression :=
-	identifier;
-	| dot identifier;
-	| TemplateInstance;
-	| this;
-	| super;
-	| null;
-	| true;
-	| false;
-	| dolloar;
-	| file;
-	| line;
-	| IntegerLiteral;
-	| FloatLiteral;
-	| CharacterLiteral;
-	| stringliteral;
-	| ArrayLiteral;
-	| AssocArrayLiteral;
-	| FunctionLiteral;
-	| StructLiteral;
-	| AssertExpression;
-	| MixinExpression;
-	| ImportExpression;
-	| BasicType dot IdentifierOrTemplateInstance;
-	| Typeof dot IdentifierOrTemplateInstance;
-	| lparen Type rparen dot IdentifierOrTemplateInstance;
-	| BasicType Arguments;
-	| Typeof Arguments;
-	| lparen Type rparen Arguments;
-	| TypeidExpression;
-	| IsExpression;
-	| lparen Expression rparen;
-	| TraitsExpression;
-
-ArrayLiteral :=
-	lbrack ArgumentList rbrack;
-
-AssocArrayLiteral :=
-	lbrack KeyValuePairs rbrack;
-
-ArrayValueList :=
-	ArrayValue;
-	| ArrayValue comma ArrayValue;
-
-ArrayValue :=
-	AssignExpression;
-	| AssignExpression colon AssignExpression;
-
-FunctionLiteral :=
-	function Type ParameterAttributes FunctionBody;
-	| function ParameterAttributes FunctionBody;
-	| function Type FunctionBody;
-	| function FunctionBody;
-	| delegate Type ParameterAttributes FunctionBody;
-	| delegate ParameterAttributes FunctionBody;
-	| delegate Type FunctionBody;
-	| delegate FunctionBody;
-	| ParameterAttributes FunctionBody;
-	| FunctionBody;
-
-ParameterAttributes :=
-	Parameters;
-	| Parameters FunctionAttributes;
-
-StructLiteral :=
-	lcurly ArrayValueList rculry;
-
-AssertExpression :=
-	assert lparen AssignExpression rparen;
-	| assert lparen AssignExpression comma AssignExpression rparen;
-
-MixinExpression :=
-	mixin lparen AssignExpression rparen;
-
-ImportExpression :=
-	import lparen AssignExpression rparen;
-
-TypeidExpression :=
-	typeid lparen Type rparen;
-	| typeid lparen Expression rparen;
-
-IsExpression :=
-	is lparen Type rparen;
-	| is lparen Type colon TypeSpecialization rparen;
-	| is lparen Type equal TypeSpecialization rparen;
-	| is lparen Type identifier rparen;
-	| is lparen Type identifier colon TypeSpecialization rparen;
-	| is lparen Type identifier equal TypeSpecialization rparen;
-	| is lparen Type identifier equal TypeSpecialization comma TemplateParameterList rparen;
-
-TypeSpecialization :=
-	TypeWithModifier;
-	| struct;
-	| union;
-	| class;
-	| interface;
-	| enum;
-	| function;
-	| delegate;
-	| super;
-	| const;
-	| immutable;
-	| inout;
-	| shared;
-	| return;
-
-TraitsExpression :=
-	__traits lparen TraitsKeyword comma TraitsArguments rparen;
-
-TraitsKeyword :=
-	identifier;
-
-TraitsArguments :=
-	TraitsArgument;
-	| TraitsArgument comma TraitsArguments;
-
-TraitsArgument :=
-	AssignExpression;
-	| Type;
-
-Statement :=
-	ScopeStatement;
-
-ScopeStatement :=
-	semicolon;
-	| NonEmptyStatement;
-	| ScopeBlockStatement;
-
-ScopeBlockStatement :=
-	 BlockStatement;
-
-ScopeNonEmptyStatement :=
-	NonEmptyStatement;
-	| BlockStatement;
-
-NoScopeNonEmptyStatement :=
-	NonEmptyStatement;
-	| BlockStatement;
-
-NoScopeStatement :=
-	semicolon;
-	| NonEmptyStatement;
-	| BlockStatement;
-
-NonEmptyStatement :=
-	LabeledStatement;
-	| ExpressionStatement;
-	| DeclarationStatement;
-	| IfStatement;
-	| WhileStatement;
-	| DoStatement;
-	| ForStatement;
-	| ForeachStatement;
-	| SwitchStatement;
-	| FinalSwitchStatement;
-	| CaseStatement;
-	| CaseRangeStatement;
-	| DefaultStatement;
-	| ContinueStatement;
-	| BreakStatement;
-	| ReturnStatement;
-	| GotoStatement;
-	| WithStatement;
-	| SynchronizedStatement;
-	| TryStatement;
-	| ScopeGuardStatement;
-	| ThrowStatement;
-	| AsmStatement;
-	| PragmaStatement;
-	| MixinStatement;
-	| ForeachRangeStatement;
-	| ConditionalStatement;
-	| StaticAssert;
-	| TemplateMixin;
-	| EnumDeclaration;
-	| ClassDeclaration;
-	| InterfaceDeclaration;
-	| AggregateDeclaration;
-	| TemplateDeclaration;
-
-LabeledStatement :=
-	identifier colon NoScopeStatement;
-
-BlockStatement :=
-	lcurly rcurly;
-	| lcurly StatementList rcurly;
-
-StatementList :=
-	Statement;
-	| Statement StatementList;
-
-ExpressionStatement :=
-	Expression semicolon;
-
-DeclarationStatement :=
-	Declaration;
-
-IfStatement :=
-	if lparen IfCondition rparen ThenStatement;
-	| if lparen IfCondition rparen ThenStatement else ElseStatement;
-
-IfCondition :=
-	Expression;
-	| auto identifier assign Expression;
-	| BasicType BasicTypes2 Declarator assign Expression;
-	| BasicType Declarator assign Expression;
-
-ThenStatement :=
-	ScopeNonEmptyStatement;
-
-ElseStatement :=
-	ScopeNonEmptyStatement;
-
-WhileStatement :=
-	while lparen Expression rparen ScopeNonEmptyStatement;
-
-DoStatement :=
-	do ScopeNonEmptyStatement while lparen Expression rparen semicolon;
-
-ForStatement :=
-	for lparen Initialize Test semicolon Increment rparen ScopeNonEmptyStatement;
-	| for lparen Initialize semicolon Increment rparen ScopeNonEmptyStatement;
-	| for lparen Initialize Test semicolon rparen ScopeNonEmptyStatement;
-	| for lparen Initialize semicolon rparen ScopeNonEmptyStatement;
-
-Initialize :=
-	semicolon;
-	| NoScopeNonEmptyStatement;
-
-// expression was opt
-Test :=
-	Expression;
-
-// expression was opt
-Increment :=
-	Expression;
-
-ForeachStatement :=
-	Foreach lparen ForeachTypeList semicolon Aggregate rparen NoScopeNonEmptyStatement;
-
-Foreach :=
-	foreach;
-	| foreach_reverse;
-
-ForeachTypeList :=
-	ForeachType;
-	| ForeachType comma ForeachTypeList;
-
-ForeachType :=
-	ref Type identifier;
-	| ref identifier;
-	| Type identifier;
-	| identifier;
-
-Aggregate :=
-	Expression;
-
-SwitchStatement :=
-	switch lparen Expression rparen ScopeNonEmptyStatement;
-
-CaseStatement :=
-	case ArgumentList colon Statement;
-	| case ArgumentList colon;
-
-CaseRangeStatement :=
-	case FirstExp colon dotdot case LastExp colon Statement;
-	| case FirstExp colon dotdot case LastExp colon;
-
-FirstExp :=
-	AssignExpression;
-
-LastExp :=
-	AssignExpression;
-
-DefaultStatement :=
-	default colon Statement;
-	| default colon;
-
-FinalSwitchStatement :=
-	final switch lparen Expression rparen ScopeNonEmptyStatement;
-
-ContinueStatement :=
-	continue semicolon;
-	| continue identifier semicolon;
-
-BreakStatement :=
-	break semicolon;
-	| break identifier semicolon;
-
-ReturnStatement :=
-	return semicolon;
-	| return Expression semicolon;
-
-GotoStatement :=
-	goto identifier semicolon;
-	| goto default semicolon;
-	| goto case semicolon;
-	| goto case Expression semicolon;
-
-WithStatement :=
-	with lparen Expression rparen ScopeNonEmptyStatement;
-	| with lparen Symbol rparen ScopeNonEmptyStatement;
-	| with lparen TemplateInstance rparen ScopeNonEmptyStatement;
-
-SynchronizedStatement :=
-	synchronized ScopeNonEmptyStatement;
-	| synchronized lparen Expression rparen ScopeNonEmptyStatement;
-
-TryStatement :=
-	try ScopeNonEmptyStatement Catches;
-	| try ScopeNonEmptyStatement Catches FinallyStatement;
-	| try ScopeNonEmptyStatement FinallyStatement;
-
-Catches :=
-	LastCatch;
-	| Catch;
-	| Catch Catches;
-
-LastCatch :=
-	catch NoScopeNonEmptyStatement;
-
-Catch :=
-	catch lparen CatchParameter rparen NoScopeNonEmptyStatement;
-
-CatchParameter :=
-	BasicType identifier;
-
-FinallyStatement :=
-	finally NoScopeNonEmptyStatement;
-
-ThrowStatement :=
-	throw Expression semicolon;
-
-ScopeGuardStatement :=
-	scope lparen exit rparen ScopeNonEmptyStatement;
-	| scope lparen success rparen ScopeNonEmptyStatement;
-	| scope lparen failure rparen ScopeNonEmptyStatement;
-
-AsmStatement :=
-	asm lcurly rcurly;
-	| asm lcurly AsmInstructionList rcurly;
-
-AsmInstructionList :=
-	AsmInstruction semicolon;
-	| AsmInstruction semicolon AsmInstructionList;
-
-PragmaStatement :=
-	Pragma NoScopeStatement;
-
-MixinStatement :=
-	mixin lparen AssignExpression rparen semicolon;
-
-ForeachRangeStatement :=
-	Foreach lparen ForeachType semicolon LwrExpression dotdot UprExpression rparen ScopeNonEmptyStatement;
-
-LwrExpression :=
-	Expression;
-
-UprExpression :=
-	Expression;
-
-AggregateDeclaration :=
-	struct identifier StructBody;
-	| union identifier StructBody;
-	| struct identifier semicolon;
-	| union identifier semicolon;
-	| StructTemplateDeclaration;
-	| UnionTemplateDeclaration;
-
-StructBody :=
-	lcurly DeclDefs rcurly;
-	| lcurly rcurly;
-
-ClassDeclaration :=
-	class identifier BaseClassList ClassBody;
-	| class identifier ClassBody;
-	| ClassTemplateDeclaration;
-	| class identifier semicolon;
-
-BaseClassList :=
-	colon SuperClass;
-	| colon SuperClass comma InterfaceClasses;
-
-SuperClass :=
-	GlobalIdentifierList;
-	| Protection GlobalIdentifierList;
-
-InterfaceClasses :=
-	InterfaceClass;
-	| InterfaceClass comma InterfaceClasses;
-
-InterfaceClass :=
-	GlobalIdentifierList;
-	| Protection GlobalIdentifierList;
-
-Protection :=
-	private;
-	| package;
-	| public;
-	| export;
-
-ClassBody :=
-	lcurly rcurly;
-	| lcurly DeclDefs rcurly;
-
-Constructor :=
-	this Parameters MemberFunctionAttributes Constraint FunctionBody;
-	| this Parameters MemberFunctionAttributes FunctionBody;
-	| this TemplateParameters Parameters Constraint FunctionBody;
-	| this TemplateParameters Parameters FunctionBody;
-	| this TemplateParameters Parameters MemberFunctionAttributes Constraint FunctionBody;
-	| this TemplateParameters Parameters MemberFunctionAttributes FunctionBody;
-	| this lparen this rparen Constraint FunctionBody;
-
-Destructor :=
-	tilde this lparen rparen FunctionBody;
-
-StaticConstructor :=
-	static this lparen rparen FunctionBody;
-
-StaticDestructor :=
-	static tilde this lparen rparen FunctionBody;
-
-SharedStaticConstructor :=
-	shared static this lparen rparen FunctionBody;
-
-SharedStaticDestructor :=
-	shared static tilde this lparen rparen FunctionBody;
-
-Invariant :=
-	invariant lparen rparen BlockStatement;
-
-ClassAllocator :=
-	new Parameters FunctionBody;
-
-ClassDeallocator :=
-	delete Parameters FunctionBody;
-
-AliasThis :=
-	alias identifier this semicolon;
-
-InterfaceDeclaration :=
-	interface identifier BaseInterfaceList InterfaceBody;
-	| interface identifier InterfaceBody;
-	| InterfaceTemplateDeclaration;
-	| interface identifier semicolon;
-
-BaseInterfaceList :=
-	colon InterfaceClasses;
-
-InterfaceBody :=
-	lcurly DeclDefs rcurly;
-	| lcurly rcurly;
-
-EnumDeclaration :=
-	enum EnumTag EnumBody;
-	| enum EnumBody;
-	| enum EnumTag colon EnumBaseType EnumBody;
-	| enum colon EnumBaseType EnumBody;
-	| enum EnumTag semicolon;
-	| enum EnumInitializer semicolon;
-	| enum Type EnumInitializers semicolon;
-
-EnumTag :=
-	identifier;
-
-EnumBaseType :=
-	Type;
-
-EnumInitializers :=
-	EnumInitializer;
-	| EnumInitializers colon EnumInitializer;
-
-EnumInitializer :=
-	identifier assign AssignExpression;
-
-EnumBody :=
-	semicolon;
-	| lcurly EnumMembers rcurly;
-
-EnumMembers :=
-	EnumMember;
-	| EnumMember comma;
-	| EnumMember comma EnumMembers;
-
-EnumMember :=
-	 identifier;
-	 | identifier assign AssignExpression;
-	 | Type identifier assign AssignExpression;
-
-FunctionBody :=
-	 BlockStatement;
-	 | BodyStatement;
-	 | InStatement BodyStatement;
-	 | OutStatement BodyStatement;
-	 | InStatement OutStatement BodyStatement;
-	 | OutStatement InStatement BodyStatement;
-
-InStatement :=
-	 in BlockStatement;
-
-OutStatement :=
-	 out BlockStatement;
-	 | out lparen identifier rparen BlockStatement;
-
-BodyStatement :=
-	 body BlockStatement;
-
-ConditionalDeclaration :=
-	 Condition DeclarationBlock;
-	 | Condition DeclarationBlock else DeclarationBlock;
-
-ConditionalStatement :=
-	 Condition NoScopeNonEmptyStatement;
-	 | Condition NoScopeNonEmptyStatement else NoScopeNonEmptyStatement;
-
-Condition :=
-	 VersionCondition;
-	 | DebugCondition;
-	 | StaticIfCondition;
-
-VersionCondition :=
-	 version lparen Integer rparen;
-	 | version lparen identifier rparen;
-	 | version lparen unittest rparen;
-
-VersionSpecification :=
-	 version assign identifier semicolon;
-	 | version assign Integer semicolon;
-
-DebugCondition :=
-	 debug;
-	 | debug lparen Integer rparen;
-	 | debug lparen identifier rparen;
-
-DebugSpecification :=
-	 debug assign identifier semicolon;
-	 | debug assign Integer semicolon;
-
-StaticIfCondition :=
-	 static if lparen AssignExpression rparen;
-
-StaticAssert :=
-	 static assert lparen AssignExpression rparen semicolon;
-	 | static assert lparen AssignExpression comma AssignExpression rparen semicolon;
-
-TemplateDeclaration :=
-	template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
-	| template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
-
-TemplateIdentifier :=
-	identifier;
-
-TemplateParameters :=
-	lparen TemplateParameterList rparen;
-
-TemplateParameterList :=
-	TemplateParameter;
-	| TemplateParameter comma;
-	| TemplateParameter comma TemplateParameterList;
-
-TemplateParameter :=
-	TemplateTypeParameter;
-	| TemplateValueParameter;
-	| TemplateAliasParameter;
-	| TemplateTupleParameter;
-	| TemplateThisParameter;
-
-TemplateTupleParameter :=
-	identifier dotdotdot;
-
-IdentifierOrTemplateInstance :=
-	identifier;
-	| TemplateInstance;
-
-TemplateInstance :=
-	TemplateIdentifier bang lparen TemplateArgumentList rparen;
-	| TemplateIdentifier bang TemplateSingleArgument;
-
-TemplateArgumentList :=
-	TemplateArgument;
-	| TemplateArgument comma;
-	| TemplateArgument comma TemplateArgumentList;
-
-TemplateArgument :=
-	Type;
-	| AssignExpression;
-	| Symbol;
-
-Symbol :=
-	SymbolTail;
-	| dot SymbolTail;
-
-SymbolTail :=
-	identifier;
-	| identifier dot SymbolTail;
-	| TemplateInstance;
-	| TemplateInstance dot SymbolTail;
-
-TemplateSingleArgument :=
-	identifier;
-	| BasicTypeX;
-	| CharacterLiteral;
-	| StringLiteral;
-	| IntegerLiteral;
-	| FloatLiteral;
-	| true;
-	| false;
-	| null;
-	| __FILE__;
-	| __LINE__;
-
-TemplateTypeParameter :=
-	identifier;
-	| identifier TemplateTypeParameterSpecialization;
-	| identifier TemplateTypeParameterDefault;
-	| identifier TemplateTypeParameterSpecialization TemplateTypeParameterDefault;
-
-TemplateTypeParameterSpecialization :=
-	colon Type;
-
-TemplateTypeParameterDefault :=
-	assign Type;
-
-TemplateValueParameter :=
-	TemplateValueDeclaration;
-	| TemplateValueDeclaration TemplateValueParameterSpecialization;
-	| TemplateValueDeclaration TemplateValueParameterDefault;
-	| TemplateValueDeclaration TemplateValueParameterSpecialization TemplateValueParameterDefault;
-
-// without storage classes
-TemplateValueDeclaration :=
-	ParameterDeclarator;
-
-TemplateValueParameterSpecialization :=
-	colon ConditionalExpression;
-
-// already part of conditionalexpression
-TemplateValueParameterDefault :=
-	assign __FILE__;
-	| assign __LINE__;
-
-TemplateAliasParameter :=
-	alias Type identifier TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
-	| alias identifier TemplateAliasParameterSpecialization TemplateAliasParameterDefault;
-	| alias identifier TemplateAliasParameterSpecialization;
-	| alias identifier TemplateAliasParameterDefault;
-	| alias identifier;
-	| alias Type identifier TemplateAliasParameterDefault;
-	| alias Type identifier TemplateAliasParameterSpecialization;
-	| alias Type identifier;
-
-TemplateAliasParameterSpecialization :=
-	colon Type;
-
-TemplateAliasParameterDefault :=
-	assign TypeOrExpression;
-
-ClassTemplateDeclaration :=
-	class identifier lparen TemplateParameterList rparen Constraint BaseClassList ClassBody;
-	| class identifier lparen TemplateParameterList rparen BaseClassList ClassBody;
-	| class identifier lparen TemplateParameterList rparen Constraint ClassBody;
-	| class identifier lparen TemplateParameterList rparen ClassBody;
-
-StructTemplateDeclaration :=
-	struct identifier lparen TemplateParameterList rparen Constraint StructBody;
-	| struct identifier lparen TemplateParameterList rparen StructBody;
-
-UnionTemplateDeclaration :=
-	union identifier lparen TemplateParameterList rparen Constraint StructBody;
-	| union identifier lparen TemplateParameterList rparen StructBody;
-
-InterfaceTemplateDeclaration :=
-	interface identifier lparen TemplateParameterList rparen Constraint BaseInterfaceList InterfaceBody;
-	| interface identifier lparen TemplateParameterList rparen Constraint InterfaceBody;
-	| interface identifier lparen TemplateParameterList rparen InterfaceBody;
-	| interface identifier lparen TemplateParameterList rparen BaseInterfaceList InterfaceBody;
-
-TemplateMixinDeclaration :=
-	mixin template TemplateIdentifier lparen TemplateParameterList rparen Constraint lcurly DeclDefs rcurly;
-	| mixin template TemplateIdentifier lparen TemplateParameterList rparen lcurly DeclDefs rcurly;
-
-Constraint :=
-	if lparen ConstraintExpression rparen;
-
-ConstraintExpression :=
-	Expression;
-
-TemplateMixin :=
-	mixin TemplateIdentifier semicolon;
-	| mixin TemplateIdentifier identifer semicolon;
-	| mixin TemplateIdentifier bang lparen TemplateArgumentList rparen semicolon;
-	| mixin TemplateIdentifier bang lparen TemplateArgumentList rparen semicolon identifier;
-
-UnitTest :=
-	unittest BlockStatement;
-
-AsmInstruction :=
-	stringliteral;
+"[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
+"[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+"!" {: return Token(this.getLoc(), termbang); :}
+"!<" {: return Token(this.getLoc(), termbangless); :}
+"!<=" {: return Token(this.getLoc(), termbanglessequal); :}
+"!<>" {: return Token(this.getLoc(), termbangsquare); :}
+"!<>=" {: return Token(this.getLoc(), termbangsquareassign); :}
+"!=" {: return Token(this.getLoc(), termnotequal); :}
+"!>" {: return Token(this.getLoc(), termbanggreater); :}
+"!>=" {: return Token(this.getLoc(), termbanggreaterassign); :}
+"!is" {: return Token(this.getLoc(), termbangis); :}
+"$" {: return Token(this.getLoc(), termdollarsym); :}
+"%" {: return Token(this.getLoc(), termmodulo); :}
+"%=" {: return Token(this.getLoc(), termmoduloassign); :}
+"&" {: return Token(this.getLoc(), termlogicaland); :}
+"&&" {: return Token(this.getLoc(), termand); :}
+"&=" {: return Token(this.getLoc(), termandassign); :}
+"(" {: return Token(this.getLoc(), termlparen); :}
+")" {: return Token(this.getLoc(), termrparen); :}
+"*" {: return Token(this.getLoc(), termstar); :}
+"*=" {: return Token(this.getLoc(), termstarassign); :}
+"+=" {: return Token(this.getLoc(), termplusassign); :}
+"," {: return Token(this.getLoc(), termcomma); :}
+"-" {: return Token(this.getLoc(), termminus); :}
+"--" {: return Token(this.getLoc(), termdecrement); :}
+"-=" {: return Token(this.getLoc(), termminusassign); :}
+"." {: return Token(this.getLoc(), termdot); :}
+".." {: return Token(this.getLoc(), termdotdot); :}
+"..." {: return Token(this.getLoc(), termdotdotdot); :}
+"/" {: return Token(this.getLoc(), termdiv); :}
+"/=" {: return Token(this.getLoc(), termdivassign); :}
+":" {: return Token(this.getLoc(), termcolon); :}
+";" {: return Token(this.getLoc(), termsemicolon); :}
+"<" {: return Token(this.getLoc(), termless); :}
+"<<" {: return Token(this.getLoc(), termleftshift); :}
+"<<=" {: return Token(this.getLoc(), termleftshiftassign); :}
+"<=" {: return Token(this.getLoc(), termlessequal); :}
+"=>" {: return Token(this.getLoc(), termarrow); :}
+"<>" {: return Token(this.getLoc(), termsquare); :}
+"<>=" {: return Token(this.getLoc(), termsquareassign); :}
+"=" {: return Token(this.getLoc(), termassign); :}
+"==" {: return Token(this.getLoc(), termequal); :}
+">" {: return Token(this.getLoc(), termgreater); :}
+">=" {: return Token(this.getLoc(), termgreaterequal); :}
+">>" {: return Token(this.getLoc(), termrightshift); :}
+">>=" {: return Token(this.getLoc(), termrightshiftassign); :}
+">>>" {: return Token(this.getLoc(), termunsignedrightshift); :}
+">>>=" {: return Token(this.getLoc(), termunsignedrightshiftassign); :}
+"?" {: return Token(this.getLoc(), termquestionmark); :}
+"@disable" {: return Token(this.getLoc(), termdisable); :}
+"@property" {: return Token(this.getLoc(), termproperty); :}
+"@safe" {: return Token(this.getLoc(), termsafe); :}
+"@system" {: return Token(this.getLoc(), termsystem); :}
+"@trusted" {: return Token(this.getLoc(), termtrusted); :}
+"[:digit:]+" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloatliteral, this.lexText.getString()); :}
+"\+" {: return Token(this.getLoc(), termplus); :}
+"\+\+" {:  return Token(this.getLoc(), termincrement); :}
+"\\[" {: return Token(this.getLoc(), termlbrack); :}
+"\\]" {: return Token(this.getLoc(), termrbrack); :}
+"^" {: return Token(this.getLoc(), termxor); :}
+"^=" {: return Token(this.getLoc(), termxorassign); :}
+"^^=" {: return Token(this.getLoc(), termxorxorassign); :}
+//"__thread" {: return Token(this.getLoc(), termthread); :}
+"__traits" {: return Token(this.getLoc(), termtraits); :}
+"abstract" {: return Token(this.getLoc(), termabstract); :}
+"alias" {: return Token(this.getLoc(), termalias); :}
+"align" {: return Token(this.getLoc(), termalign); :}
+"asm" {: return Token(this.getLoc(), termasm); :}
+"assert" {: return Token(this.getLoc(), termassert); :}
+"auto" {: return Token(this.getLoc(), termauto); :}
+"body" {: return Token(this.getLoc(), termbody); :}
+"bool" {: return Token(this.getLoc(), termbool); :}
+"break" {: return Token(this.getLoc(), termbreak); :}
+"byte" {: return Token(this.getLoc(), termbyte); :}
+"case" {: return Token(this.getLoc(), termcase); :}
+"cast" {: return Token(this.getLoc(), termcast); :}
+"catch" {: return Token(this.getLoc(), termcatch); :}
+"__gshared" {: return Token(this.getLoc(), termgshared); :}
+"cdouble" {: return Token(this.getLoc(), termcdouble); :}
+"cfloat" {: return Token(this.getLoc(), termcfloat); :}
+"char" {: return Token(this.getLoc(), termchar); :}
+"class" {: return Token(this.getLoc(), termclass); :}
+"const" {: return Token(this.getLoc(), termconst); :}
+"continue" {: return Token(this.getLoc(), termcontinue); :}
+"creal" {: return Token(this.getLoc(), termcreal); :}
+"dchar" {: return Token(this.getLoc(), termdchar); :}
+"default" {: return Token(this.getLoc(), termdefault); :}
+"delegate" {: return Token(this.getLoc(), termdelegate); :}
+"deprecated" {: return Token(this.getLoc(), termdeprecated); :}
+"do" {: return Token(this.getLoc(), termdo); :}
+"double" {: return Token(this.getLoc(), termdouble); :}
+"enum" {: return Token(this.getLoc(), termenum); :}
+"else" {: return Token(this.getLoc(), termelse); :}
+"export" {: return Token(this.getLoc(), termexport); :}
+"extern" {: return Token(this.getLoc(), termextern); :}
+"false" {: return Token(this.getLoc(), termfalse); :}
+"final" {: return Token(this.getLoc(), termfinal); :}
+"finally" {: return Token(this.getLoc(), termfinally); :}
+"float" {: return Token(this.getLoc(), termfloat); :}
+"for" {: return Token(this.getLoc(), termfor); :}
+"foreach" {: return Token(this.getLoc(), termforeach); :}
+"foreach_reverse" {: return Token(this.getLoc(), termforeach_reverse); :}
+"function" {: return Token(this.getLoc(), termfunction); :}
+"goto" {: return Token(this.getLoc(), termgoto); :}
+"idouble" {: return Token(this.getLoc(), termidouble); :}
+"if" {: return Token(this.getLoc(), termif); :}
+"ifloat" {: return Token(this.getLoc(), termifloat); :}
+"import" {: return Token(this.getLoc(), termimport); :}
+"immutable" {: return Token(this.getLoc(), termimmutable); :}
+"in" {: return Token(this.getLoc(), termin); :}
+"inout" {: return Token(this.getLoc(), terminout); :}
+"int" {: return Token(this.getLoc(), termint); :}
+"size_t" {: return Token(this.getLoc(), termsize_t); :}
+"interface" {: return Token(this.getLoc(), terminterface); :}
+"invariant" {: return Token(this.getLoc(), terminvariant); :}
+"ireal" {: return Token(this.getLoc(), termireal); :}
+"is" {: return Token(this.getLoc(), termis); :}
+"long" {: return Token(this.getLoc(), termlong); :}
+"lazy" {: return Token(this.getLoc(), termlazy); :}
+"mixin" {: return Token(this.getLoc(), termmixin); :}
+"module" {: return Token(this.getLoc(), termmodule); :}
+"new" {: return Token(this.getLoc(), termnew); :}
+"nothrow" {: return Token(this.getLoc(), termnothrow); :}
+"null" {: return Token(this.getLoc(), termnull); :}
+"out" {: return Token(this.getLoc(), termout); :}
+"override" {: return Token(this.getLoc(), termoverride); :}
+"private" {: return Token(this.getLoc(), termprivate); :}
+"protected" {: return Token(this.getLoc(), termprotected); :}
+"public" {: return Token(this.getLoc(), termpublic); :}
+"pragma" {: return Token(this.getLoc(), termpragma); :}
+"real" {: return Token(this.getLoc(), termreal); :}
+"ref" {: return Token(this.getLoc(), termref); :}
+"return" {: return Token(this.getLoc(), termreturn); :}
+"pure" {: return Token(this.getLoc(), termpure); :}
+"scope" {: return Token(this.getLoc(), termscope); :}
+"short" {: return Token(this.getLoc(), termshort); :}
+"static" {: return Token(this.getLoc(), termstatic); :}
+"struct" {: return Token(this.getLoc(), termstruct); :}
+"super" {: return Token(this.getLoc(), termsuper); :}
+"switch" {: return Token(this.getLoc(), termswitch); :}
+"synchronized" {: return Token(this.getLoc(), termsynchronized); :}
+"this" {: return Token(this.getLoc(), termthis); :}
+"throw" {: return Token(this.getLoc(), termthrow); :}
+"true" {: return Token(this.getLoc(), termtrue); :}
+"try" {: return Token(this.getLoc(), termtry); :}
+"typeid" {: return Token(this.getLoc(), termtypeid); :}
+"typeof" {: return Token(this.getLoc(), termtypeof); :}
+"ubyte" {: return Token(this.getLoc(), termubyte); :}
+"uint" {: return Token(this.getLoc(), termuint); :}
+"ulong" {: return Token(this.getLoc(), termulong); :}
+"union" {: return Token(this.getLoc(), termunion); :}
+"unittest" {: return Token(this.getLoc(), termunittest); :}
+"ushort" {: return Token(this.getLoc(), termushort); :}
+"void" {: return Token(this.getLoc(), termvoid); :}
+"wchar" {: return Token(this.getLoc(), termwchar); :}
+"while" {: return Token(this.getLoc(), termwhile); :}
+"with" {: return Token(this.getLoc(), termwith); :}
+"__FILE__" {: return Token(this.getLoc(), termfile); :}
+"__LINE__" {: return Token(this.getLoc(), termline); :}
+"{" {: return Token(this.getLoc(), termlcurly); :}
+"|" {: return Token(this.getLoc(), termlogicalor); :}
+"|=" {: return Token(this.getLoc(), termorassign); :}
+"||" {: return Token(this.getLoc(), termor); :}
+"}" {: return Token(this.getLoc(), termrcurly); :}
+"~" {: return Token(this.getLoc(), termtilde); :}
+"~=" {: return Token(this.getLoc(), termtildeassign); :}

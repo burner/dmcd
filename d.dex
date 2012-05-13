@@ -1,5 +1,6 @@
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
 "[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+"'[:word:blank:][:word:]'" {: return Token(this.getLoc(), termcharliteral, this.lexText.getString()); :}
 "!" {: return Token(this.getLoc(), termbang); :}
 "!<" {: return Token(this.getLoc(), termbangless); :}
 "!<=" {: return Token(this.getLoc(), termbanglessequal); :}
@@ -9,6 +10,7 @@
 "!>" {: return Token(this.getLoc(), termbanggreater); :}
 "!>=" {: return Token(this.getLoc(), termbanggreaterassign); :}
 "!is" {: return Token(this.getLoc(), termbangis); :}
+"!in" {: return Token(this.getLoc(), termbangin); :}
 "$" {: return Token(this.getLoc(), termdollarsym); :}
 "%" {: return Token(this.getLoc(), termmodulo); :}
 "%=" {: return Token(this.getLoc(), termmoduloassign); :}
@@ -59,9 +61,10 @@
 "\\[" {: return Token(this.getLoc(), termlbrack); :}
 "\\]" {: return Token(this.getLoc(), termrbrack); :}
 "^" {: return Token(this.getLoc(), termxor); :}
+"^^" {: return Token(this.getLoc(), termxorxor); :}
 "^=" {: return Token(this.getLoc(), termxorassign); :}
 "^^=" {: return Token(this.getLoc(), termxorxorassign); :}
-"__thread" {: return Token(this.getLoc(), termthread); :}
+//"__thread" {: return Token(this.getLoc(), termthread); :}
 "__traits" {: return Token(this.getLoc(), termtraits); :}
 "abstract" {: return Token(this.getLoc(), termabstract); :}
 "alias" {: return Token(this.getLoc(), termalias); :}
@@ -77,6 +80,7 @@
 "cast" {: return Token(this.getLoc(), termcast); :}
 "catch" {: return Token(this.getLoc(), termcatch); :}
 "__gshared" {: return Token(this.getLoc(), termgshared); :}
+"shared" {: return Token(this.getLoc(), termshared); :}
 "cdouble" {: return Token(this.getLoc(), termcdouble); :}
 "cfloat" {: return Token(this.getLoc(), termcfloat); :}
 "char" {: return Token(this.getLoc(), termchar); :}
@@ -86,6 +90,7 @@
 "creal" {: return Token(this.getLoc(), termcreal); :}
 "dchar" {: return Token(this.getLoc(), termdchar); :}
 "default" {: return Token(this.getLoc(), termdefault); :}
+"delete" {: return Token(this.getLoc(), termdelete); :}
 "delegate" {: return Token(this.getLoc(), termdelegate); :}
 "deprecated" {: return Token(this.getLoc(), termdeprecated); :}
 "do" {: return Token(this.getLoc(), termdo); :}
@@ -116,6 +121,7 @@
 "invariant" {: return Token(this.getLoc(), terminvariant); :}
 "ireal" {: return Token(this.getLoc(), termireal); :}
 "is" {: return Token(this.getLoc(), termis); :}
+"in" {: return Token(this.getLoc(), termin); :}
 "long" {: return Token(this.getLoc(), termlong); :}
 "lazy" {: return Token(this.getLoc(), termlazy); :}
 "mixin" {: return Token(this.getLoc(), termmixin); :}
@@ -132,8 +138,10 @@
 "real" {: return Token(this.getLoc(), termreal); :}
 "ref" {: return Token(this.getLoc(), termref); :}
 "return" {: return Token(this.getLoc(), termreturn); :}
+"package" {: return Token(this.getLoc(), termpackage); :}
 "pure" {: return Token(this.getLoc(), termpure); :}
 "scope" {: return Token(this.getLoc(), termscope); :}
+"success" {: return Token(this.getLoc(), termsuccess); :}
 "short" {: return Token(this.getLoc(), termshort); :}
 "static" {: return Token(this.getLoc(), termstatic); :}
 "struct" {: return Token(this.getLoc(), termstruct); :}
@@ -144,6 +152,7 @@
 "throw" {: return Token(this.getLoc(), termthrow); :}
 "true" {: return Token(this.getLoc(), termtrue); :}
 "try" {: return Token(this.getLoc(), termtry); :}
+"template" {: return Token(this.getLoc(), termtemplate); :}
 "typeid" {: return Token(this.getLoc(), termtypeid); :}
 "typeof" {: return Token(this.getLoc(), termtypeof); :}
 "ubyte" {: return Token(this.getLoc(), termubyte); :}
@@ -153,6 +162,7 @@
 "unittest" {: return Token(this.getLoc(), termunittest); :}
 "ushort" {: return Token(this.getLoc(), termushort); :}
 "void" {: return Token(this.getLoc(), termvoid); :}
+"version" {: return Token(this.getLoc(), termversion); :}
 "wchar" {: return Token(this.getLoc(), termwchar); :}
 "while" {: return Token(this.getLoc(), termwhile); :}
 "with" {: return Token(this.getLoc(), termwith); :}
