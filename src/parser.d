@@ -190,7 +190,7 @@ class Parse {
 			Pair!(int,immutable(immutable(TableItem)[]))(
 			this.input.getTyp(), [TableItem(false)]);
 
-		log("%s", this.input.toString());
+		//log("%s", this.input.toString());
 
 		immutable(immutable(Pair!(int,immutable(TableItem[])))[]) row
 			= parseTable[this.parseStack.back()];
@@ -309,7 +309,7 @@ class Parse {
 		
 		//action = this.getAction(input)[actIdx]; 
 		//log("%s", action.toString());
-		this.printStack();
+		//this.printStack();
 		if(action.getTyp() == TableType.Accept) {
 			//log("%s %s", action.toString(), input.toString());
 			this.parseStack.popBack(rules[action.getNumber()].length-1);

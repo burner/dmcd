@@ -155,7 +155,7 @@ class AST {
 	private string toStringGraph(const ASTNode node, int indent) const {
 		StringBuffer!(char) ret = new StringBuffer!(char)(128);	
 		for(int i = 0; i < indent; i++) {
-			ret.pushBack('\t');
+			ret.pushBack(" ");
 		}
 		ret.pushBack("%s %s ", idToString(node.getTyp()),
 			node.getToken().toStringShort());
