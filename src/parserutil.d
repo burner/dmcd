@@ -36,7 +36,8 @@ string tableitemToString(const TableItem ti) {
 			break;
 		case TableType.Shift:
 			ret.pushBack("Shift: ");
-			ret.pushBack(parsetable.idToString(ti.getNumber()));
+			//assert(ti.getNumber() != 705);
+			ret.pushBack("%d", ti.getNumber());
 			break;
 	}
 	return ret.getString();

@@ -122,7 +122,8 @@ class Parse {
 	}
 
 	package int getTos() const {
-		return this.parseStack[this.parseStack.getSize()-1];
+		//return this.parseStack[this.parseStack.getSize()-1];
+		return this.parseStack.back();
 	}
 
 	package AST getAst() {
@@ -273,7 +274,7 @@ class Parse {
 	}
 
 	private void printStack() const {
-		printf("parse stack: ");
+		printf("parse stack %d: ", this.id);
 		foreach(it; this.parseStack) {
 			printf("%d ", it);
 		}
@@ -281,7 +282,8 @@ class Parse {
 	}
 
 	private string stackToString() const {
-		auto ret = new StringBuffer!(char)("parse stack: ");
+		auto ret = new StringBuffer!(char)("parse stack");
+		ret.pushBack(" id %d", this.id);
 		foreach(it; this.parseStack) {
 			ret.pushBack("%d ", it);
 		}
@@ -291,7 +293,7 @@ class Parse {
 
 
 	private void printTokenStack() const {
-		printf("token stack: ");
+		printf("token stack %d: ", this.id);
 		foreach(it; this.tokenStack) {
 			printf("%s:%d ", it.toStringShort(), it.getTreeIdx());
 		}
@@ -301,14 +303,18 @@ class Parse {
 	private string traceToString() const {
 		auto ret = new StringBuffer!(char)(128);
 		ret.pushBack("Parse %d Trace:", this.id);
-		foreach(idx, it; this.trace) {
-			ret.pushBack("%d:%s, ", it.second, tableitemToString(it.first));
+		foreach_reverse(const size_t idx, const Pair!(TableItem,int) it; this.trace) {
+			ret.pushBack("%d:%s\n", it.second, tableitemToString(it.first));
+			if(idx == 15) {
+				break;
+			}
 		}
 		return ret.getString();
 	}
 
 	private string tokenStackToString() const {
-		auto ret = new StringBuffer!(char)("token stack: ");
+		auto ret = new StringBuffer!(char)("token stack ");
+		ret.pushBack("%d:", this.id);
 		auto cnt = 0;
 		foreach_reverse(it; this.tokenStack) {
 			ret.pushBack("%s ", it.toStringShort());
