@@ -6,6 +6,7 @@ import hurt.io.stdio;
 import hurt.util.pair;
 import hurt.util.slog;
 import hurt.util.util;
+import hurt.math.mathutil;
 import hurt.string.formatter;
 import hurt.string.stringbuffer;
 
@@ -14,6 +15,7 @@ import lexer;
 import lextable;
 import parsetable;
 import token;
+import parserutil;
 
 class Parse {
 	private int id;
@@ -23,6 +25,9 @@ class Parse {
 	private Deque!(Token) tokenStack;
 	private AST ast;
 	private Token input;
+
+	// trace
+	private Deque!(Pair!(TableItem,int)) trace;
 
 	this(Parser parser, int id) {
 		this.parser = parser;
@@ -35,6 +40,9 @@ class Parse {
 		this.ast = new AST();
 		this.tokenBufIdx = 0;
 		this.input = this.getToken();
+
+		// trace
+		this.trace = new Deque!(Pair!(TableItem,int))(128);
 	}
 
 	this(Parser parser, Parse toCopy, int id) {
@@ -48,6 +56,13 @@ class Parse {
 		this.tokenBufIdx = toCopy.tokenBufIdx;
 		this.input = toCopy.input;
 		this.id = id;
+
+		// trace
+		this.trace = new Deque!(Pair!(TableItem,int))(toCopy.trace);
+	}
+
+	public TableItem getLastAction() const {
+		return this.trace.back().first;
 	}
 
 	package int getId() const {
@@ -252,6 +267,7 @@ class Parse {
 		this.tokenStack.popBack(rules[actionNum].length-1);
 		this.tokenStack.pushBack(ret);
 		//this.printTokenStack();
+		this.printStack();
 		//log("%s", this.ast.toString());
 
 	}
@@ -282,9 +298,19 @@ class Parse {
 		println();
 	}
 
+	private string traceToString() const {
+		auto ret = new StringBuffer!(char)(128);
+		ret.pushBack("Parse %d Trace:", this.id);
+		foreach(idx, it; this.trace) {
+			ret.pushBack("%d:%s, ", it.second, tableitemToString(it.first));
+		}
+		return ret.getString();
+	}
+
 	private string tokenStackToString() const {
 		auto ret = new StringBuffer!(char)("token stack: ");
-		foreach(it; this.tokenStack) {
+		auto cnt = 0;
+		foreach_reverse(it; this.tokenStack) {
 			ret.pushBack("%s ", it.toStringShort());
 		}
 		ret.pushBack('\n');
@@ -297,6 +323,7 @@ class Parse {
 			"ERROR", this.parseStack.back(), input.toString(), this.id);
 		ret.pushBack(this.stackToString());
 		ret.pushBack(this.tokenStackToString());
+		ret.pushBack(this.traceToString());
 		return ret.getString();
 	}
 
@@ -312,6 +339,7 @@ class Parse {
 		//this.printStack();
 		if(action.getTyp() == TableType.Accept) {
 			//log("%s %s", action.toString(), input.toString());
+			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
 			this.parseStack.popBack(rules[action.getNumber()].length-1);
 			this.runAction(action.getNumber());
 			return Pair!(int,string)(1,"");
@@ -322,6 +350,10 @@ class Parse {
 			//log("%s", input.toString());
 			//log();
 			this.parseStack.pushBack(action.getNumber());
+
+			// trace
+			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
+
 			this.tokenStack.pushBack(input);
 			input = this.getToken();
 		} else if(action.getTyp() == TableType.Reduce) {
@@ -332,6 +364,10 @@ class Parse {
 			this.parseStack.popBack(rules[action.getNumber()].length-1);
 			this.parseStack.pushBack(
 				this.getGoto(rules[action.getNumber()][0]));
+
+			// trace
+			//this.trace.pushBack(action.getNumber());
+			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
 
 			// tmp token stack stuff
 			this.runAction(action.getNumber());
@@ -417,8 +453,10 @@ class Parser {
 	}
 
 	private int merge(Parse a, Parse b) {
-		log("a ast = %s", a.getAst().toStringGraph());
-		log("b ast = %s", b.getAst().toStringGraph());
+		//log("a ast = %s", a.getAst().toStringGraph());
+		//log("b ast = %s", b.getAst().toStringGraph());
+		log("a id %d last action %s", a.getId(), tableitemToString(a.getLastAction()));
+		log("b id %d last action %s", b.getId(), tableitemToString(b.getLastAction()));
 		return b.getId();
 	}
 
@@ -457,11 +495,11 @@ class Parser {
 				immutable(TableItem[]) actions = this.parses[i].getAction();
 				// if there are more than one action we found a conflict
 				if(actions.length > 1) {
-					/*log("fork at id %d, tos %d, input %s, number of actions %d",
+					log("fork at id %d, tos %d, input %s, number of actions %d",
 						this.parses[i].getId(), this.parses[i].getTos(),
 						this.parses[i].getCurrentInput().toString(), 
 						actions.length);
-					*/
+					
 					for(size_t j = 1; j < actions.length; j++) {
 						Parse tmp = new Parse(this, this.parses[i], 
 							this.nextId++);
