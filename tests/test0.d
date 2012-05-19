@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:42
-// Tests the simplest of programs.
+
+//T Tests the simplest of programs.
 
 int main()
 {

@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:84
-// Tests local variables with simple expressions.
+
+//T Tests local variables with simple expressions.
 
 int main()
 {

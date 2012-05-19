@@ -1,3 +1,9 @@
+//T compiles:no
+//T lexer:yes
+//T parser:yes
+//T semantic:no
+//T retval:0
+
 module hello.world.gggg; 
 
 int func(int a, int b) {

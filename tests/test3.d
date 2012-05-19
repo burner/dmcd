@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:42
-// Tests casting.
+
+//T Tests casting.
 
 int main()
 {

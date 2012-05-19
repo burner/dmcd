@@ -1,6 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:0
-// Create one variable of every primitive type.
+//T Create one variable of every primitive type.
 
 int main()
 {

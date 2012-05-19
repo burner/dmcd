@@ -1,5 +1,9 @@
 //T compiles:no
-// Issue #25.
+//T lexer:yes
+//T parser:yes
+//T semantic:no
+//T Issue #25.
+
 
 int func1() { return 2; }
 int func2() { return 20; }

@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:6
-//? desc:Various cases for comments.
+
+//T Various cases for comments.
 
 int main()
 {

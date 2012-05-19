@@ -1,4 +1,8 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
+
 
 int main()
 {

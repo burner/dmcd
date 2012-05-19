@@ -1,5 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:30
+
 //T dependency:test37_import.d
 
 import test37_import;

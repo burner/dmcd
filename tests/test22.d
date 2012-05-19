@@ -1,5 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:33
+
 //T dependency:test22_import.d
 
 import test22_import;

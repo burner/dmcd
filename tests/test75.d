@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:0
-//? desc:Test goto case multiple cases in case list.
+
+//T Test goto case multiple cases in case list.
 
 int transmogrify(int input)
 {

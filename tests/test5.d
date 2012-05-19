@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:42
-// Tests simple functions, and use before definition.
+
+//T Tests simple functions, and use before definition.
 
 int main()
 {

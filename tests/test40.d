@@ -1,5 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T has-passed:no
+
 //T retval:41
 
 auto add(int a, int b)

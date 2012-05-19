@@ -1,6 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:42
-// Tests increment/decrement semantics.
+//T Tests increment/decrement semantics.
 
 int add(int a, int b)
 {

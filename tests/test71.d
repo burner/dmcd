@@ -1,4 +1,9 @@
-//? desc:Test the while loop.
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
+//T retval:0
+
+//T Test the while loop.
 
 int main()
 {

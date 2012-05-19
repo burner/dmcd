@@ -1,7 +1,11 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:12
 //T has-passed:yes
-// Tests the casting of booleans to ints. 
+
+//T Tests the casting of booleans to ints. 
 
 int main()
 {

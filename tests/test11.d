@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:42
-// Tests struct member functions, implicit and explicit this.
+
+//T Tests struct member functions, implicit and explicit this.
 
 struct S
 {

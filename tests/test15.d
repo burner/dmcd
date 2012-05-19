@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:73
-// Simple test of ref.
+
+//T Simple test of ref.
 
 void change(ref int i, int to)
 {

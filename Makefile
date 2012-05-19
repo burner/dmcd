@@ -59,3 +59,6 @@ clean:
 cleanobjs:
 	rm *.o&
 	rm dmcd&
+
+test: build
+	./tester.py

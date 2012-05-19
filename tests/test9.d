@@ -1,6 +1,9 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:0
-// Tests strings and character literals, and string/pointer casts.
+//T Tests strings and character literals, and string/pointer casts.
 
 extern(C) size_t strlen(const char* s);
 

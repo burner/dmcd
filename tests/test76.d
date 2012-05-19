@@ -1,6 +1,10 @@
 //T compiles:yes
+//T lexer:yes
+//T parser:yes
+//T semantic:yes
 //T retval:0
-//? desc:Test case range statements.
+
+//T Test case range statements.
 
 int transmogrify(int input)
 {
