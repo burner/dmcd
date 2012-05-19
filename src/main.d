@@ -10,7 +10,7 @@ import lexer;
 import token;
 import parser;
 
-void main(string[] args) {
+int main(string[] args) {
 	Args arg = Args(args);
 	bool lpMulti = true; // true means multithreaded
 	arg.setOption("-l", "--lpMulti", "if false is passed" ~
@@ -34,5 +34,8 @@ void main(string[] args) {
 	printfln("lexing and parsing took %f seconds", sw.stop());
 	if(succ) {
 		p.getAst().toGraph("test1.dot");
+		return 0;
 	}
+
+	return 1;
 }
