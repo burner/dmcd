@@ -24,9 +24,11 @@ def getTestInformation(filename):
 	return ret
 
 def runTest(filename):
-	print("./dmcd -f {0}".format(filename))
-	ret = subprocess.Popen("./dmcd -f {0}".format(filename), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	print("".join(ret.stdout))
+	inp = ("./dmcd -f ").split()
+	inp[1] += " " + filename
+	print(inp)
+	ret = subprocess.Popen(inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+	ret.wait()
 
 def doTest(filename):
 	info = getTestInformation(filename)

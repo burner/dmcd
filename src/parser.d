@@ -441,6 +441,7 @@ class Parser {
 			}
 			t = this.getNextToken();
 		}
+		log("%s", t.toString());
 		return t;
 	}
 
