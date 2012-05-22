@@ -1,4 +1,6 @@
-OBJS=main.o token.o lexer.o parsetable.o lextable.o parser.o ast.o parserutil.o
+OBJS=main.o token.o lexer.o parsetable.o lextable.o parser.o ast.o parserutil.o\
+exceptions.o
+
 GEN=src/parsetable.d src/lextable.d
 
 DFLAGS=-unittest -I../libhurt -Isrc -m64 -gc -debug
@@ -28,6 +30,9 @@ src/token.d Makefile
 
 lextable.o: src/lextable.d Makefile
 	dmd -c $(DFLAGS) src/lextable.d
+
+exceptions.o: src/exceptions.d Makefile
+	dmd -c $(DFLAGS) src/exceptions.d
 
 ast.o: src/ast.d src/token.d Makefile
 	dmd -c $(DFLAGS) src/ast.d

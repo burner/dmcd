@@ -20,6 +20,7 @@ import hurt.util.pair;
 import lextable;
 import parsetable;
 import token;
+import exceptions;
 
 class Lexer : Thread {
 	private string filename;
@@ -265,8 +266,8 @@ class Lexer : Thread {
 						this.saveLocation();
 						this.lexText.clear();
 					} else {
-						assert(false, 
-							format("we failed with state %d and nextstate %d, 
+						throw new LexerException(format(
+							"we failed with state %d and nextstate %d, 
 							" ~ "inputchar was %c", currentState, 
 							nextState, nextChar));
 					}
