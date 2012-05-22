@@ -175,5 +175,5 @@
 "}" {: return Token(this.getLoc(), termrcurly); :}
 "~" {: return Token(this.getLoc(), termtilde); :}
 "~=" {: return Token(this.getLoc(), termtildeassign); :}
-"//[:control:graph:]*\\n" {: return Token(this.getLoc(), -99); :}
+"//[:control:graph:]*" {: return Token(this.getLoc(), -99); :}
 

@@ -40,7 +40,7 @@ ast.o: src/ast.d src/token.d Makefile
 parserutil.o: src/parserutil.d src/parsetable.d Makefile
 	dmd -c $(DFLAGS) src/parserutil.d
 
-lexer.o: src/lexer.d src/lextable.d src/token.d Makefile
+lexer.o: src/lexer.d src/lextable.d src/token.d src/exceptions.d Makefile
 	dmd -c $(DFLAGS) src/lexer.d
 
 main.o: src/main.d src/lexer.d src/lextable.d src/token.d Makefile

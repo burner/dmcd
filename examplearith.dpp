@@ -1,3 +1,5 @@
+// comment
+
 module hello.world.gggg; 
 
 int func(int a, int b) {

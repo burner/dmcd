@@ -1,5 +1,8 @@
 module parser;
 
+import std.concurrency;
+import core.thread;
+
 import hurt.algo.binaryrangesearch;
 import hurt.container.deque;
 import hurt.io.stdio;
@@ -383,7 +386,7 @@ class Parse {
 	}
 }
 
-class Parser {
+class Parser : Thread {
 	private Lexer lexer;
 	private Deque!(Token) tokenBuffer;
 	private Deque!(Token) tokenStore;
@@ -395,7 +398,11 @@ class Parser {
 	private int nextId;
 	private bool lastTokenFound;
 
-	public this(Lexer lexer) {
+	private Tid parent;
+
+	public this(Lexer lexer, Tid parent) {
+		super(&run);
+		this.parent = parent;
 		this.lexer = lexer;	
 		this.tokenBuffer = new Deque!(Token)(64);
 		this.tokenStore = new Deque!(Token);
@@ -559,5 +566,9 @@ class Parser {
 		// parse
 		this.mergeRun(this.acceptingParses);
 		return !this.acceptingParses.isEmpty();
+	}
+
+	void run() {
+		this.parse();
 	}
 }

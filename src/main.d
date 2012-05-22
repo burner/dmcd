@@ -1,3 +1,7 @@
+module main;
+
+import std.concurrency;
+
 import hurt.io.stdio;
 import hurt.util.slog;
 import hurt.container.deque;
@@ -9,6 +13,7 @@ import hurt.util.slog;
 import lexer;
 import token;
 import parser;
+import exceptions;
 
 int main(string[] args) {
 	Args arg = Args(args);
@@ -28,9 +33,25 @@ int main(string[] args) {
 
 	StopWatch sw;
 	sw.start();
-	Parser p = new Parser(new Lexer(file, lpMulti, 10));
+	Parser p;
+	Lexer l;
+	Tid lId;
+	Tid pId;
+	bool succ = false;
+	l = new Lexer(file, lpMulti, 10, thisTid);
+	if(lpMulti) {
+		l.start();
+	}
+	p = new Parser(l, thisTid);
+	p.start();
 
-	bool succ = p.parse();
+	receive( (string s) { log("%s", s);
+			return 1; },
+		(bool success) { succ = success; });
+
+	l.join();
+	p.join();
+
 	printfln("lexing and parsing took %f seconds", sw.stop());
 	if(succ) {
 		p.getAst().toGraph("test1.dot");

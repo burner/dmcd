@@ -3,6 +3,8 @@ module lexer;
 import core.sync.semaphore;
 import core.thread;
 
+import std.concurrency;
+
 import hurt.algo.binaryrangesearch;
 import hurt.container.map;
 import hurt.container.stack;
@@ -45,8 +47,11 @@ class Lexer : Thread {
 	// true means single run, false means step be step
 	private bool kind;
 
-	this(string filename, bool kind = false, uint count = 10) {
+	private Tid parent;
+
+	this(string filename, bool kind, uint count, Tid parent) {
 		super(&run);
+		this.parent = parent;
 		this.filename = filename;
 		this.lineNumber = 0;
 		this.inputChar = new Stack!(dchar)();
@@ -245,31 +250,39 @@ class Lexer : Thread {
 			1);
 		while(!this.isEmpty()) {
 			dchar nextChar = this.getNextChar();
+			log("%c", nextChar);
 			nextState = this.getNextState(nextChar, currentState);
-			if(nextState != -1) { // simplie a next state
+			if(nextState != -1) { // simply a next state
 				currentState = nextState;
 				lexText.pushBack(nextChar);
 			// accepting state
 			} else if(nextState == -1) { 
+				log();
 				stateType accept = isAcceptingState(currentState);
 				Token save;
 				if(accept != -1) {
-					//log("%2d accept number %d", currentState, accept);
+					log("%2d accept number %d %s", currentState, accept, 
+						this.lexText.getString());
 					inputChar.push(nextChar);
 					save = this.acceptingAction(accept);
 					this.lexText.clear();
 					currentState = 0;
 					this.saveLocation();
 				} else {
+					log();
 					if(this.errorFunction(currentState, nextState, nextChar)) {
+						log();
 						currentState = 0;
 						this.saveLocation();
 						this.lexText.clear();
 					} else {
-						throw new LexerException(format(
+						log();
+						send(this.parent, format( 
 							"we failed with state %d and nextstate %d, 
-							" ~ "inputchar was %c", currentState, 
-							nextState, nextChar));
+							" ~ "inputchar was %c at position %s:%d:%d", currentState, 
+							nextState, nextChar, this.filename, this.getCurrentLineCount(),
+							this.getCurrentIndexInLine()));
+						return;
 					}
 				}
 				if(this.pushBack(save, false)) { // single step
@@ -277,7 +290,7 @@ class Lexer : Thread {
 				}
 			}
 		}
-		//log();
+		log();
 
 		// we are done but there their might be a state left
 		if(currentState == 0) {
