@@ -73,9 +73,9 @@ class Lexer : Thread {
 		this.getNextLine();
 
 		this.kind = kind;
-		if(this.kind) {
+		/*if(this.kind) {
 			this.start();
-		}
+		}*/
 	}
 
 	~this() {
@@ -252,12 +252,13 @@ class Lexer : Thread {
 			dchar nextChar = this.getNextChar();
 			log("%c", nextChar);
 			nextState = this.getNextState(nextChar, currentState);
+			log("next state %d", nextState);
 			if(nextState != -1) { // simply a next state
 				currentState = nextState;
 				lexText.pushBack(nextChar);
 			// accepting state
 			} else if(nextState == -1) { 
-				log();
+				log("%s", this.lexText.getString());
 				stateType accept = isAcceptingState(currentState);
 				Token save;
 				if(accept != -1) {

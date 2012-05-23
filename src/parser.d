@@ -306,7 +306,8 @@ class Parse {
 	private string traceToString() const {
 		auto ret = new StringBuffer!(char)(128);
 		ret.pushBack("Parse %d Trace:", this.id);
-		foreach_reverse(const size_t idx, const Pair!(TableItem,int) it; this.trace) {
+		foreach_reverse(const size_t idx, const Pair!(TableItem,int) it; 
+				this.trace) {
 			ret.pushBack("%d:%s\n", it.second, tableitemToString(it.first));
 			if(idx == 15) {
 				break;
@@ -328,7 +329,8 @@ class Parse {
 
 	private string reportError(const Token input) const {
 		StringBuffer!(char) ret = new StringBuffer!(char)(1023);
-		ret.pushBack("%?1!1s in state %?1!1d on input %?1!1s this is parse %d\n", 
+		ret.pushBack(
+			"%?1!1s in state %?1!1d on input %?1!1s this is parse %d\n", 
 			"ERROR", this.parseStack.back(), input.toString(), this.id);
 		ret.pushBack(this.stackToString());
 		ret.pushBack(this.tokenStackToString());
@@ -348,7 +350,8 @@ class Parse {
 		//this.printStack();
 		if(action.getTyp() == TableType.Accept) {
 			//log("%s %s", action.toString(), input.toString());
-			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
+			this.trace.pushBack(Pair!(TableItem,int)(action,
+				action.getNumber()));
 			this.parseStack.popBack(rules[action.getNumber()].length-1);
 			this.runAction(action.getNumber());
 			return Pair!(int,string)(1,"");
@@ -361,7 +364,8 @@ class Parse {
 			this.parseStack.pushBack(action.getNumber());
 
 			// trace
-			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
+			this.trace.pushBack(Pair!(TableItem,int)(action,
+				action.getNumber()));
 
 			this.tokenStack.pushBack(input);
 			input = this.getToken();
@@ -376,7 +380,8 @@ class Parse {
 
 			// trace
 			//this.trace.pushBack(action.getNumber());
-			this.trace.pushBack(Pair!(TableItem,int)(action,action.getNumber()));
+			this.trace.pushBack(Pair!(TableItem,int)(action,
+				action.getNumber()));
 
 			// tmp token stack stuff
 			this.runAction(action.getNumber());
@@ -501,7 +506,7 @@ class Parser : Thread {
 		}
 	}
 
-	public bool parse() {
+	public void parse() {
 		while(!this.parses.isEmpty()) {
 			// for every parse
 			for(size_t i = 0; i < this.parses.getSize(); i++) {
@@ -565,7 +570,8 @@ class Parser : Thread {
 		// this is necessary because their might be more than one accepting 
 		// parse
 		this.mergeRun(this.acceptingParses);
-		return !this.acceptingParses.isEmpty();
+		//return !this.acceptingParses.isEmpty();
+		send(this.parent, !this.acceptingParses.isEmpty());
 	}
 
 	void run() {

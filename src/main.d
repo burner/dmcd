@@ -33,23 +33,24 @@ int main(string[] args) {
 
 	StopWatch sw;
 	sw.start();
-	Parser p;
-	Lexer l;
-	Tid lId;
-	Tid pId;
 	bool succ = false;
-	l = new Lexer(file, lpMulti, 10, thisTid);
+	Lexer l = new Lexer(file, lpMulti, 10, thisTid);
 	if(lpMulti) {
 		l.start();
 	}
-	p = new Parser(l, thisTid);
+	Parser p = new Parser(l, thisTid);
 	p.start();
 
-	receive( (string s) { log("%s", s);
-			return 1; },
-		(bool success) { succ = success; });
+	bool needToReceiveMore = true;
+	while(needToReceiveMore) {
+		receive( (string s) { log("%s", s);
+				return 1; },
+			(bool success) { succ = success; needToReceiveMore = false; });
+	}
 
-	l.join();
+	if(lpMulti) {
+		l.join();
+	}
 	p.join();
 
 	printfln("lexing and parsing took %f seconds", sw.stop());
