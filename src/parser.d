@@ -271,7 +271,7 @@ class Parse {
 		this.tokenStack.popBack(rules[actionNum].length-1);
 		this.tokenStack.pushBack(ret);
 		//this.printTokenStack();
-		this.printStack();
+		//this.printStack();
 		//log("%s", this.ast.toString());
 
 	}

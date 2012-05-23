@@ -22,7 +22,7 @@ src/parsetable.d: d4.dlr Makefile
 	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot
 
 src/lextable.d: d4.dlr d.dex Makefile
-	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot
+	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot -v
 
 parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d\
 src/token.d Makefile

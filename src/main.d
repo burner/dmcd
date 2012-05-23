@@ -9,6 +9,7 @@ import hurt.time.stopwatch;
 import hurt.io.stdio;
 import hurt.util.getopt;
 import hurt.util.slog;
+import hurt.util.util;
 
 import lexer;
 import token;
@@ -42,10 +43,18 @@ int main(string[] args) {
 	p.start();
 
 	bool needToReceiveMore = true;
+	int lexerror = 0;
 	while(needToReceiveMore) {
-		receive( (string s) { log("%s", s);
-				return 1; },
-			(bool success) { succ = success; needToReceiveMore = false; });
+		receive( 
+			(string s) { 
+				log("%s", s);
+				lexerror = 1; 
+			},
+			(bool success) { 
+				succ = success; 
+				needToReceiveMore = false; 
+			}
+		);
 	}
 
 	if(lpMulti) {
@@ -54,10 +63,13 @@ int main(string[] args) {
 	p.join();
 
 	printfln("lexing and parsing took %f seconds", sw.stop());
+	if(lexerror != 0) {
+		exit(lexerror);
+	}
 	if(succ) {
 		p.getAst().toGraph("test1.dot");
-		return 0;
+		exit(127);
 	}
 
-	return 1;
+	return 0;
 }

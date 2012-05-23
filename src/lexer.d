@@ -41,6 +41,7 @@ class Lexer : Thread {
 	__gshared Semaphore mutex;
 	__gshared Semaphore empty;
 	__gshared uint count;
+	private __gshared bool lockDisabled = false;
 
 	private Location loc;
 
@@ -192,8 +193,11 @@ class Lexer : Thread {
 	public void getToken(Deque!(Token) toSaveIn) {
 		if(this.kind) {
 			while(true) {
+				if(lockDisabled) {
+					break;
+				}
 				this.mutex.wait();
-				if(!this.deque.isEmpty()) {
+				if(!this.deque.isEmpty() || this.lockDisabled) {
 					break;
 				}
 				this.mutex.notify();
@@ -224,7 +228,11 @@ class Lexer : Thread {
 
 			// over the count or last token
 			if(this.deque.getSize() > this.count || last) {
-				this.mutex.notify();
+				if(last) {
+					this.deque.pushBack(Token(this.getLoc(), termdollar));
+					this.lockDisabled = true;
+				}
+				//this.mutex.notify();
 				this.empty.notify();
 				return false;
 			}
@@ -278,10 +286,14 @@ class Lexer : Thread {
 						this.lexText.clear();
 					} else {
 						log();
+						// to make the parser quit
+						this.pushBack(Token(this.getLoc(), termdollar), true);
 						send(this.parent, format( 
-							"we failed with state %d and nextstate %d, 
-							" ~ "inputchar was %c at position %s:%d:%d", currentState, 
-							nextState, nextChar, this.filename, this.getCurrentLineCount(),
+							"we failed with state %d and nextstate %d,"
+							~ "inputchar was %c aka %d at position %s:%d:%d", 
+							currentState, nextState, nextChar, 
+							cast(int)nextChar, this.filename, 
+							this.getCurrentLineCount(),
 							this.getCurrentIndexInLine()));
 						return;
 					}
