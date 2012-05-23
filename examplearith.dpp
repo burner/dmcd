@@ -6,11 +6,6 @@ int func(int a, int b) {
 	return a + b;
 }
 
-/* Hello is is a c
-		style comment  
-
-	hope this works */
-
 private class Gen(T) {
 	public:
 		this(T foo) {

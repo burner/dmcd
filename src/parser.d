@@ -286,7 +286,7 @@ class Parse {
 
 	private string stackToString() const {
 		auto ret = new StringBuffer!(char)("parse stack");
-		ret.pushBack(" id %d", this.id);
+		ret.pushBack(" id %d:", this.id);
 		foreach(it; this.parseStack) {
 			ret.pushBack("%d ", it);
 		}
@@ -453,7 +453,7 @@ class Parser : Thread {
 			}
 			t = this.getNextToken();
 		}
-		log("%s", t.toString());
+		//log("%s", t.toString());
 		return t;
 	}
 
