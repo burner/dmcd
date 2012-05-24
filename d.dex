@@ -1,6 +1,6 @@
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
 "[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
-"'[:word::blank:][:word:]'" {: return Token(this.getLoc(), termcharliteral, this.lexText.getString()); :}
+"'[:word::blank:]'" {: return Token(this.getLoc(), termcharliteral, this.lexText.getString()); :}
 "!" {: return Token(this.getLoc(), termbang); :}
 "!<" {: return Token(this.getLoc(), termbangless); :}
 "!<=" {: return Token(this.getLoc(), termbanglessequal); :}
