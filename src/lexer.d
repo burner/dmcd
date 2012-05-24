@@ -222,6 +222,7 @@ class Lexer : Thread {
 
 	private bool pushBack(Token token, bool last = false) {
 		// only if multithreaded
+		log("%s", token.toString());
 		if(this.kind) {
 			this.mutex.lock();
 
