@@ -374,7 +374,22 @@ class Parse {
 				this.parseStack.getSize());*/
 			// do action
 			// pop RHS of Production
-			this.parseStack.popBack(rules[action.getNumber()].length-1);
+			//this.parseStack.popBack(rules[action.getNumber()].length-1);
+			for(int i = 0; i < rules[action.getNumber()].length-1; i++) {
+				printf("%s ", this.tokenStack[-(i+1)].toStringShort());
+			}
+			println();
+			foreach(idx, it; rules[action.getNumber()][1 .. $]) {
+				if(this.tokenStack[-(idx+1)].getTyp() == it) {
+					this.parseStack.popBack();
+				} else {
+					return Pair!(int,string)(-1, this.reportError(input) ~
+						format("while poping right hand side of rule %d"
+						~ " we found %s instead of %s", action.getNumber(),
+						idToString(this.tokenStack[-(idx+1)].getTyp()), idToString(it)));
+				}
+
+			}
 			this.parseStack.pushBack(
 				this.getGoto(rules[action.getNumber()][0]));
 
