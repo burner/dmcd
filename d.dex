@@ -175,5 +175,6 @@
 "}" {: return Token(this.getLoc(), termrcurly); :}
 "~" {: return Token(this.getLoc(), termtilde); :}
 "~=" {: return Token(this.getLoc(), termtildeassign); :}
+"\"[:word::\n\t'!§$%&/()=?\\}'\]\[{,\\*\\+^<>|.-_#~]*\"" {: return Token(this.getLoc(), termstringliteral); :}
 "//[:asciiprint:]*" {: return Token(this.getLoc(), -99); :}
 "/\*[:word::whitespacecontrol:\n\t]*\*/" {: return Token(this.getLoc(), -99); :}
