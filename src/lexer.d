@@ -222,7 +222,7 @@ class Lexer : Thread {
 
 	private bool pushBack(Token token, bool last = false) {
 		// only if multithreaded
-		log("%s", token.toString());
+		//log("%s", token.toString());
 		if(this.kind) {
 			this.mutex.lock();
 
@@ -308,17 +308,14 @@ class Lexer : Thread {
 				}
 			}
 		}
-		log("currentState %d", currentState);
+		//log("currentState %d", currentState);
 
 		// we are done but there their might be a state left
 		if(currentState == 0) {
 			//ok I guess
-			log();
 			this.pushBack(Token(this.getLoc(), termdollar), true);
 		} else if(isAcceptingState(currentState)) {
-			log();
 			Token save = this.acceptingAction(isAcceptingState(currentState));
-			log("%s", save.toString());
 			this.lexText.clear();
 			this.pushBack(save);
 			this.pushBack(Token(this.getLoc(), termdollar), true);
@@ -327,7 +324,6 @@ class Lexer : Thread {
 			assert(false, format("no more input when in state %d", 
 				currentState));
 		}
-		log();
 		this.file.close();
 		return;
 	}

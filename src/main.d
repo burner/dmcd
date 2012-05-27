@@ -25,12 +25,15 @@ int main(string[] args) {
 		" be multithreaded.", lpMulti);
 
 	string file = "examplearith.dpp";
-	arg.setOption("-f", "--file", "pass a string do define the file you " ~
-		"want to parse. Default is examplearith.dpp" , file);
 
 	size_t numToken = 10;
 	arg.setOption("-t", "--token", "the number of token lexed in one run of" ~
 		" lexer. Default is 10" , numToken, true);
+
+	foreach(string it; arg) {
+		log("input file %s", it);
+		file = it;
+	}
 
 	StopWatch sw;
 	sw.start();
