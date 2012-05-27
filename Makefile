@@ -1,5 +1,5 @@
 OBJS=main.o token.o lexer.o parsetable.o lextable.o parser.o ast.o parserutil.o\
-exceptions.o
+exceptions.o util.o
 
 GEN=src/parsetable.d src/lextable.d
 
@@ -33,6 +33,9 @@ lextable.o: src/lextable.d Makefile
 
 exceptions.o: src/exceptions.d Makefile
 	dmd -c $(DFLAGS) src/exceptions.d
+
+util.o: src/util.d Makefile
+	dmd -c $(DFLAGS) src/util.d
 
 ast.o: src/ast.d src/token.d Makefile
 	dmd -c $(DFLAGS) src/ast.d

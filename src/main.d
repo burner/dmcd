@@ -12,6 +12,7 @@ import hurt.util.slog;
 import hurt.util.util;
 
 import lexer;
+import util;
 import token;
 import parser;
 import exceptions;
@@ -70,7 +71,7 @@ int main(string[] args) {
 		exit(lexerror);
 	}
 	if(succ) {
-		p.getAst().toGraph("test1.dot");
+		p.getAst().toGraph(removePath(file)~".dot");
 		exit(127);
 	}
 
