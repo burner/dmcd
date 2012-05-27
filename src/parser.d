@@ -379,17 +379,40 @@ class Parse {
 				printf("%s ", this.tokenStack[-(i+1)].toStringShort());
 			}
 			println();
-			foreach(idx, it; rules[action.getNumber()][1 .. $]) {
+			log();
+			for(int i = 0; i < rules[action.getNumber()].length-1; i++) {
+				long len = rules[action.getNumber()].length-1;
+				log("len %d tokenStack %d parseStack %d access %d\nrule len %d",
+					len, this.tokenStack.getSize(), this.parseStack.getSize(),
+					-(i+1), rules[action.getNumber()].length);
+				if(this.tokenStack[-(i+1)].getTyp() == 
+						rules[action.getNumber()][$ - 1 - i]) {
+					log();
+					this.parseStack.popBack();
+				} else {
+					log();
+					return Pair!(int,string)(-1, this.reportError(input) ~
+						format("while poping right hand side of rule %d (%s)"
+						~ " we found %s instead of %s", action.getNumber(),
+						prodToString(action.getNumber()).getString(),
+						idToString(this.tokenStack[-(len+i+1)].getTyp()), 
+						idToString(rules[action.getNumber()][i+1])));
+				}
+			}
+			log();
+			/*foreach_reverse(idx, it; rules[action.getNumber()][1 .. $]) {
 				if(this.tokenStack[-(idx+1)].getTyp() == it) {
 					this.parseStack.popBack();
 				} else {
 					return Pair!(int,string)(-1, this.reportError(input) ~
-						format("while poping right hand side of rule %d"
+						format("while poping right hand side of rule %d (%s)"
 						~ " we found %s instead of %s", action.getNumber(),
-						idToString(this.tokenStack[-(idx+1)].getTyp()), idToString(it)));
+						prodToString(action.getNumber()).getString(),
+						idToString(this.tokenStack[-(idx+1)].getTyp()), 
+						idToString(it)));
 				}
 
-			}
+			}*/
 			this.parseStack.pushBack(
 				this.getGoto(rules[action.getNumber()][0]));
 
