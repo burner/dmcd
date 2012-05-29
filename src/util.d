@@ -7,5 +7,5 @@ public pure @safe nothrow string removePath(string path) {
 			break;
 		}
 	}
-	return path[i .. $];
+	return path[i+1 .. $];
 }

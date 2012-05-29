@@ -19,6 +19,7 @@ import hurt.string.stringbuffer;
 import hurt.string.utf;
 import hurt.util.slog;
 import hurt.util.pair;
+import hurt.conv.convutil;
 
 import lextable;
 import parsetable;
@@ -190,7 +191,20 @@ class Lexer : Thread {
 
 	private bool errorFunction(stateType currentState, stateType nextState, 
 			dchar input) {
-		return false;
+		string lt = this.lexText.getString();
+		size_t numberIdx = 0;
+		foreach(it; lt) {
+			if(isDigit(it)) {
+				lt++;
+			} else {
+				break;
+			}
+		}
+		if(numberIdx == 0) {
+			return false;
+		} else if(lt[numberIdx+1 .. numberIdx+3] == "..") {
+			return true;
+		}
 	}
 
 	public void getToken(Deque!(Token) toSaveIn) {
