@@ -24,7 +24,7 @@ gives the user feedback about his compile.
 </tr>
 <tr name="lexing" date="2012-05-09 08:29:10">
 	<td>2012-05-09 08:29:10</td>
-	<td>Lexing</td></td></td>
+	<td>Lexing</td><td></td>
 </tr>
 <tr name="parsing" date="2012-05-09 08:29:10">
 	<td/><td>Parsing</td>

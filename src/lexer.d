@@ -191,11 +191,11 @@ class Lexer : Thread {
 
 	private bool errorFunction(stateType currentState, stateType nextState, 
 			dchar input) {
-		string lt = this.lexText.getString();
+		auto lt = this.lexText.getString();
 		size_t numberIdx = 0;
 		foreach(it; lt) {
 			if(isDigit(it)) {
-				lt++;
+				numberIdx++;
 			} else {
 				break;
 			}
@@ -203,8 +203,12 @@ class Lexer : Thread {
 		if(numberIdx == 0) {
 			return false;
 		} else if(lt[numberIdx+1 .. numberIdx+3] == "..") {
+			this.pushBack(Token(this.getLoc(), terminteger, lt[0 .. numberIdx]));
+			this.pushBack(Token(this.getLoc(), termdotdot));
 			return true;
 		}
+
+		return false;
 	}
 
 	public void getToken(Deque!(Token) toSaveIn) {

@@ -3,6 +3,7 @@
 import glob
 import re
 import subprocess
+from lxml import etree
 
 def globTests(): # get all tests that fit the form
 	testCaseRegex = re.compile("tests/test[0-9]+\.d")
@@ -36,6 +37,9 @@ def doTest(filename):
 	runTest(filename)
 
 if __name__ == "__main__":
-	files = globTests()
-	for i in files:
-		print(doTest(i))
+	#files = globTests()
+	#for i in files:
+		#print(doTest(i))
+
+	doc = etree.parse('README')
+	print(etree.tostring(doc))
