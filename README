@@ -1,8 +1,6 @@
 <html>
-<header>
 <title>Distributed multithreaded caching D compiler</title>
 <h1>Distributed multithreaded caching D compiler</h1>
-</header>
 
 <body>
 dmdc is a Compiler utilizing dex and dalr for lexer and parser generation.
@@ -19,21 +17,80 @@ gives the user feedback about his compile.
 <tr name="toprow">
 	<td>Date</td>
 	<td>Category</td>
-	<td>Test #</td>
 	<td>Test 0</td>
+	<td>Test 1</td>
+</tr>
+<tr name="lexing" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Lexing</td>
+	<td  testtype="Lexing" bgcolor="green" test="test0.d" date="2012-05-09 09:14:45">YES</td>
+	<td  testtype="Lexing" bgcolor="green" test="test1.d" date="2012-05-09 09:14:45">YES</td>
+</tr>
+<tr name="parsing" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Parsing</td>
+	<td testtype="Parsing"  bgcolor="red" test="test0.d" date="2012-05-09 09:14:45">YES</td>
+	<td testtype="Parsing"  bgcolor="green" test="test1.d" date="2012-05-09 09:14:45">YES</td>
+</tr>
+<tr name="compiling" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Compiling</td>
+	<td testtype="Compiling"  bgcolor="red" test="test0.d" date="2012-05-09 09:14:45">YES</td>
+	<td testtype="Compiling"  bgcolor="red" test="test1.d" date="2012-05-09 09:14:45">YES</td>
+</tr>
+<tr name="running" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Running</td>
+	<td testtype="Running"  bgcolor="red" test="test0.d" date="2012-05-09 09:14:45">YES</td>
+	<td testtype="Running"  bgcolor="red" test="test1.d" date="2012-05-09 09:14:45">YES</td>
+</tr>
+<tr name="compileTime" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Compile Time</td>
+	<td testtype="compileTime" bgcolor="white" test="test0.d" date="2012-05-09 09:14:45">0.12</td>
+	<td testtype="compileTime" bgcolor="white" test="test1.d" date="2012-05-09 09:14:45">0.14</td>
+</tr>
+<tr name="runTime" date="2012-05-09 09:14:45">
+	<td>2012-05-09 09:14:45</td>
+	<td>Run Time</td>
+	<td testtype="runTime" bgcolor="white" test="test0.d" date="2012-05-09 09:14:45">0.0</td>
+	<td testtype="runTime" bgcolor="white" test="test1.d" date="2012-05-09 09:14:45">0.0</td>
 </tr>
 <tr name="lexing" date="2012-05-09 08:29:10">
 	<td>2012-05-09 08:29:10</td>
-	<td>Lexing</td><td></td>
+	<td>Lexing</td>
+	<td  testtype="Lexing" bgcolor="green" test="test0.d" date="2012-05-09 08:29:10">YES</td>
+	<td  testtype="Lexing" bgcolor="green" test="test1.d" date="2012-05-09 08:29:10">YES</td>
 </tr>
 <tr name="parsing" date="2012-05-09 08:29:10">
-	<td/><td>Parsing</td>
+	<td>2012-05-09 08:29:10</td>
+	<td>Parsing</td>
+	<td testtype="Parsing"  bgcolor="red" test="test0.d" date="2012-05-09 08:29:10">YES</td>
+	<td testtype="Parsing"  bgcolor="green" test="test1.d" date="2012-05-09 08:29:10">YES</td>
 </tr>
 <tr name="compiling" date="2012-05-09 08:29:10">
-	<td/><td>Compiling</td>
+	<td>2012-05-09 08:29:10</td>
+	<td>Compiling</td>
+	<td testtype="Compiling"  bgcolor="red" test="test0.d" date="2012-05-09 08:29:10">YES</td>
+	<td testtype="Compiling"  bgcolor="red" test="test1.d" date="2012-05-09 08:29:10">YES</td>
 </tr>
 <tr name="running" date="2012-05-09 08:29:10">
-	<td/><td>Running</td>
+	<td>2012-05-09 08:29:10</td>
+	<td>Running</td>
+	<td testtype="Running"  bgcolor="red" test="test0.d" date="2012-05-09 08:29:10">YES</td>
+	<td testtype="Running"  bgcolor="red" test="test1.d" date="2012-05-09 08:29:10">YES</td>
+</tr>
+<tr name="compileTime" date="2012-05-09 08:29:10">
+	<td>2012-05-09 08:29:10</td>
+	<td>Compile Time</td>
+	<td testtype="compileTime" bgcolor="white" test="test0.d" date="2012-05-09 08:29:10">0.12</td>
+	<td testtype="compileTime" bgcolor="white" test="test1.d" date="2012-05-09 08:29:10">0.14</td>
+</tr>
+<tr name="runTime" date="2012-05-09 08:29:10">
+	<td>2012-05-09 08:29:10</td>
+	<td>Run Time</td>
+	<td testtype="runTime" bgcolor="white" test="test0.d" date="2012-05-09 08:29:10">0.0</td>
+	<td testtype="runTime" bgcolor="white" test="test1.d" date="2012-05-09 08:29:10">0.0</td>
 </tr>
 </table>
 </center>
