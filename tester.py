@@ -180,7 +180,7 @@ def doTest(filename):
 
 def testDictToReadmeDict(di):
 	print(di)
-	return [
+	l = [
 		# Lexing
 		{"test":di["test"],
 		"testtype":"Lexing", "date":di["date"],
@@ -196,25 +196,32 @@ def testDictToReadmeDict(di):
 		# Compiling
 		{"test":di["test"],
 		"testtype":"Compiling", "date":di["date"],
-		"text":di["Compiling"],"bgcolor":color[di["compiles"] == di["Compiling"]]},
+		"text":di["Compiling"],"bgcolor":color[di["compiles"] == di["Compiling"]]}]
 		# Running
-		{"test":di["test"],
+	if "retval" in di:
+		l.append({"test":di["test"],
 		"testtype":"Running", "date":di["date"],
-		"text":di["retval"],"bgcolor":color[False]},
-		# Compile Time
-		{"test":di["test"],
-		"testtype":"compileTime", "date":di["date"],
-		"text":di["compileTime"],"bgcolor":"white"},
-		# Running Time
-		{"test":di["test"],
-		"testtype":"runTime", "date":di["date"],
-		"text":di["runTime"],"bgcolor":"white"} ]
+		"text":di["retval"],"bgcolor":color[False]})
+	else:
+		l.append({"test":di["test"],
+		"testtype":"Running", "date":di["date"],
+		"text":"","bgcolor":color[False]})
+	# Compile Time
+	l.append({"test":di["test"],
+	"testtype":"compileTime", "date":di["date"],
+	"text":di["compileTime"],"bgcolor":"white"})
+	# Running Time
+	l.append({"test":di["test"],
+	"testtype":"runTime", "date":di["date"],
+	"text":di["runTime"],"bgcolor":"white"})
+
+	return l
 	
 
 def runAllTests(date):
 	tests = globTests()
 	ret = []
-	for i in tests[0:3]:
+	for i in tests[:54]:
 		tmp = doTest(i)
 		tmp["date"] = date.strftime("%Y-%m-%d %H:%M:%S")
 		tmp["test"] = i[i.rfind('/')+1:]
@@ -223,6 +230,7 @@ def runAllTests(date):
 	return ret
 			
 if __name__ == "__main__":
+	#dr = []
 	dr = readReadme("test2.html")
 	#dr = readReadme("README")
 	#names = getSortedTestNames(dr[0])
