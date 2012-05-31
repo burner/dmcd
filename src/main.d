@@ -18,6 +18,8 @@ import parser;
 import exceptions;
 
 int main(string[] args) {
+	StopWatch arSw;
+	arSw.start();
 	Args arg = Args(args);
 	bool lpMulti = true; // true means multithreaded
 	arg.setOption("-l", "--lpMulti", "if false is passed" ~
@@ -35,6 +37,8 @@ int main(string[] args) {
 		log("input file %s", it);
 		file = it;
 	}
+
+	log("arg parsing took %f", arSw.stop());
 
 	StopWatch sw;
 	sw.start();
@@ -71,7 +75,7 @@ int main(string[] args) {
 		exit(lexerror);
 	}
 	if(succ) {
-		p.getAst().toGraph(removePath(file)~".dot");
+		//p.getAst().toGraph(removePath(file)~".dot");
 	} else {
 		exit(33);
 	}

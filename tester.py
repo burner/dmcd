@@ -130,13 +130,18 @@ def getValueByDateNameAndType(data, date, name, typ):
 	dateValues = data[date.strftime("%Y-%m-%d %H:%M:%S")]
 	for it in dateValues:
 		if it["test"] == name:
-			if typ != "Running Time" and typ != "Compile Time":
+			if typ != "Running Time" and typ != "Compile Time" and typ != "Retval":
 				it["bgcolor"] = color[it[typ] == it[typ.lower()]]
 				it["text"] = it[typ.lower()]
+			elif typ == "Retval":
+				it["text"] = it[typ]
+				it["bgcolor"] = "red"
 			elif typ == "Running Time":
 				it["text"] = it["runTime"]
+				it["bgcolor"] = "white"
 			elif typ == "Compile Time":
 				it["text"] = it["compileTime"]
+				it["bgcolor"] = "white"
 			return it
 
 	return {}
@@ -243,7 +248,7 @@ def getOldTestResults(filename):
 	tree = etree.parse(filename)
 			
 if __name__ == "__main__":
-	oldtest = None
+	oldtest = {}
 	if os.path.isfile("test2.html"):
 		oldtest = readReadme("test2.html")
 		#print(oldstuff)

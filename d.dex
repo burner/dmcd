@@ -54,7 +54,9 @@
 "@safe" {: return Token(this.getLoc(), termsafe); :}
 "@system" {: return Token(this.getLoc(), termsystem); :}
 "@trusted" {: return Token(this.getLoc(), termtrusted); :}
-"[:digit:]+" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0x[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0b[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
 "[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloatliteral, this.lexText.getString()); :}
 "\+" {: return Token(this.getLoc(), termplus); :}
 "\+\+" {:  return Token(this.getLoc(), termincrement); :}
