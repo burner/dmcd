@@ -438,8 +438,8 @@ BasicType2 :=
 		{: ret = buildTreeWithLoc(termBasicType2, [-3,-2,-1], actionNum, 
 			this.tokenStack[-3].getLoc()); :}
 	| delegate Parameters;
-		{: ret = buildTreeWithLoc(termBasicType2, [-3,-2,-1], actionNum, 
-			this.tokenStack[-3].getLoc()); :}
+		{: ret = buildTreeWithLoc(termBasicType2, [-2,-1], actionNum, 
+			this.tokenStack[-2].getLoc()); :}
 	| function Parameters;
 		{: ret = buildTreeWithLoc(termBasicType2, [-2,-1], actionNum, 
 			this.tokenStack[-2].getLoc()); :}
@@ -1416,7 +1416,7 @@ CastExpression :=
 			actionNum, this.tokenStack[-5].getLoc()); :}
 	| cast lparen rparen UnaryExpression;
 		{: ret = buildTreeWithLoc(termCastExpression, [-1], 
-			actionNum, this.tokenStack[-5].getLoc()); :}
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 // checked
 CastQual :=
@@ -2255,7 +2255,7 @@ WithStatement :=
 SynchronizedStatement :=
 	synchronized ScopeStatement;
 		{: ret = buildTreeWithLoc(termSynchronizedStatement, [-2,-1], 
-			actionNum, this.tokenStack[-3].getLoc()); :}
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| synchronized lparen Expression rparen ScopeStatement;
 		{: ret = buildTreeWithLoc(termSynchronizedStatement, [-3,-1], 
 			actionNum, this.tokenStack[-5].getLoc()); :}
@@ -2811,8 +2811,8 @@ ConditionalStatement :=
 		{: ret = buildTreeWithLoc(termConditionalStatement, [-2,-1], 
 			actionNum, this.tokenStack[-2].getLoc()); :}
 	 | Condition NoScopeNonEmptyStatement else NoScopeNonEmptyStatement;
-		{: ret = buildTreeWithLoc(termConditionalStatement, [-5,-4,-3,-1], 
-			actionNum, this.tokenStack[-5].getLoc()); :}
+		{: ret = buildTreeWithLoc(termConditionalStatement, [-4,-3,-1], 
+			actionNum, this.tokenStack[-4].getLoc()); :}
 
 // checked
 Condition :=
@@ -2945,7 +2945,7 @@ TemplateInstance :=
 			actionNum, this.tokenStack[-5].getLoc()); :}
 	| TemplateIdentifier bang TemplateSingleArgument;
 		{: ret = buildTreeWithLoc(termTemplateInstance, [-3,-1], 
-			actionNum, this.tokenStack[-5].getLoc()); :}
+			actionNum, this.tokenStack[-3].getLoc()); :}
 
 // checked
 TemplateThisParameter :=
@@ -3108,13 +3108,13 @@ TemplateAliasParameter :=
 			actionNum, this.tokenStack[-4].getLoc()); :}
 	| alias identifier TemplateAliasParameterSpecialization;
 		{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-2,-1], 
-			actionNum, this.tokenStack[-4].getLoc()); :}
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| alias identifier TemplateAliasParameterDefault;
 		{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-2,-1], 
-			actionNum, this.tokenStack[-4].getLoc()); :}
+			actionNum, this.tokenStack[-3].getLoc()); :}
 	| alias identifier;
 		{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-1], 
-			actionNum, this.tokenStack[-4].getLoc()); :}
+			actionNum, this.tokenStack[-2].getLoc()); :}
 	| alias BasicType Declarator TemplateAliasParameterDefault;
 		{: ret = buildTreeWithLoc(termTemplateAliasParameter, [-3,-2,-1], 
 			actionNum, this.tokenStack[-4].getLoc()); :}
@@ -3186,7 +3186,7 @@ InterfaceTemplateDeclaration :=
 			[-6,-4,-2,-1], actionNum, this.tokenStack[-7].getLoc()); :}
 	| interface identifier lparen TemplateParameterList rparen InterfaceBody;
 		{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
-			[-5,-3,-1], actionNum, this.tokenStack[-7].getLoc()); :}
+			[-5,-3,-1], actionNum, this.tokenStack[-6].getLoc()); :}
 	| interface identifier lparen TemplateParameterList rparen BaseInterfaceList InterfaceBody;
 		{: ret = buildTreeWithLoc(termInterfaceTemplateDeclaration, 
 			[-6,-4,-2,-1], actionNum, this.tokenStack[-7].getLoc()); :}

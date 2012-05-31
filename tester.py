@@ -1,12 +1,55 @@
 #!/usr/bin/python
 
+import xml.dom.minidom
+import itertools
 import glob
 import sys
 import re
-import subprocess
 from lxml import etree
 from collections import defaultdict
 from datetime import datetime, timedelta
+
+from os import kill
+import os.path
+from signal import alarm, signal, SIGALRM, SIGKILL
+from subprocess import PIPE, Popen
+
+def run(args, cwd = None, shell = False, kill_tree = True, timeout = -1, env = None):
+	'''
+	Run a command with a timeout after which it will be forcibly
+	killed.
+	'''
+	class Alarm(Exception):
+		pass
+	def alarm_handler(signum, frame):
+		raise Alarm
+	p = Popen(args, shell = shell, cwd = cwd, stdout = PIPE, stderr = PIPE, env = env)
+	if timeout != -1:
+		signal(SIGALRM, alarm_handler)
+		alarm(timeout)
+	try:
+		stdout, stderr = p.communicate()
+		if timeout != -1:
+			alarm(0)
+	except Alarm:
+		pids = [p.pid]
+		if kill_tree:
+			pids.extend(get_process_children(p.pid))
+		for pid in pids:
+			# process might have died before getting to this line
+			# so wrap to avoid OSError: no such process
+			try: 
+				kill(pid, SIGKILL)
+			except OSError:
+				pass
+		return 65, '', ''
+	return p.returncode, stdout, stderr
+
+def get_process_children(pid):
+	p = Popen('ps --no-headers -o pid --ppid %d' % pid, shell = True,
+			  stdout = PIPE, stderr = PIPE)
+	stdout, stderr = p.communicate()
+	return [int(p) for p in stdout.split()]
 
 testCaseNumber = re.compile("[0-9]+")
 
@@ -16,15 +59,10 @@ styleText = "tr.top td { border-top: thick solid black; }\ntr.bottom td { border
 
 bodytext = "dmdc is a Compiler utilizing dex and dalr for lexer and parser generation.  Libhurt is used as std library in combination with the druntime. The Compiler will be split in two separate programs.\n The compiler daemon which will run until it is advise to quit. This daemon does the compiler, the work distribution as well as the caching.\n The other part is the driver program. It tells the backend what to compile and gives the user feedback about his compile.\n"
 
-typesNames = ["Lexing", "Parsing", "Semantic", "Compiling", "Running", "Compile Time", "Running Time"]
+typeNames = ["Lexer", "Parser", "Semantic", "Compiles", "Retval", "Compile Time", "Running Time"]
 
-def typeNameToXml(name):
-	if name == "Compile Time":
-		return "compileTime"
-	elif name == "Running Time":
-		return "runTime"
-	else:
-		return name
+options = [ ["-l true", "-l false"], ["-t 1", "-t 5", "-t 10", "-t 25", "-t 50"]
+]
 
 def toHTML_XML(sortedNames, dates, data):
 	root = etree.Element("html")
@@ -39,8 +77,7 @@ def toHTML_XML(sortedNames, dates, data):
 	body = etree.SubElement(root, "body")
 	body.text = bodytext
 
-	center = etree.SubElement(body, "center")
-	table = etree.SubElement(center, "table")
+	table = etree.SubElement(body, "table")
 	table.attrib["border"] = str(1)
 	topRow = etree.SubElement(table, "tr")
 	date = etree.SubElement(topRow, "td")
@@ -52,69 +89,86 @@ def toHTML_XML(sortedNames, dates, data):
 		tmp.text = name[:4] + " " + name[4:-2]
 
 	for date in dates:
-		for typ in typesNames:
+		for typ in typeNames:
 			row = etree.SubElement(table, "tr")
-			if typ == "Lexing":
+			if typ == "Lexer":
 				row.attrib["class"] = "top row"
-			tmp = etree.SubElement(row, "td")
+			tmp = etree.SubElement(row, "td", {"typ":"date"})
 			tmp.text = date.strftime("%Y-%m-%d %H:%M:%S")
 			tmp = etree.SubElement(row, "td")
 			tmp.text = typ
 			for name in sortedNames:
-				tmp = etree.SubElement(row, "td", 
-					getValueByDateNameAndType(data, date, name, 
-					typeNameToXml(typ)))
+				vals = getValueByDateNameAndType(data, date, name, typ)
+				tmp = etree.SubElement(row, "td", vals)
 				tmp.attrib["date"] = date.strftime("%Y-%m-%d %H:%M:%S")
 				if "text" in tmp.attrib:
-					tmp.text = tmp.attrib["text"]
+					tmp.text = vals["text"] 
 			
 
-	#print(etree.tostring(root, pretty_print=True))
-	#sys.stdout.buffer.write(etree.tostring(root, pretty_print=True))
-	#sys.stdout.flush()
 	return root
 
 def getSortedTestNames(date):
-	#print(date)
-	sortedUniqueTestName = sorted(
-		list(set(
-			[ value["test"] for key in date for value in date[key]])),
-			key = lambda i: int(testCaseNumber.search(i).group(0))
-		)
+	names =	[ value["test"] for key in date for value in date[key]]	
+	nameSet = list(set(names))
+	sor = sorted(nameSet, 
+		key = lambda i: int(testCaseNumber.search(i).group(0)))
 
-	return sortedUniqueTestName
+	return sor
 
 def getSortedDateTimes(date):
 	dates = sorted(
-		[ datetime.strptime(key, "%Y-%m-%d %H:%M:%S") for key in date])
+		[ datetime.strptime(key, "%Y-%m-%d %H:%M:%S") for key in date], 
+		reverse=True)
 	return dates
+
+def subNoneTypes(dic):
+	for k in dic:
+		if dic[k] == None:
+			dic[k] == ""
 
 def getValueByDateNameAndType(data, date, name, typ):
 	dateValues = data[date.strftime("%Y-%m-%d %H:%M:%S")]
 	for it in dateValues:
-		if it["test"] == name and it["testtype"] == typ:
+		if it["test"] == name:
+			if typ != "Running Time" and typ != "Compile Time":
+				it["bgcolor"] = color[it[typ] == it[typ.lower()]]
+				it["text"] = it[typ.lower()]
+			elif typ == "Running Time":
+				it["text"] = it["runTime"]
+			elif typ == "Compile Time":
+				it["text"] = it["compileTime"]
 			return it
 
+	return {}
+
+def isInList(lst, testname):
+	for it in lst:
+		if it["test"] == testname:
+			return True
+	
+	return False
+
 def readReadme(name):
-	rest = []
 	date = defaultdict(list)
 	context = etree.iterparse(name)
 
 	# parse the existing tests
 	for action, elem in context:
 		if elem.tag == "tr":
+			datum = ""
 			for td in elem.iter():
-				if "testtype" in td.attrib:
-					date[td.attrib.get("date")].append(
-						{"test":td.attrib.get("test"),
-						"testtype":td.attrib.get("testtype"), 
-						"bgcolor":td.attrib.get("bgcolor"), "text":td.text})
-				else:
-					rest.append(td)
+				if "typ" in td.attrib and td.attrib["typ"] == "date":
+					datum = td.text
+				if "test" in td.attrib and not isInList(date[datum], td.attrib["test"]):
+					tmp = td.attrib
+					if "bgcolor" in tmp:
+						del tmp["bgcolor"]
 
-	#print(date, [etree.tostring(i) for i in rest])
-	#print(date)
-	return (date,rest)
+					date[datum].append(tmp)
+					
+					
+
+	return date
 
 def getTestInformation(filename):
 	f = open(filename)
@@ -126,6 +180,13 @@ def getTestInformation(filename):
 			ret[i[:colon].strip(" \t\r\n")] = i[colon+1:].strip(" \t\r\n")
 		else:
 			ret["desc"] = i.strip(" \t\r\n")
+
+	for i in ["compiles", "lexer", "parser", "semantic"]:
+		if i not in ret:
+			ret[i] = "yes"	
+
+	if "retval" not in ret:
+		ret["retval"] = "0"
 
 	return ret
 
@@ -139,11 +200,9 @@ def runTest(filename):
 	inp += " " + filename
 	print(inp)
 	before = datetime.now();
-	ret = subprocess.Popen(inp, stdout=subprocess.PIPE, 
-		stderr=subprocess.PIPE, shell=True)
-	rc = ret.wait()
+	rc = run(inp, shell=True, timeout = 12);
 	after = datetime.now();
-	return (rc, (after-before).total_seconds())
+	return (rc[0], (after-before).total_seconds())
 
 def doTest(filename):
 	info = getTestInformation(filename)
@@ -151,112 +210,63 @@ def doTest(filename):
 	info["compileTime"] = str(ri[1])
 	info["runTime"] = "0.0"
 	if ri[0] == 0:
-		info["Lexing"] = "yes"
-		info["Parsing"] = "yes"
-		info["Semantic"] = "yes"
-		info["Compiling"] = "yes"
-	if ri[0] < 32:
-		info["Lexing"] = "no"
-		info["Parsing"] = "no"
-		info["Semantic"] = "no"
-		info["Compiling"] = "no"
-	if ri[0] < 64:
-		info["Lexing"] = "yes"
-		info["Parsing"] = "no"
-		info["Semantic"] = "no"
-		info["Compiling"] = "no"
-	if ri[0] < 96:
-		info["Lexing"] = "yes"
-		info["Parsing"] = "yes"
-		info["Semantic"] = "no"
-		info["Compiling"] = "no"
-	if ri[0] < 128:
-		info["Lexing"] = "yes"
-		info["Parsing"] = "yes"
-		info["Semantic"] = "yes"
-		info["Compiling"] = "no"
+		info["Lexer"] = "yes"; info["Parser"] = "yes"; info["Retval"] = "0";
+		info["Semantic"] = "yes"; info["Compiles"] = "yes";
+	if ri[0] > 0 and ri[0] <= 32:
+		info["Lexer"] = "no"; info["Parser"] = "no"; info["Retval"] = "0";
+		info["Semantic"] = "no"; info["Compiles"] = "no";
+	if ri[0] > 32 and ri[0] <= 64:
+		info["Lexer"] = "yes"; info["Parser"] = "no"; info["Retval"] = "0";
+		info["Semantic"] = "no"; info["Compiles"] = "no";
+	if ri[0] > 64 and ri[0] <= 96:
+		info["Lexer"] = "yes"; info["Parser"] = "yes"; info["Retval"] = "0";
+		info["Semantic"] = "no"; info["Compiles"] = "no";
+	if ri[0] > 96 and ri[0] <= 127:
+		info["Lexer"] = "yes"; info["Parser"] = "yes"; info["Retval"] = "0";
+		info["Semantic"] = "yes"; info["Compiles"] = "no";
 
 	return info	
-
-def testDictToReadmeDict(di):
-	print(di)
-	l = [
-		# Lexing
-		{"test":di["test"],
-		"testtype":"Lexing", "date":di["date"],
-		"text":di["Lexing"],"bgcolor":color[di["lexer"] == di["Lexing"]]},
-		# Parsing
-		{"test":di["test"],
-		"testtype":"Parsing", "date":di["date"],
-		"text":di["Parsing"],"bgcolor":color[di["parser"] == di["Parsing"]]},
-		# Semantic
-		{"test":di["test"],
-		"testtype":"Semantic", "date":di["date"],
-		"text":di["Semantic"],"bgcolor":color[di["semantic"] == di["Semantic"]]},
-		# Compiling
-		{"test":di["test"],
-		"testtype":"Compiling", "date":di["date"],
-		"text":di["Compiling"],"bgcolor":color[di["compiles"] == di["Compiling"]]}]
-		# Running
-	if "retval" in di:
-		l.append({"test":di["test"],
-		"testtype":"Running", "date":di["date"],
-		"text":di["retval"],"bgcolor":color[False]})
-	else:
-		l.append({"test":di["test"],
-		"testtype":"Running", "date":di["date"],
-		"text":"","bgcolor":color[False]})
-	# Compile Time
-	l.append({"test":di["test"],
-	"testtype":"compileTime", "date":di["date"],
-	"text":di["compileTime"],"bgcolor":"white"})
-	# Running Time
-	l.append({"test":di["test"],
-	"testtype":"runTime", "date":di["date"],
-	"text":di["runTime"],"bgcolor":"white"})
-
-	return l
-	
 
 def runAllTests(date):
 	tests = globTests()
 	ret = []
-	for i in tests[:54]:
+	for i in tests:
 		tmp = doTest(i)
 		tmp["date"] = date.strftime("%Y-%m-%d %H:%M:%S")
 		tmp["test"] = i[i.rfind('/')+1:]
+		#print(tmp)
 		ret.append(tmp)
 
 	return ret
+
+def getOldTestResults(filename):
+	tree = etree.parse(filename)
 			
 if __name__ == "__main__":
-	#dr = []
-	dr = readReadme("test2.html")
-	#dr = readReadme("README")
-	#names = getSortedTestNames(dr[0])
-	#sortedDates = getSortedDateTimes(dr[0])
-	#root = toHTML_XML(names, sortedDates, dr[0])
-	#et = etree.ElementTree(root)
-	#et.write("README")
-	n = datetime.now()
-	l = []
-	for i in runAllTests(n):
-		l.extend(testDictToReadmeDict(i))
-
-	d = {n.strftime("%Y-%m-%d %H:%M:%S"):l}
-	for key in dr[0]:
-		d[key] = dr[0][key]
-	#print(d)
-	names = getSortedTestNames(d)
-	#print(names)
-	sortedDates = getSortedDateTimes(d)
-	print(sortedDates, type(sortedDates))
-	reverse = []
-	for i in sortedDates:
-		reverse.insert(0, i)
-
-	root = toHTML_XML(names, reverse, d)
-	et = etree.ElementTree(root)
-	et.write("test2.html")
+	oldtest = None
+	if os.path.isfile("test2.html"):
+		oldtest = readReadme("test2.html")
+		#print(oldstuff)
 	
-	#print(l)
+	n = datetime.now()
+	d = defaultdict(list)
+	for i in runAllTests(n):
+		d[n.strftime("%Y-%m-%d %H:%M:%S")].append(i)
+	#print(d)
+
+	merge = {}
+	for key in oldtest:
+		merge[key] = oldtest[key]
+
+	for key in d:
+		merge[key] = d[key]
+
+	names = getSortedTestNames(merge)
+	print(names)
+	sortedDates = getSortedDateTimes(merge)
+	print(sortedDates)
+	root = toHTML_XML(names, sortedDates, merge)
+	xml = xml.dom.minidom.parseString(etree.tostring(root))
+	f = open("test2.html", 'w')
+	f.write(xml.toprettyxml())
+	f.close()

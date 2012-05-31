@@ -73,8 +73,8 @@ int main(string[] args) {
 	if(succ) {
 		p.getAst().toGraph(removePath(file)~".dot");
 	} else {
-		exit(32);
+		exit(33);
 	}
 
-	return 64;
+	return 65;
 }

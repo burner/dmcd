@@ -68,5 +68,7 @@ cleanobjs:
 	rm *.o&
 	rm dmcd&
 
-test: build
+test: $(GEN) $(OBJS) Makefile
+	sh IncreBuildId.sh
+	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a -I../libhurt -Isrc -m64 -gc -debug
 	./tester.py
