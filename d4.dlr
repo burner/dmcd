@@ -8,6 +8,21 @@
 	TemplateTypeParameter := identifier;
 }%
 
+%{
+	PrimaryExpression := line;
+	DefaultInitializerExpression;
+}%
+
+%{
+	IdentifierList := TemplateInstance;
+	SymbolTail := TemplateInstance;
+}%
+
+%{
+	BasicType2 := lbrack Type rbrack;
+	DeclaratorSuffix := lbrack Type rbrack;
+}%
+
 %right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
 %left assign plusassign minusassign starassign divassign moduloassign orassign andassign xorassign tildeassign leftshiftassign rightshiftassign unsignedrightshiftassign xorxorassign
 //%right dot

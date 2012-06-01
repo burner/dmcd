@@ -3,8 +3,8 @@ exceptions.o util.o
 
 GEN=src/parsetable.d src/lextable.d
 
-#DFLAGS=-unittest -I../libhurt -Isrc -m64 -gc -debug
-DFLAGS=-I../libhurt -Isrc -m64
+DFLAGS=-unittest -I../libhurt -Isrc -m64 -gc -debug
+#DFLAGS=-I../libhurt -Isrc -m64
 
 all: build
 
@@ -47,7 +47,7 @@ parserutil.o: src/parserutil.d src/parsetable.d
 lexer.o: src/lexer.d src/lextable.d src/token.d src/exceptions.d 
 	dmd -c $(DFLAGS) src/lexer.d
 
-main.o: src/main.d src/lexer.d src/lextable.d src/token.d 
+main.o: src/main.d src/lexer.d src/lextable.d src/token.d src/util.d
 	dmd -c $(DFLAGS) src/main.d
 
 token.o: src/token.d src/lextable.d 

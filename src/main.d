@@ -75,7 +75,7 @@ int main(string[] args) {
 		exit(lexerror);
 	}
 	if(succ) {
-		//p.getAst().toGraph(removePath(file)~".dot");
+		p.getAst().toGraph(removePath(file)~".dot");
 	} else {
 		exit(33);
 	}

@@ -1,5 +1,5 @@
 "[ \\t\\n]+" {: return Token(this.getLoc(), -99); :}
-"[:alpha:_][:word:]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
+"[:alpha:_][:word:_]*" {: return Token(this.getLoc(), termidentifier, this.lexText.getString()); :}
 "'[:word::blank:]'" {: return Token(this.getLoc(), termcharliteral, this.lexText.getString()); :}
 "!" {: return Token(this.getLoc(), termbang); :}
 "!<" {: return Token(this.getLoc(), termbangless); :}
@@ -55,8 +55,17 @@
 "@system" {: return Token(this.getLoc(), termsystem); :}
 "@trusted" {: return Token(this.getLoc(), termtrusted); :}
 "[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
-"0x[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
-"0b[:digit:][:digit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"[:digit:][:digit:_]*[uU]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"[:digit:][:digit:_]*[uU][LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"[:digit:][:digit:_]*[LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0x[:xdigit:][:xdigit:_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0x[:xdigit:][:xdigit:_]*[Uu]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0x[:xdigit:][:xdigit:_]*[Uu][LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0x[:xdigit:][:xdigit:_]*[LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0b[01][01_]*" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0b[01][01_]*[Uu]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0b[01][01_]*[Uu][LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
+"0b[01][01_]*[LlSsBb]" {: return Token(this.getLoc(), terminteger, this.lexText.getString()); :}
 "[:digit:]+.[:digit:]+" {: return Token(this.getLoc(), termfloatliteral, this.lexText.getString()); :}
 "\+" {: return Token(this.getLoc(), termplus); :}
 "\+\+" {:  return Token(this.getLoc(), termincrement); :}
