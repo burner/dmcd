@@ -1,6 +1,7 @@
 module main;
 
 import std.concurrency;
+import std.getopt;
 
 import hurt.io.stdio;
 import hurt.util.slog;
@@ -11,13 +12,14 @@ import hurt.util.getopt;
 import hurt.util.slog;
 import hurt.util.util;
 
-import lexer;
-import util;
-import token;
-import parser;
 import exceptions;
+import lexer;
+import parser;
+import token;
+import util;
 
 int main(string[] args) {
+	string file = "examplearith.dpp";
 	StopWatch arSw;
 	arSw.start();
 	Args arg = Args(args);
@@ -27,23 +29,20 @@ int main(string[] args) {
 		" if nothing or true is passed the lexer parser combination will" ~
 		" be multithreaded.", lpMulti);
 
-	string file = "examplearith.dpp";
-
-	size_t numToken = 10;
+	uint numToken = 10;
 	arg.setOption("-t", "--token", "the number of token lexed in one run of" ~
 		" lexer. Default is 10" , numToken, true);
 
+	log("arg parsing took %f", arSw.stop());
 	foreach(string it; arg) {
 		log("input file %s", it);
 		file = it;
 	}
 
-	log("arg parsing took %f", arSw.stop());
-
 	StopWatch sw;
 	sw.start();
 	bool succ = false;
-	Lexer l = new Lexer(file, lpMulti, 10, thisTid);
+	Lexer l = new Lexer(file, lpMulti, numToken, thisTid);
 	if(lpMulti) {
 		l.start();
 	}

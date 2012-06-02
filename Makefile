@@ -56,6 +56,9 @@ token.o: src/token.d src/lextable.d
 parsetable.o: src/parsetable.d 
 	dmd -c $(DFLAGS) src/parsetable.d
 
+opts.o: src/opts.d 
+	dmd -c $(DFLAGS) src/opts.d
+
 clean:
 	rm ambiGraph*.dot&
 	rm ambiGraph*.png&
