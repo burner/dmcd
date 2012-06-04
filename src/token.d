@@ -2,6 +2,7 @@ module token;
 
 import hurt.string.stringbuffer;
 import hurt.string.formatter;
+import hurt.string.stringstore;
 import hurt.util.slog;
 import hurt.conv.conv;
 
@@ -12,7 +13,7 @@ struct Token {
 	private Location loc;
 	// if this is -3 treeIdx gives you the index of the ast node
 	private int typ; 
-	private dstring value;
+	private strptr!dchar value;
 	private long treeIdx; // the index of the ast node in the ast array
 	private bool treeIdxPlaced;
 
@@ -22,12 +23,13 @@ struct Token {
 		this.treeIdx = -1;
 	}
 
-	this(int typ, dstring value) {
+	this(int typ, strptr!dchar value) {
 		this(typ);
 		this.value = value;
 	}
 
-	this(Location loc, int typ, dstring value = "") {
+	this(Location loc, int typ, 
+			strptr!dchar value = strptr!(dchar)(null, 0, 0 ,0)) {
 		this(typ);
 		this.loc = loc;
 		this.value = value;
@@ -58,7 +60,7 @@ struct Token {
 		
 		// the payload
 		ret.pushBack("%s %s", idToString(typ), 
-			conv!(dstring,string)(value));
+			conv!(dstring,string)(value.toString()));
 
 		ret.pushBack(" %b:%d", this.treeIdxPlaced, this.treeIdx);
 
@@ -67,18 +69,18 @@ struct Token {
 
 	string toStringShort() const {
 		if(this.treeIdxPlaced) {
-			if(value is null || value == "") {
+			if(value.toString() == "") {
 				return format("[%s ti %u]", idToString(typ), this.treeIdx);
 			} else {
 				return format("[%s v %s ti %u]", idToString(typ), 
-					conv!(dstring,string)(value), this.treeIdx);
+					conv!(dstring,string)(value.toString()), this.treeIdx);
 			}
 		} else {
-			if(value is null || value == "") {
+			if(value.toString() == "") {
 				return format("[%s]", idToString(typ));
 			} else {
 				return format("[%s v %s]", idToString(typ), 
-					conv!(dstring,string)(value));
+					conv!(dstring,string)(value.toString()));
 			}
 		}
 	}
@@ -88,7 +90,7 @@ struct Token {
 	}
 
 	public const(dstring) getValue() const {
-		return this.value;
+		return this.value.toString();
 	}
 
 	public Location getLoc() const {

@@ -16,6 +16,7 @@ import hurt.io.stdio;
 import hurt.io.stream;
 import hurt.string.formatter;
 import hurt.string.stringbuffer;
+import hurt.string.stringstore;
 import hurt.string.utf;
 import hurt.util.slog;
 import hurt.util.pair;
@@ -44,6 +45,7 @@ class Lexer : Thread {
 	__gshared Semaphore empty;
 	__gshared uint count;
 	__gshared bool isLocked;
+	__gshared StringStore!dchar stringStore;
 	private __gshared bool lockDisabled = false;
 
 	private Location loc;
@@ -66,6 +68,7 @@ class Lexer : Thread {
 		this.empty = new Semaphore(0);
 		this.count = count;
 		this.isLocked = false;
+		this.stringStore = new StringStore!dchar();
 
 		if(!exists(this.filename)) {
 			throw new Exception(__FILE__ ~ ":" ~ conv!(int,string)(__LINE__) ~
@@ -92,6 +95,10 @@ class Lexer : Thread {
 				print(jt);
 			println();
 		}
+	}
+
+	public Deque!(Token) getTokenDeque() {
+		return this.deque;
 	}
 
 	private dstring getCurrentLex() const {
@@ -203,8 +210,10 @@ class Lexer : Thread {
 		if(numberIdx == 0) {
 			return false;
 		} else if(lt[numberIdx+1 .. numberIdx+3] == "..") {
-			this.pushBack(Token(this.getLoc(), terminteger, lt[0 .. numberIdx]));
-			this.pushBack(Token(this.getLoc(), termdotdot));
+			this.pushBack(Token(this.getLoc(), terminteger, 
+				stringStore.pushBack(lt[0 .. numberIdx])));
+			this.pushBack(Token(this.getLoc(), termdotdot,
+				stringStore.pushBack("")));
 			return true;
 		}
 

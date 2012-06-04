@@ -1,6 +1,7 @@
 module ast;
 
 import hurt.container.deque;
+import hurt.container.stack;
 import hurt.string.stringbuffer;
 import hurt.string.formatter;
 import hurt.io.stream;
@@ -11,6 +12,22 @@ import token;
 import parsetable;
 
 import std.process;
+
+struct Iterator {
+	private Stack!(Pair!(size_t,size_t)) stack;
+	private AST ast;
+	private ASTNode current;
+	private ubyte curChildIdx;
+
+	public this(AST ast, size_t treeIdx, size_t childIdx) {
+		this.stack = new Stack!(Pair!(size_t,size_t))();
+		this.stack.push(Pair!(size_t,size_t)(treeIdx,childIdx));
+		this.ast = ast;
+	}
+
+	public void next() {
+	}
+}
 
 struct ASTNode {
 	private Token token;
@@ -27,7 +44,11 @@ struct ASTNode {
 		this.childs.second++;
 	}
 
-	private Token getToken() const {
+	private Token getToken() {
+		return this.token;
+	}
+
+	private const(Token) getToken() const {
 		return this.token;
 	}
 
@@ -56,7 +77,7 @@ struct ASTNode {
 			"align=\"right\">%s</td></tr>\n",
 				this.token.getLoc().toString()));
 		}
-		if(this.token.getValue() !is null && this.token.getValue() != "") {
+		if(this.token.getValue() != "") {
 			ret.pushBack(format("<tr><td align=\"left\">Value</td><td " ~
 			"align=\"right\">%s</td></tr>\n", this.token.getValue()));
 		}

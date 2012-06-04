@@ -22,7 +22,7 @@ build: $(GEN) $(OBJS)
 src/parsetable.d: d4.dlr 
 	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot
 
-src/lextable.d: d4.dlr d.dex 
+src/lextable.d: d.dex 
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot -v
 
 parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d\
@@ -76,3 +76,6 @@ test: $(GEN) $(OBJS)
 	sh IncreBuildId.sh
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a -I../libhurt -Isrc -m64 -gc -debug
 	./tester.py
+
+count:
+	wc -l src/main.d src/token.d src/lextable.d src/parser.d src/ast.d src/parserutil.d src/exceptions.d src/util.d

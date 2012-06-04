@@ -29,6 +29,11 @@ int main(string[] args) {
 		" if nothing or true is passed the lexer parser combination will" ~
 		" be multithreaded.", lpMulti);
 
+	bool lexerOnly = false; 
+	arg.setOption("-s", "--lexeronly", "if false is passed" ~
+		" the lexer will print all the token of input file, "
+		"nothing more is done", lexerOnly);
+
 	uint numToken = 10;
 	arg.setOption("-t", "--token", "the number of token lexed in one run of" ~
 		" lexer. Default is 10" , numToken, true);
@@ -43,31 +48,47 @@ int main(string[] args) {
 	sw.start();
 	bool succ = false;
 	Lexer l = new Lexer(file, lpMulti, numToken, thisTid);
-	if(lpMulti) {
+	if(lpMulti && !lexerOnly) {
 		l.start();
 	}
-	Parser p = new Parser(l, thisTid);
-	p.start();
-
-	bool needToReceiveMore = true;
+	Parser p;
 	int lexerror = 0;
-	while(needToReceiveMore) {
-		receive( 
-			(string s) { 
-				log("%s", s);
-				lexerror = 1; 
-			},
-			(bool success) { 
-				succ = success; 
-				needToReceiveMore = false; 
-			}
-		);
-	}
+	if(!lexerOnly) {
+		p = new Parser(l, thisTid);
+		p.start();
 
-	if(lpMulti) {
-		l.join();
+		bool needToReceiveMore = true;
+		while(needToReceiveMore) {
+			receive( 
+				(string s) { 
+					log("%s", s);
+					lexerror = 1; 
+				},
+				(bool success) { 
+					succ = success; 
+					needToReceiveMore = false; 
+				}
+			);
+		}
+
+		if(lpMulti) {
+			l.join();
+		}
+		p.join();
+	} else {
+		if(lpMulti) {
+			l.start();
+			l.join();
+		} else {
+			while(!l.isEmpty()) {
+				l.run();
+			}
+		}
+		foreach(it; l.getTokenDeque()) {
+			printf("%s,", it.toStringShort());
+		}
+		println();
 	}
-	p.join();
 
 	printfln("lexing and parsing took %f seconds", sw.stop());
 	if(lexerror != 0) {

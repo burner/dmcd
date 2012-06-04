@@ -382,7 +382,8 @@ class Parse {
 			log();*/
 			for(int i = 0; i < rules[action.getNumber()].length-1; i++) {
 				long len = rules[action.getNumber()].length-1;
-				/*log("len %d tokenStack %d parseStack %d access %d\nrule len %d",
+				/*
+				log("len %d tokenStack %d parseStack %d access %d\nrule len %d",
 					len, this.tokenStack.getSize(), this.parseStack.getSize(),
 					-(i+1), rules[action.getNumber()].length);*/
 				if(this.tokenStack[-(i+1)].getTyp() == 
@@ -497,8 +498,7 @@ class Parser : Thread {
 	}
 
 	private int merge(Parse a, Parse b) {
-		//log("a ast = %s", a.getAst().toStringGraph());
-		//log("b ast = %s", b.getAst().toStringGraph());
+		// AndAnd := OrExp | CmpExp
 		log("a id %d last action %s", a.getId(), tableitemToString(a.getLastAction()));
 		log("b id %d last action %s", b.getId(), tableitemToString(b.getLastAction()));
 		return b.getId();

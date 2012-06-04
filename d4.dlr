@@ -25,18 +25,18 @@
 
 %right abstract auto const deprecated extern final immutable inout shared nothrow override pure ref scope static synchronized gshared thread
 %left assign plusassign minusassign starassign divassign moduloassign orassign andassign xorassign tildeassign leftshiftassign rightshiftassign unsignedrightshiftassign xorxorassign
-//%right dot
-%left comma
-%left logicalor
-%left logicaland
-%left or
-%left xor
-%left and
-%left equal notequal bangis is bangin in
-%left less greater lessequal greaterequal
-%left leftshift rightshift
-%left plus minus
-%left star div modulo
+%right dot
+%right comma
+%right logicalor
+%right logicaland
+%right or
+%right xor
+%right and
+%right equal notequal bangis is bangin in
+%right less greater lessequal greaterequal
+%right leftshift rightshift
+%right plus minus
+%right star div modulo
 %right increment decrement bang tilde
 %right lparen rparen lbrack rbrack
 
