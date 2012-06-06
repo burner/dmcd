@@ -13,7 +13,7 @@ run: build
 
 parsetable: d4.dlr
 	#../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -k true
-	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree
+	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetabletmp.d -rm parsetable --glr true -z prodTree -e true
 
 build: $(GEN) $(OBJS) 
 	sh IncreBuildId.sh
