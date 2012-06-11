@@ -1,5 +1,5 @@
 OBJS=main.o token.o lexer.o parsetable.o lextable.o parser.o ast.o parserutil.o\
-exceptions.o util.o
+exceptions.o util.o symtabattributes.o symtabentry.o
 
 GEN=src/parsetable.d src/lextable.d
 
@@ -55,6 +55,12 @@ token.o: src/token.d src/lextable.d
 
 parsetable.o: src/parsetable.d 
 	dmd -c $(DFLAGS) src/parsetable.d
+
+symtabattributes.o: src/symtabattributes.d 
+	dmd -c $(DFLAGS) src/symtabattributes.d
+
+symtabentry.o: src/symtabentry.d 
+	dmd -c $(DFLAGS) src/symtabentry.d
 
 opts.o: src/opts.d 
 	dmd -c $(DFLAGS) src/opts.d

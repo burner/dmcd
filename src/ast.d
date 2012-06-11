@@ -26,6 +26,7 @@ struct Iterator {
 	}
 
 	public void next() {
+		// first i need to figure out how to process the ast
 	}
 }
 
