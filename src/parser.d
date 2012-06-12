@@ -29,6 +29,8 @@ class Parse {
 	private AST ast;
 	private Token input;
 
+	private bool dontPopToken;
+
 	// trace
 	private Deque!(Pair!(TableItem,int)) trace;
 
@@ -46,6 +48,7 @@ class Parse {
 
 		// trace
 		this.trace = new Deque!(Pair!(TableItem,int))(128);
+		this.dontPopToken = false;
 	}
 
 	this(Parser parser, Parse toCopy, int id) {
@@ -62,6 +65,7 @@ class Parse {
 
 		// trace
 		this.trace = new Deque!(Pair!(TableItem,int))(toCopy.trace);
+		this.dontPopToken = toCopy.dontPopToken;
 	}
 
 	public TableItem getLastAction() const {
@@ -268,8 +272,10 @@ class Parse {
 		}
 		//log("%d", this.id);
 		//log("%s", ret.toString());
-		this.tokenStack.popBack(rules[actionNum].length-1);
-		this.tokenStack.pushBack(ret);
+		if(!this.dontPopToken) {
+			this.tokenStack.popBack(rules[actionNum].length-1);
+			this.tokenStack.pushBack(ret);
+		}
 		//this.printTokenStack();
 		//this.printStack();
 		//log("%s", this.ast.toString());
