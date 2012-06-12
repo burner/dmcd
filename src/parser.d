@@ -276,6 +276,8 @@ class Parse {
 			this.tokenStack.popBack(rules[actionNum].length-1);
 			this.tokenStack.pushBack(ret);
 		}
+
+		this.dontPopToken = false;
 		//this.printTokenStack();
 		//this.printStack();
 		//log("%s", this.ast.toString());
@@ -420,6 +422,14 @@ class Parse {
 		}
 		//printfln("id %d ast %s", this.id, this.ast.toStringGraph());
 		return Pair!(int,string)(0,"");
+	}
+
+	void openScope() {
+		log();
+	}
+
+	void closeScope() {
+		log();
 	}
 }
 

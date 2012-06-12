@@ -269,9 +269,10 @@ Decl :=
 	| BasicType Declarators semicolon; 
 		{: ret = buildTreeWithLoc(termDecl, [-3,-2], actionNum, 
 			this.tokenStack[-3].getLoc()); :}
-	| BasicType Declarator FunctionBody; 
+	| BasicType {: this.dontPopToken = true; this.openScope(); :} Declarator FunctionBody; 
 		{: ret = buildTreeWithLoc(termDecl, [-3,-2,-1], actionNum, 
-			this.tokenStack[-3].getLoc()); :}
+			this.tokenStack[-3].getLoc());
+			this.closeScope(); :}
 	| AutoDeclaration;
 		{: ret = buildTreeWithLoc(termDecl, [-1], 
 			actionNum, this.tokenStack[-1].getLoc()); :}
