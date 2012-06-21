@@ -7,6 +7,7 @@ import hurt.util.slog;
 import hurt.conv.conv;
 
 import lextable;
+import location;
 import parsetable;
 
 struct Token {

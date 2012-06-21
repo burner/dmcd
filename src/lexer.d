@@ -23,6 +23,7 @@ import hurt.util.pair;
 import hurt.conv.convutil;
 
 import lextable;
+import location;
 import parsetable;
 import token;
 import exceptions;

@@ -1,24 +1,41 @@
 module symtabentry;
 
 import hurt.string.stringstore;
-import hurt.container.map;
-import hurt.util.pair;
+import hurt.container.store;
 
-struct SymTabEntry {
-	private strptr!dchar identifier;
-	private strptr!dchar typ;
+import symtab;
+import location;
+
+alias strPtr!size_t childPtr;
+
+struct SymTabItem {
+	private hurt.string.stringstore.strptr!dchar identifier;
+	private hurt.string.stringstore.strptr!dchar typ;
+	private childPtr childs;
 	private uint attributes;
-	private Pair!(size_t,size_t) childs;
+	private bool pseudoScope;
+	private Location loc;
+	private SymTab symtab;
 
-	this(strptr!dchar identifier, strptr!dchar typ, uint attributes, 
-			size_t childIdx) {
+	this(SymTab symtab, strptr!dchar identifier, strptr!dchar typ, Location loc,
+			uint attributes) {
+		this.symtab = symtab;
 		this.identifier = identifier;
 		this.typ = typ;
 		this.attributes = attributes;
-		this.childs = Pair!(size_t,size_t)(childIdx,0);
+		this.loc = loc;
 	}
 
-	public void appendChild() {
-		this.childs.second++;
+	this(SymTab symtab, strptr!dchar identifier, strptr!dchar typ, 
+			Location loc) {
+		this(symtab, identifier, typ, loc, 0);
+	}
+
+	public void setSymTab(SymTab symtab) {
+		this.symtab = symtab;
+	}
+
+	public bool isPseudoScope() const {
+		return this.pseudoScope;
 	}
 }

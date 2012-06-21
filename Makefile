@@ -1,5 +1,6 @@
 OBJS=main.o token.o lexer.o parsetable.o lextable.o parser.o ast.o parserutil.o\
-exceptions.o util.o symtabattributes.o symtabentry.o
+exceptions.o util.o symtabattributes.o symtabentry.o symtab.o location.o\
+
 
 GEN=src/parsetable.d src/lextable.d
 
@@ -20,10 +21,10 @@ build: $(GEN) $(OBJS)
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
 src/parsetable.d: d4.dlr 
-	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot -v
+	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot -v -e
 
 src/lextable.d: d.dex 
-	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot -v
+	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot -v -l false
 
 parser.o: src/parser.d src/parsetable.d src/lextable.d src/lexer.d src/ast.d\
 src/token.d 
@@ -59,8 +60,15 @@ parsetable.o: src/parsetable.d
 symtabattributes.o: src/symtabattributes.d 
 	dmd -c $(DFLAGS) src/symtabattributes.d
 
-symtabentry.o: src/symtabentry.d 
+symtabentry.o: src/symtabentry.d  src/symtabattributes.d
 	dmd -c $(DFLAGS) src/symtabentry.d
+
+symtab.o: src/symtab.d src/symtabentry.d src/symtabattributes.d
+	dmd -c $(DFLAGS) src/symtab.d
+
+location.o: src/location.d 
+	dmd -c $(DFLAGS) src/location.d
+
 
 opts.o: src/opts.d 
 	dmd -c $(DFLAGS) src/opts.d

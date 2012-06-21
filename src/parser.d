@@ -16,6 +16,7 @@ import hurt.string.stringbuffer;
 import ast;
 import lexer;
 import lextable;
+import location;
 import parsetable;
 import token;
 import parserutil;
