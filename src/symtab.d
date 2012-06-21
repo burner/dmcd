@@ -34,4 +34,9 @@ class SymTab {
 		this.symbols.pushBack(item);
 		this.symbolStack.push(this.symbols.getSize()-1);
 	}
+
+	void closeScope() {
+		assert(!this.symbolStack.isEmpty());
+		this.symbolStack.pop();
+	}
 }
