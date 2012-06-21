@@ -11,12 +11,12 @@ import location;
 
 class SymTab {
 	Deque!(SymTabItem) symbols;
-	Store!size_t childIdStore;
+	Store childIdStore;
 	Stack!(size_t) symbolStack;
 
 	this() {
 		this.symbols = new Deque!(SymTabItem)();
-		this.childIdStore = new Store!size_t(256);
+		this.childIdStore = new Store();
 	}
 
 	/*  append a child to the current top of the symbolStack.

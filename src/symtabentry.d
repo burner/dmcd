@@ -6,12 +6,10 @@ import hurt.container.store;
 import symtab;
 import location;
 
-alias strPtr!size_t childPtr;
-
 struct SymTabItem {
 	private hurt.string.stringstore.strptr!dchar identifier;
 	private hurt.string.stringstore.strptr!dchar typ;
-	private childPtr childs;
+	private strPtr childs;
 	private uint attributes;
 	private bool pseudoScope;
 	private Location loc;
@@ -37,5 +35,13 @@ struct SymTabItem {
 
 	public bool isPseudoScope() const {
 		return this.pseudoScope;
+	}
+
+	public bool opEquals(const ref SymTabItem other) const {
+		return this.loc == other.loc && this.identifier == other.identifier;
+	}
+
+	public bool opEquals(const SymTabItem other) const {
+		return this.loc == other.loc && this.identifier == other.identifier;
 	}
 }
