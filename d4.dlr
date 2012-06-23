@@ -269,7 +269,9 @@ Decl :=
 	| BasicType Declarators semicolon; 
 		{: ret = buildTreeWithLoc(termDecl, [-3,-2], actionNum, 
 			this.tokenStack[-3].getLoc()); :}
-	| BasicType {: this.dontPopToken = true; this.openScope(); :} Declarator FunctionBody; 
+	| BasicType Declarator {: 
+			this.dontPopToken = true; 
+			this.openScope(-1,-2); :} FunctionBody; 
 		{: ret = buildTreeWithLoc(termDecl, [-3,-2,-1], actionNum, 
 			this.tokenStack[-3].getLoc());
 			this.closeScope(); :}

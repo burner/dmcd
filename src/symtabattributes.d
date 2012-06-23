@@ -38,6 +38,7 @@ private static Deque!(string) attributesNamesAccess;
 
 static this() {
 	attributesNamesAccess = new Deque!(string)(32);
+	assert(attributesNames.length < 32);
 	foreach(it; attributesNames) {
 		attributesNamesAccess.pushBack(it[1 .. $]);
 	}

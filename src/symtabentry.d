@@ -11,7 +11,7 @@ struct SymTabItem {
 	private hurt.string.stringstore.strptr!dchar typ;
 	private strPtr childs;
 	private uint attributes;
-	private bool pseudoScope;
+	//private bool pseudoScope;
 	private Location loc;
 	private SymTab symtab;
 
@@ -33,8 +33,16 @@ struct SymTabItem {
 		this.symtab = symtab;
 	}
 
-	public bool isPseudoScope() const {
+	/*public bool isPseudoScope() const {
 		return this.pseudoScope;
+	}*/
+
+	public strPtr getChildPtr() {
+		return this.childs;
+	}
+
+	public void setChildPtr(strPtr ptr) {
+		this.childs = ptr;
 	}
 
 	public bool opEquals(const ref SymTabItem other) const {

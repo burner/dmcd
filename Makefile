@@ -21,7 +21,7 @@ build: $(GEN) $(OBJS)
 	dmd $(OBJS) buildinfo.d -ofdmcd -L../libhurt/libhurt.a $(DFLAGS)
 
 src/parsetable.d: d4.dlr 
-	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot -v
+	../dalr/Dalr -g ambiGraph -i d4.dlr -r src/parsetable.d -rm parsetable --glr true -z prodTree -t ableitungen.dot -v -e
 
 src/lextable.d: d.dex 
 	../dex/fsm -i d.dex -n src/lextable.d -nm lextable -mdg lexgraph.dot -v -l false

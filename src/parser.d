@@ -11,6 +11,7 @@ import hurt.util.slog;
 import hurt.util.util;
 import hurt.math.mathutil;
 import hurt.string.formatter;
+import hurt.string.stringstore;
 import hurt.string.stringbuffer;
 
 import ast;
@@ -20,6 +21,7 @@ import location;
 import parsetable;
 import token;
 import parserutil;
+import symtab;
 
 class Parse {
 	private int id;
@@ -29,6 +31,7 @@ class Parse {
 	private Deque!(Token) tokenStack;
 	private AST ast;
 	private Token input;
+	private SymTab symTab;
 
 	private bool dontPopToken;
 
@@ -50,6 +53,7 @@ class Parse {
 		// trace
 		this.trace = new Deque!(Pair!(TableItem,int))(128);
 		this.dontPopToken = false;
+		this.symTab = new SymTab();
 	}
 
 	this(Parser parser, Parse toCopy, int id) {
@@ -67,6 +71,9 @@ class Parse {
 		// trace
 		this.trace = new Deque!(Pair!(TableItem,int))(toCopy.trace);
 		this.dontPopToken = toCopy.dontPopToken;
+		this.symTab = new SymTab(toCopy.symTab);
+
+		assert(this.symTab == toCopy.symTab);
 	}
 
 	public TableItem getLastAction() const {
@@ -425,12 +432,23 @@ class Parse {
 		return Pair!(int,string)(0,"");
 	}
 
-	void openScope() {
-		log();
+	//void openScope(strptr!dchar identifier, strptr!dchar typ, Location loc,
+			//uint attributes = 0) {
+	void openScope(long identIdx, long typIdx, long attribIdx = 0) {
+		Location loc;
+		strptr!dchar identifier;
+		strptr!dchar typ;
+		uint attributes;
+		this.symTab.openScope(identifier, typ, loc, attributes);
 	}
 
 	void closeScope() {
-		log();
+		this.symTab.closeScope();
+	}
+
+	void append(strptr!dchar identifier, strptr!dchar typ, Location loc,
+			uint attributes = 0) {
+		this.symTab.append(identifier, typ, loc, attributes);
 	}
 }
 
