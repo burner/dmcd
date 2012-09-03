@@ -58,22 +58,39 @@ class Parse {
 
 	this(Parser parser, Parse toCopy, int id) {
 		this.parser = parser;
-		this.parseStack = new Deque!(int)(toCopy.parseStack);
-		this.tokenStack = new Deque!(Token)(toCopy.tokenStack);
+		if(toCopy.parseStack !is null) {
+			this.parseStack = new Deque!(int)(toCopy.parseStack);
+		} else {
+			warn("parseStack was null");
+		}
+		if(toCopy.tokenStack !is null) {
+			this.tokenStack = new Deque!(Token)(toCopy.tokenStack);
+		} else {
+			warn("tokenStack was null");
+		}
 		this.tokenBufIdx = toCopy.tokenBufIdx;
-		this.ast = new AST(toCopy.ast);
-		assert(this.ast == toCopy.ast);
+		if(toCopy.ast !is null) {
+			this.ast = new AST(toCopy.ast);
+		} else {
+			warn("ast was null");
+		}
+		if(this.ast !is null && toCopy.ast !is null) {
+			assert(this.ast == toCopy.ast);
+		}
 
 		this.tokenBufIdx = toCopy.tokenBufIdx;
 		this.input = toCopy.input;
 		this.id = id;
 
 		// trace
-		this.trace = new Deque!(Pair!(TableItem,int))(toCopy.trace);
+		if(toCopy.trace !is null) {
+			this.trace = new Deque!(Pair!(TableItem,int))(toCopy.trace);
+		}
 		this.dontPopToken = toCopy.dontPopToken;
-		this.symTab = new SymTab(toCopy.symTab);
-
-		assert(this.symTab == toCopy.symTab);
+		if(toCopy.symTab !is null) {
+			this.symTab = new SymTab(toCopy.symTab);
+			assert(this.symTab == toCopy.symTab);
+		}
 	}
 
 	public TableItem getLastAction() const {

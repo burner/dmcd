@@ -20,9 +20,15 @@ class SymTab {
 	}
 	
 	this(SymTab toCopy) {
-		this.symbols = new Deque!(SymTabItem)(toCopy.symbols);
-		this.childIdStore = toCopy.childIdStore;
-		this.symbolStack = new Stack!(size_t)(toCopy.symbolStack);
+		if(toCopy.symbols !is null) {
+			this.symbols = new Deque!(SymTabItem)(toCopy.symbols);
+		}
+		if(toCopy.childIdStore !is null) {
+			this.childIdStore = toCopy.childIdStore;
+		}
+		if(toCopy.symbolStack !is null) {
+			this.symbolStack = new Stack!(size_t)(toCopy.symbolStack);
+		}
 	}
 
 	/** Assing idx to the last pointer of the cp pointer.
