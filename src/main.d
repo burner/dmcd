@@ -84,13 +84,18 @@ int main(string[] args) {
 				l.run();
 			}
 		}
-		foreach(it; l.getTokenDeque()) {
+		/*foreach(it; l.getTokenDeque()) {
 			printf("%s,", it.toStringShort());
 		}
 		println();
+		*/
 	}
 
-	printfln("lexing and parsing took %f seconds", sw.stop());
+	double timeStop = sw.stop();
+	printfln("lexing and parsing took %f seconds %d", timeStop,
+			l.getTokenDeque().getSize());
+	printfln("that are %f tokens per second",
+			(1.0/timeStop)*l.getTokenDeque().getSize());
 	if(lexerror != 0) {
 		exit(lexerror);
 	}

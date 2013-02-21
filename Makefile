@@ -4,6 +4,7 @@ exceptions.o util.o symtabattributes.o symtabentry.o symtab.o location.o\
 
 GEN=src/parsetable.d src/lextable.d
 
+#DFLAGS=-unittest -I../libhurt -Isrc -m64 -gc -debug -version=DOnotSTOREtoken
 DFLAGS=-unittest -I../libhurt -Isrc -m64 -gc -debug
 #DFLAGS=-I../libhurt -Isrc -m64
 

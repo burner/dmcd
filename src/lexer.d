@@ -254,6 +254,12 @@ class Lexer : Thread {
 		if(this.kind) {
 			this.mutex.lock();
 
+			/*version(DOnotSTOREtoken) {
+				if(this.deque.getSize() >= 1024) {
+					this.deque.clean();
+				}
+			}*/
+
 			// save the token
 			//log("%d %s", token.getTyp(), token.getValue());
 			this.deque.pushBack(token);
